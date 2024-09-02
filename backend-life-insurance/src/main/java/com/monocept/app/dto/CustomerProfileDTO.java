@@ -14,7 +14,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CustomerProfileDTO {
-    private String customerName;
+    private String firstName;
+    private String lastName;
     private String customerAddress;
     private LocalDate customerDOB;
     private String customerEmailAddress;
@@ -23,4 +24,11 @@ public class CustomerProfileDTO {
     private long customerMobileNumber;
     private String customerNomineeName;
     private NomineeRelation nomineeRelation;
+    private String firstStreet;
+    private String lastStreet;
+    private String pinCode;
+    private String State;
+    private String City;
+
+
 }

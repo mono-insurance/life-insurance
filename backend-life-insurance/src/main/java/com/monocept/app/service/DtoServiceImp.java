@@ -2,10 +2,9 @@ package com.monocept.app.service;
 
 import com.monocept.app.dto.AdminResponseDTO;
 import com.monocept.app.dto.CredentialsDTO;
+import com.monocept.app.dto.CustomerProfileDTO;
 import com.monocept.app.dto.EmployeeDTO;
-import com.monocept.app.entity.Admin;
-import com.monocept.app.entity.Credentials;
-import com.monocept.app.entity.Employee;
+import com.monocept.app.entity.*;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,6 +30,21 @@ public class DtoServiceImp implements DtoService{
         employee.setActive(true);
         return employee;
     }
+
+    @Override
+    public Customer convertCustomerDtoToCustomer(CustomerProfileDTO customerProfileDTO) {
+        Customer customer=new Customer();
+        customer.setFirstName(customerProfileDTO.getFirstName());
+        customer.setLastName(customerProfileDTO.getLastName());
+        customer.setApproved(false);
+        customer.setGender(customerProfileDTO.getCustomerGender());
+        customer.setDateOfBirth(customerProfileDTO.getCustomerDOB());
+        customer.setNomineeName(customerProfileDTO.getCustomerNomineeName());
+        customer.setNomineeRelation(customerProfileDTO.getNomineeRelation());
+        customer.setActive(false);
+        return customer;
+    }
+
 
     private CredentialsDTO convertToCredentialsDTO(Credentials credentials) {
         return new CredentialsDTO(
