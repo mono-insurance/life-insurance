@@ -127,5 +127,4 @@ public class Policy {
     @JoinColumn(name = "type_id")
     @JsonBackReference
     private InsuranceType insuranceType;
-
 }
