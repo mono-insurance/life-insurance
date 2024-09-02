@@ -3,15 +3,16 @@ package com.monocept.app.dto;
 import com.monocept.app.utils.GenderType;
 import com.monocept.app.utils.NomineeRelation;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 public class CustomerProfileDTO {
     private String customerName;
     private String customerAddress;

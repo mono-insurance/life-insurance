@@ -27,22 +27,32 @@ public class AdminController {
 		super();
 		this.adminService = adminService;
 	}
+	
+	
 	@PostMapping("/add-employee")
 	ResponseEntity<Boolean> addNewEmployee(@RequestBody @Valid EmployeeDTO employeeDTO){
 		Boolean isAdded=adminService.addNewEmployee(employeeDTO);
 		return new ResponseEntity<>(isAdded,HttpStatus.OK);
 	}
 
+	
+	
 	@DeleteMapping("/employee/{eid}")
 	ResponseEntity<Boolean> deleteEmployee(@PathVariable("eid")Long employeeId){
 		Boolean isDeleted=adminService.deleteEmployee(employeeId);
 		return new ResponseEntity<>(isDeleted,HttpStatus.OK);
+		
+		
 	}
 	@PostMapping("/add-insurance-type")
 	ResponseEntity<Boolean> addNewInsuranceType(@RequestBody @Valid InsuranceTypeDTO insuranceTypeDTO){
 		Boolean isAdded=adminService.addNewInsuranceType(insuranceTypeDTO);
 		return new ResponseEntity<>(isAdded,HttpStatus.OK);
+		
+		
 	}
+	
+	
 	@PostMapping("/add-insurance")
 	ResponseEntity<Boolean> addNewInsurance(@RequestBody @Valid InsuranceDetailsDTO insuranceDetailsDTO){
 		Boolean isAdded=adminService.addNewInsurance(insuranceDetailsDTO);
@@ -54,6 +64,8 @@ public class AdminController {
 		Boolean isAdded=adminService.addNewInsuranceImages(insuranceId,file);
 		return new ResponseEntity<>(isAdded,HttpStatus.OK);
 	}
+	
+	
 	@DeleteMapping("/insurance-images/{iid}")
 	ResponseEntity<Boolean> deleteImage(@PathVariable("iid")int imageId){
 		Boolean isDeleted= adminService.deleteImage(imageId);

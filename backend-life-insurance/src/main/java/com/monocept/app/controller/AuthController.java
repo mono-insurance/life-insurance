@@ -26,6 +26,8 @@ public class AuthController {
         LoginResponseDTO loginResponseDTO=authService.loginUser(loginDTO);
         return new ResponseEntity<>(loginResponseDTO, HttpStatus.OK);
     }
+    
+    
     @PostMapping("/update-password")
     ResponseEntity<LoginResponseDTO> updatePassword(@RequestBody String password) {
         LoginResponseDTO loginResponseDTO = authService.updatePassword(password);
