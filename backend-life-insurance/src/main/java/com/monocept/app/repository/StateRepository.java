@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StateRepository extends JpaRepository<State,Long> {
+    Boolean existsByStateNameAndIsActiveTrue(String state);
+
+    State findByStateName(String state);
 }

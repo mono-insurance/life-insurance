@@ -9,4 +9,6 @@ public interface CustomerService {
     CustomerProfileResponseDTO updateCustomerProfile(CustomerProfileDTO customerProfileDTO);
 
     CustomerProfileResponseDTO getAllCustomers();
+
+    Long customerRegisterRequest(CustomerProfileDTO customerProfileDTO);
 }
