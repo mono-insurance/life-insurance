@@ -24,7 +24,7 @@ public class Settings {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "setting_id")
-    private int settingId;
+    private long settingId;
 
     @NotBlank
     @Column(name = "setting_key")

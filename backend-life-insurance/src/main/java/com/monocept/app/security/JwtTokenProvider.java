@@ -68,13 +68,13 @@ public class JwtTokenProvider {
                     .parse(token);
             return true;
         } catch (MalformedJwtException ex) {
-            throw new RoleAccessException(HttpStatus.BAD_REQUEST, "Invalid JWT token");
+            throw new RoleAccessException("Invalid JWT token");
         } catch (ExpiredJwtException ex) {
-            throw new RoleAccessException(HttpStatus.BAD_REQUEST, "Expired JWT token");
+            throw new RoleAccessException("Expired JWT token");
         } catch (UnsupportedJwtException ex) {
-            throw new RoleAccessException(HttpStatus.BAD_REQUEST, "Unsupported JWT token");
+            throw new RoleAccessException("Unsupported JWT token");
         } catch (IllegalArgumentException ex) {
-            throw new RoleAccessException(HttpStatus.BAD_REQUEST, "JWT claims string is empty.");
+            throw new RoleAccessException("JWT claims string is empty.");
         }
     }
 }
