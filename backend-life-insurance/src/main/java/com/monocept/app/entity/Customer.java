@@ -25,7 +25,7 @@ public class Customer {
 	
     @Id
     @Column(name ="customer_id")
-    private long customerId;
+    private Long customerId;
     
 	@NotBlank
 	@Column(name ="first_name")
@@ -43,11 +43,11 @@ public class Customer {
 	@Column(name ="gender")
 	private GenderType gender;
 	
+	@NotNull
 	@Column(name ="is_active")
-	private boolean isActive;
+	private Boolean isActive;
 
 	@NotBlank
-
 	@Column(name ="nominee_name")
 	private String nomineeName;
 	
@@ -56,9 +56,9 @@ public class Customer {
 	@Column(name ="nominee_relation")
 	private NomineeRelation nomineeRelation;
 	
-	
+	@NotNull
 	@Column(name ="is_approved")
-	private boolean isApproved;
+	private Boolean isApproved;
 	
 	@OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name="address_id")

@@ -1,6 +1,6 @@
 package com.monocept.app.controller;
 
-import com.monocept.app.dto.CustomerProfileDTO;
+import com.monocept.app.dto.CustomerDTO;
 import com.monocept.app.dto.LoginDTO;
 import com.monocept.app.dto.LoginResponseDTO;
 import com.monocept.app.service.AuthService;
@@ -17,14 +17,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("public/api/auth")
 public class AuthController {
+	
     @Autowired
-    private final AuthService authService;
-    private final CustomerService customerService;
+    private AuthService authService;
+    private CustomerService customerService;
+    
 
     public AuthController(AuthService authService, CustomerService customerService) {
         this.authService = authService;
         this.customerService = customerService;
     }
+    
+    
     @PostMapping("/login")
     ResponseEntity<LoginResponseDTO>login(@RequestBody @Valid LoginDTO loginDTO){
         LoginResponseDTO loginResponseDTO=authService.loginUser(loginDTO);
@@ -37,9 +41,9 @@ public class AuthController {
         LoginResponseDTO loginResponseDTO = authService.updatePassword(password);
         return new ResponseEntity<>(loginResponseDTO, HttpStatus.OK);
     }
-    @PostMapping("/customer-register")
-    ResponseEntity<Long> customerRegisterRequest(@RequestBody @Valid CustomerProfileDTO customerProfileDTO) {
-        Long id = customerService.customerRegisterRequest(customerProfileDTO);
+    @PostMapping("/register")
+    ResponseEntity<Long> customerRegisterRequest(@RequestBody @Valid CustomerDTO customerDTO) {
+        Long id = customerService.customerRegisterRequest(customerDTO);
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
 

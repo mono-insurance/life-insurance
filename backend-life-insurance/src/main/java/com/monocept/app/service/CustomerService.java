@@ -1,14 +1,13 @@
 package com.monocept.app.service;
 
-import com.monocept.app.dto.CustomerProfileDTO;
-import com.monocept.app.dto.CustomerProfileResponseDTO;
+import com.monocept.app.dto.CustomerDTO;
 
 public interface CustomerService {
-    CustomerProfileResponseDTO getCustomerProfile();
+//    CustomerProfileResponseDTO getCustomerProfile();
+//
+//    CustomerProfileResponseDTO updateCustomerProfile(CustomerDTO customerDTO);
+//
+//    CustomerProfileResponseDTO getAllCustomers();
 
-    CustomerProfileResponseDTO updateCustomerProfile(CustomerProfileDTO customerProfileDTO);
-
-    CustomerProfileResponseDTO getAllCustomers();
-
-    Long customerRegisterRequest(CustomerProfileDTO customerProfileDTO);
+    Long customerRegisterRequest(CustomerDTO customerDTO);
 }

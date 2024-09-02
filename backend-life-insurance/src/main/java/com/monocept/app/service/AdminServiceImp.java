@@ -34,7 +34,7 @@ public class AdminServiceImp implements AdminService{
     }
 
 	@Override
-	public AdminResponseDTO getAdminProfile() {
+	public AdminDTO getAdminProfile() {
 		String userRole= accessConService.getUserRole();
 		if(!Objects.equals(userRole, "ADMIN")){
 			throw new RoleAccessException("you don't have access");
@@ -62,13 +62,6 @@ public class AdminServiceImp implements AdminService{
 		return false;
 	}
 
-	@Override
-	public Boolean deleteEmployee(Long employeeId) {
-		Employee employee=employeeRepository.findById(employeeId).orElseThrow();
-		employee.setActive(false);
-		employeeRepository.save(employee);
-		return true;
-	}
 
 	@Override
 	public Boolean addNewInsuranceType(InsuranceTypeDTO insuranceTypeDTO) {
@@ -76,7 +69,7 @@ public class AdminServiceImp implements AdminService{
 	}
 
 	@Override
-	public Boolean addNewInsurance(InsuranceDetailsDTO insuranceDetailsDTO) {
+	public Boolean addNewInsurance(PolicyDTO policyDTO) {
 		return null;
 	}
 
@@ -92,6 +85,12 @@ public class AdminServiceImp implements AdminService{
 
 	@Override
 	public Boolean deleteInsurance(int insuranceId) {
+		return null;
+	}
+
+	@Override
+	public Boolean deleteEmployee(Long employeeId) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

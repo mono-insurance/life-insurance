@@ -31,7 +31,7 @@ public class Agent {
 	
     @Id
     @Column(name ="agent_id")
-    private long agentId;
+    private Long agentId;
     
 	@NotBlank
 	@Column(name ="first_name")
@@ -49,12 +49,13 @@ public class Agent {
 	@Column(name ="qualification")
 	private String qualification;
 	
+	@NotNull
 	@Column(name ="is_active")
-	private boolean isActive;
+	private Boolean isActive;
 	
-	
+	@NotNull
 	@Column(name ="is_approved")
-	private boolean isApproved;
+	private Boolean isApproved;
 	
 	
     @OneToOne

@@ -1,11 +1,6 @@
 package com.monocept.app.service;
 
-import com.monocept.app.dto.CustomerProfileDTO;
-import com.monocept.app.dto.CustomerProfileResponseDTO;
-import com.monocept.app.entity.Address;
-import com.monocept.app.entity.City;
-import com.monocept.app.entity.Customer;
-import com.monocept.app.entity.State;
+import com.monocept.app.dto.CustomerDTO;
 import com.monocept.app.repository.AddressRepository;
 import com.monocept.app.repository.CityRepository;
 import com.monocept.app.repository.CustomerRepository;
@@ -31,51 +26,57 @@ public class CustomerServiceImp implements CustomerService{
         this.addressRepository = addressRepository;
     }
 
-    @Override
-    public CustomerProfileResponseDTO getCustomerProfile() {
-        return null;
-    }
+	@Override
+	public Long customerRegisterRequest(CustomerDTO customerDTO) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-    @Override
-    public CustomerProfileResponseDTO updateCustomerProfile(CustomerProfileDTO customerProfileDTO) {
-        return null;
-    }
+//    @Override
+//    public CustomerProfileResponseDTO getCustomerProfile() {
+//        return null;
+//    }
+//
+//    @Override
+//    public CustomerProfileResponseDTO updateCustomerProfile(CustomerDTO customerDTO) {
+//        return null;
+//    }
+//
+//    @Override
+//    public CustomerProfileResponseDTO getAllCustomers() {
+//        return null;
+//    }
 
-    @Override
-    public CustomerProfileResponseDTO getAllCustomers() {
-        return null;
-    }
-
-    @Override
-    public Long customerRegisterRequest(CustomerProfileDTO customerProfileDTO) {
-        Customer customer=dtoService.convertCustomerDtoToCustomer(customerProfileDTO);
-        customer=customerRepository.save(customer);
-        Address address=checkAndGetAddress(customerProfileDTO);
-        customer.setAddress(address);
-        customer=customerRepository.save(customer);
-        return customer.getCustomerId();
-    }
-
-    private Address checkAndGetAddress(CustomerProfileDTO customerProfileDTO) {
-        Address address=new Address();
-        if(checkStateAndCity(customerProfileDTO)){
-            State state=stateRepository.findByStateName(customerProfileDTO.getState());
-            City city=cityRepository.findByCityName(customerProfileDTO.getCity());
-            address.setCity(city);
-            address.setState(state);
-            address.setPincode(customerProfileDTO.getPinCode());
-            address.setFirstStreet(customerProfileDTO.getFirstStreet());
-            address.setLastStreet(customerProfileDTO.getLastStreet());
-            return addressRepository.save(address);
-        }
-        return address;
-    }
-
-    private boolean checkStateAndCity(CustomerProfileDTO customerProfileDTO) {
-        String state=customerProfileDTO.getState();
-        Boolean isState= stateRepository.existsByStateNameAndIsActiveTrue(state);
-        String city=customerProfileDTO.getCity();
-        Boolean isCity= cityRepository.existsByCityNameAndIsActiveTrue(state);
-        return isCity && isState;
-    }
+//    @Override
+//    public Long customerRegisterRequest(CustomerDTO customerDTO) {
+//        Customer customer=dtoService.convertCustomerDtoToCustomer(customerDTO);
+//        customer=customerRepository.save(customer);
+//        Address address=checkAndGetAddress(customerDTO);
+//        customer.setAddress(address);
+//        customer=customerRepository.save(customer);
+//        return customer.getCustomerId();
+//    }
+//
+//    private Address checkAndGetAddress(CustomerDTO customerDTO) {
+//        Address address=new Address();
+//        if(checkStateAndCity(customerDTO)){
+//            State state=stateRepository.findByStateName(customerDTO.getState());
+//            City city=cityRepository.findByCityName(customerDTO.getCity());
+//            address.setCity(city);
+//            address.setState(state);
+//            address.setPincode(customerDTO.getPinCode());
+//            address.setFirstStreet(customerDTO.getFirstStreet());
+//            address.setLastStreet(customerDTO.getLastStreet());
+//            return addressRepository.save(address);
+//        }
+//        return address;
+//    }
+//
+//    private boolean checkStateAndCity(CustomerDTO customerDTO) {
+//        String state=customerDTO.getState();
+//        Boolean isState= stateRepository.existsByStateNameAndIsActiveTrue(state);
+//        String city=customerDTO.getCity();
+//        Boolean isCity= cityRepository.existsByCityNameAndIsActiveTrue(state);
+//        return isCity && isState;
+//    }
 }

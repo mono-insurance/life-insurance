@@ -23,7 +23,7 @@ public class Admin {
 	
 	@Id
     @Column(name ="admin_id")
-    private long adminId;
+    private Long adminId;
     
 	@NotBlank
 	@Column(name ="first_name")

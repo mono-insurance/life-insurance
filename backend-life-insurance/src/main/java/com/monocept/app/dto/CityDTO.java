@@ -1,6 +1,7 @@
 package com.monocept.app.dto;
 
-import java.util.Set;
+import com.monocept.app.entity.City;
+import com.monocept.app.entity.State;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,15 +12,16 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InsuranceTypeDTO {
+public class CityDTO {
 	
-	private Long typeId;
+	private Long cityId;
 
-    @NotBlank(message = "Insurance category is mandatory")
-    private String insuranceCategory;
+    @NotBlank(message = "City name is mandatory")
+    private String cityName;
 
-    @NotNull(message = "Active status is mandatory")
+    @NotNull(message = "Active Status is mandatory")
     private Boolean isActive;
 
-    private Set<PolicyDTO> policies;
+    private String state;
+
 }

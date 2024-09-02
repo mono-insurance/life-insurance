@@ -31,16 +31,15 @@ public class Transactions {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name ="transaction_id")
-	private long transactionId;
+	private Long transactionId;
 	
 	
     @NotNull
     @Positive
     @Column(name = "amount")
-    private double amount;
+    private Double amount;
     
-    
-	@NotNull
+
 	@Column(name = "transaction_date")
 	private LocalDate transactionDate = LocalDate.now();
 	

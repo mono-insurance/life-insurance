@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,7 +25,7 @@ public class Query {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name ="query_id")
-	private long queryId;
+	private Long queryId;
 	
 	
 	@NotBlank
@@ -35,8 +36,9 @@ public class Query {
 	@Column(name = "response")
 	private String response;
 	
+	@NotNull
 	@Column(name ="is_resolved")
-	private boolean isResolved;
+	private Boolean isResolved;
 	
 	
 	@ManyToOne(fetch = FetchType.LAZY)

@@ -35,7 +35,7 @@ public class PolicyAccount {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "policy_account_id")
-    private long policyAccountId;
+    private Long policyAccountId;
 	
 	
 	@Column(name = "created_date")
@@ -45,36 +45,37 @@ public class PolicyAccount {
 	@Column(name = "matured_date")
 	private LocalDate maturedDate;
 	
+	@NotNull
 	@Column(name ="is_active")
-	private boolean isActive;
+	private Boolean isActive;
 	
 	
     @NotNull
     @Positive
     @Column(name = "policy_term")
-    private int policyTerm;
+    private Integer policyTerm;
     
     @NotNull
     @Positive
     @Column(name = "payment_time_in_months")
-    private int paymentTimeInMonths;
+    private Integer paymentTimeInMonths;
     
     @NotNull
     @Positive
     @Column(name = "timely_balance")
-    private double timelyBalance;
+    private Double timelyBalance;
     
     
     @NotNull
     @Positive
     @Column(name = "total_amount_paid")
-    private double totalAmountPaid;
+    private Double totalAmountPaid;
     
     
     @NotNull
     @Positive
     @Column(name = "claim_amount")
-    private double claimAmount;
+    private Double claimAmount;
     
     
     @ManyToOne(fetch = FetchType.LAZY)

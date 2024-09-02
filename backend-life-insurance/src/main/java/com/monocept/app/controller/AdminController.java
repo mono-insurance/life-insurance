@@ -2,13 +2,13 @@ package com.monocept.app.controller;
 
 
 import com.monocept.app.dto.EmployeeDTO;
-import com.monocept.app.dto.InsuranceDetailsDTO;
+import com.monocept.app.dto.PolicyDTO;
 import com.monocept.app.dto.InsuranceTypeDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.monocept.app.dto.AdminResponseDTO;
+import com.monocept.app.dto.AdminDTO;
 import com.monocept.app.service.AdminService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,8 +54,8 @@ public class AdminController {
 	
 	
 	@PostMapping("/add-insurance")
-	ResponseEntity<Boolean> addNewInsurance(@RequestBody @Valid InsuranceDetailsDTO insuranceDetailsDTO){
-		Boolean isAdded=adminService.addNewInsurance(insuranceDetailsDTO);
+	ResponseEntity<Boolean> addNewInsurance(@RequestBody @Valid PolicyDTO policyDTO){
+		Boolean isAdded=adminService.addNewInsurance(policyDTO);
 		return new ResponseEntity<>(isAdded,HttpStatus.OK);
 	}
 
@@ -79,11 +79,11 @@ public class AdminController {
 	
 	@Operation(summary = "By Admin: Get the admin profile")
 	@GetMapping
-	public ResponseEntity<AdminResponseDTO> getAdminProfile(){
+	public ResponseEntity<AdminDTO> getAdminProfile(){
 		
-		AdminResponseDTO admin = adminService.getAdminProfile();
+		AdminDTO admin = adminService.getAdminProfile();
 		
-		return new ResponseEntity<AdminResponseDTO>(admin, HttpStatus.OK);
+		return new ResponseEntity<AdminDTO>(admin, HttpStatus.OK);
 
 	}
 

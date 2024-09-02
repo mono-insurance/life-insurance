@@ -11,15 +11,16 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InsuranceTypeDTO {
+public class StateDTO {
 	
-	private Long typeId;
+	private Long stateId;
 
-    @NotBlank(message = "Insurance category is mandatory")
-    private String insuranceCategory;
+    @NotBlank(message = "State name is mandatory")
+    private String stateName;
 
     @NotNull(message = "Active status is mandatory")
     private Boolean isActive;
 
-    private Set<PolicyDTO> policies;
+    private Set<CityDTO> cities;
+
 }

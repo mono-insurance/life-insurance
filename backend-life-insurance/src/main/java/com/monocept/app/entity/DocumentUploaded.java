@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,8 +28,9 @@ public class DocumentUploaded {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "document_id")
-    private long documentId;
+    private Long documentId;
 
+	@NotBlank(message = "Blob Id is mandatory")
     @Column(name = "blob_id")
     private String blobId;
 
@@ -36,21 +38,20 @@ public class DocumentUploaded {
     @Column(name = "name")
     private String name;
 
+    @NotNull
     @Column(name = "is_approved")
-    private boolean isApproved;
+    private Boolean isApproved;
 
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id")
     @JsonBackReference
     private Customer customer;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "agent_id")
     @JsonBackReference
     private Agent agent;
     
-    
     @OneToOne(mappedBy = "documentUploaded")
     private Policy policy;
+    
 }

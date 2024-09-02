@@ -1,7 +1,6 @@
 package com.monocept.app.controller;
 
-import com.monocept.app.dto.CustomerProfileDTO;
-import com.monocept.app.dto.CustomerProfileResponseDTO;
+import com.monocept.app.dto.CustomerDTO;
 import com.monocept.app.service.CustomerService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,24 +17,24 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
-    @GetMapping("/profile")
-    ResponseEntity<CustomerProfileResponseDTO> getCustomerProfile() {
-        CustomerProfileResponseDTO customerProfileResponseDTO = customerService.getCustomerProfile();
-        return new ResponseEntity<>(customerProfileResponseDTO, HttpStatus.OK);
-    }
-    @GetMapping("/all-customers")
-    ResponseEntity<CustomerProfileResponseDTO> getAllCustomers() {
-        CustomerProfileResponseDTO customerProfileResponseDTO = customerService.getAllCustomers();
-        return new ResponseEntity<>(customerProfileResponseDTO, HttpStatus.OK);
-    }
-
-
-
-    @PostMapping("/profile")
-    ResponseEntity<CustomerProfileResponseDTO> updateCustomerProfile(@RequestBody @Valid CustomerProfileDTO customerProfileDTO) {
-        CustomerProfileResponseDTO customerProfileResponseDTO = customerService.updateCustomerProfile(customerProfileDTO);
-        return new ResponseEntity<>(customerProfileResponseDTO, HttpStatus.OK);
-    }
+//    @GetMapping("/profile")
+//    ResponseEntity<CustomerProfileResponseDTO> getCustomerProfile() {
+//        CustomerProfileResponseDTO customerProfileResponseDTO = customerService.getCustomerProfile();
+//        return new ResponseEntity<>(customerProfileResponseDTO, HttpStatus.OK);
+//    }
+//    @GetMapping("/all-customers")
+//    ResponseEntity<CustomerProfileResponseDTO> getAllCustomers() {
+//        CustomerProfileResponseDTO customerProfileResponseDTO = customerService.getAllCustomers();
+//        return new ResponseEntity<>(customerProfileResponseDTO, HttpStatus.OK);
+//    }
+//
+//
+//
+//    @PostMapping("/profile")
+//    ResponseEntity<CustomerProfileResponseDTO> updateCustomerProfile(@RequestBody @Valid CustomerDTO customerDTO) {
+//        CustomerProfileResponseDTO customerProfileResponseDTO = customerService.updateCustomerProfile(customerDTO);
+//        return new ResponseEntity<>(customerProfileResponseDTO, HttpStatus.OK);
+//    }
 
 
 

@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdminResponseDTO {
+public class AdminDTO {
 	
-	private long adminId;
+	private Long adminId;
 	
 	@NotBlank(message = "First name is Mandatory")
 	private String firstName;
@@ -19,5 +19,5 @@ public class AdminResponseDTO {
 	private String lastName;
 
 	@NotBlank(message = "Credentials are Mandatory")
-    private CredentialsDTO credentials;
+    private CredentialsResponseDTO credentials;
 }

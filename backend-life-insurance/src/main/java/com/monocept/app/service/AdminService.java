@@ -1,14 +1,14 @@
 package com.monocept.app.service;
 
-import com.monocept.app.dto.AdminResponseDTO;
+import com.monocept.app.dto.AdminDTO;
 import com.monocept.app.dto.EmployeeDTO;
-import com.monocept.app.dto.InsuranceDetailsDTO;
+import com.monocept.app.dto.PolicyDTO;
 import com.monocept.app.dto.InsuranceTypeDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface AdminService {
 
-	AdminResponseDTO getAdminProfile();
+	AdminDTO getAdminProfile();
 
 
     Boolean addNewEmployee(EmployeeDTO employeeDTO);
@@ -17,7 +17,7 @@ public interface AdminService {
 
     Boolean addNewInsuranceType(InsuranceTypeDTO insuranceTypeDTO);
 
-    Boolean addNewInsurance(InsuranceDetailsDTO insuranceDetailsDTO);
+    Boolean addNewInsurance(PolicyDTO policyDTO);
 
     Boolean addNewInsuranceImages(int insuranceId, MultipartFile file);
 

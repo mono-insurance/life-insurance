@@ -17,17 +17,22 @@ public class AccessConServiceImp implements AccessConService{
         return authentication.getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_CUSTOMER"));
     }
+    
     private boolean isAgent(Authentication authentication) {
         return authentication.getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_AGENT"));
     }
+    
     private boolean isAdmin(Authentication authentication) {
         return authentication.getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
-    } private boolean isEmployee(Authentication authentication) {
+    } 
+    
+    private boolean isEmployee(Authentication authentication) {
         return authentication.getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_EMPLOYEE"));
     }
+    
     @Override
     public String getUserRole() {
         String userLoginId = SecurityContextHolder.getContext().getAuthentication().getName();

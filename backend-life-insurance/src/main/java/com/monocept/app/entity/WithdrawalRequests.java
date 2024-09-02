@@ -24,7 +24,7 @@ public class WithdrawalRequests {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name ="withdrawal_requests_id")
-	private long withdrawalRequestsId;
+	private Long withdrawalRequestsId;
 	
 	
 	@NotBlank
@@ -35,17 +35,18 @@ public class WithdrawalRequests {
     @NotNull
     @Positive
     @Column(name = "amount")
-    private double amount;
+    private Double amount;
     
     @NotNull
     @Column(name ="user_id")
-    private long userId;
+    private Long userId;
     
+    @NotNull
 	@Column(name ="is_withdraw")
-	private boolean isWithdraw;
+	private Boolean isWithdraw;
 	
-	
+    @NotNull
 	@Column(name ="is_approved")
-	private boolean isApproved;
+	private Boolean isApproved;
 
 }

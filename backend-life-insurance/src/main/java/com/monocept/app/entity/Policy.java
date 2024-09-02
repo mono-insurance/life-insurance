@@ -38,7 +38,7 @@ public class Policy {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name ="policy_id")
-	private long policyId;
+	private Long policyId;
 	
 	@NotBlank
 	@Column(name ="policy_name")
@@ -52,17 +52,17 @@ public class Policy {
     @Min(0)
     @Max(100)
     @Column(name = "commission_new_registration")
-    private float commissionNewRegistration;
+    private Float commissionNewRegistration;
     
     @NotNull
     @Min(0)
     @Max(100)
     @Column(name = "commission_installment")
-    private float commissionInstallment;
+    private Float commissionInstallment;
     
-    
+    @NotNull
 	@Column(name ="is_active")
-	private boolean isActive;
+	private Boolean isActive;
 	
 	
 	@NotBlank
@@ -73,21 +73,21 @@ public class Policy {
 	@NotNull
     @Positive
     @Column(name = "min_policy_term")
-    private int minPolicyTerm;
+    private Integer minPolicyTerm;
     
     @NotNull
     @Positive
     @Column(name = "max_policy_term")
-    private int maxPolicyTerm;
+    private Integer maxPolicyTerm;
     
     
 	@NotNull
     @Column(name = "min_age")
-    private int minAge;
+    private Integer minAge;
 
     @NotNull
     @Column(name = "max_age")
-    private int maxAge;
+    private Integer maxAge;
     
     
 	@NotBlank
@@ -97,18 +97,18 @@ public class Policy {
 	@NotNull
     @Positive
     @Column(name = "min_investment_amount")
-    private long minInvestmentAmount;
+    private Long minInvestmentAmount;
     
     @NotNull
     @Positive
     @Column(name = "max_investment_amount")
-    private long maxInvestmentAmount;
+    private Long maxInvestmentAmount;
     
     @NotNull
     @Min(0)
     @Max(100)
     @Column(name = "profit_ratio")
-    private float profitRatio;
+    private Float profitRatio;
 	
 	
 	@Column(name = "created_date")
@@ -121,6 +121,7 @@ public class Policy {
             inverseJoinColumns = @JoinColumn(name = "document_id")
     )
     private Set<DocumentNeeded> documentsNeeded;
+	
 	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "type_id")

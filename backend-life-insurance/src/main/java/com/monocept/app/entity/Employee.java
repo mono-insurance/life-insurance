@@ -11,16 +11,13 @@ import lombok.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 @Table(name = "employee")
 public class Employee {
 
 
 	@Id
-//	@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name ="employee_id")
-    private long employeeId;
+    private Long employeeId;
     
 	@NotBlank
 	@Column(name ="first_name")
@@ -38,13 +35,14 @@ public class Employee {
 	@Column(name ="qualification")
 	private String qualification;
 	
+	@NotNull
 	@Column(name ="is_active")
-	private boolean isActive;
+	private Boolean isActive;
 	
 	
-//	@OneToOne
-//    @MapsId
-//    @JoinColumn(name="employee_id")
-//    private Credentials credentials;
+	@OneToOne
+    @MapsId
+    @JoinColumn(name="employee_id")
+    private Credentials credentials;
 
 }

@@ -24,7 +24,7 @@ public class Settings {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "setting_id")
-    private long settingId;
+    private Long settingId;
 
     @NotBlank
     @Column(name = "setting_key")
@@ -34,6 +34,6 @@ public class Settings {
     @Min(0)
     @Max(100)
     @Column(name = "setting_value")
-    private float settingValue;
+    private Float settingValue;
 
 }

@@ -1,6 +1,6 @@
 package com.monocept.app.entity;
 
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,7 +26,7 @@ public class Credentials {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name ="id")
-	private long id;
+	private Long id;
 	
 	@NotBlank
 	@Column(name ="username",nullable = false, unique = true)
@@ -48,5 +48,18 @@ public class Credentials {
 	@OneToOne
     @JoinColumn(name = "role_id", referencedColumnName="id")
 	private Role role;
+	
+	@OneToOne(mappedBy = "credentials", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Customer customer;
+	
+	@OneToOne(mappedBy = "credentials", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Admin admin;
+	
+	@OneToOne(mappedBy = "credentials", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Agent agent;
+	
+	@OneToOne(mappedBy = "credentials", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Employee employee;
+	
 	
 }
