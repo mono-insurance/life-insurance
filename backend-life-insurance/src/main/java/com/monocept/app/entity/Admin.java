@@ -1,7 +1,5 @@
 package com.monocept.app.entity;
 
-import java.time.LocalDate;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
