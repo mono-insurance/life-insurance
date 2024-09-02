@@ -1,5 +1,6 @@
 package com.monocept.app.service;
 
+import com.monocept.app.dto.CustomUserDetails;
 import com.monocept.app.dto.LoginDTO;
 import com.monocept.app.dto.LoginResponseDTO;
 import com.monocept.app.entity.Credentials;
@@ -56,16 +57,16 @@ public class AuthServiceImp implements AuthService{
 
     @Override
     public LoginResponseDTO updatePassword(String password) {
-        String usernameFromToken=accessConService.checkUserAccess();
-        System.out.println("username in update password"+usernameFromToken);
-        Credentials credential=authRepository.findByUsername(usernameFromToken);
+        CustomUserDetails userDetails=accessConService.checkUserAccess();
+        System.out.println("username in update password"+userDetails.getUsername());
+        Credentials credential=authRepository.findByUsername(userDetails.getUsername());
 
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String encodedPassword = passwordEncoder.encode(password);
 
         credential.setPassword(encodedPassword);
         authRepository.save(credential);
-        LoginDTO loginDTO=new LoginDTO(String.valueOf(usernameFromToken),password);
+        LoginDTO loginDTO=new LoginDTO(String.valueOf(userDetails.getUsername()),password);
         return loginUser(loginDTO);
     }
 }

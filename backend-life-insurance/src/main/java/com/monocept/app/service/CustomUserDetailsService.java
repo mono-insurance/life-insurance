@@ -1,5 +1,6 @@
 package com.monocept.app.service;
 
+import com.monocept.app.dto.CustomUserDetails;
 import com.monocept.app.entity.Credentials;
 import com.monocept.app.repository.AuthRepository;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,8 +28,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         Credentials user =  authRepository.findByUsername(username);
         String roleName=user.getRole().getName();
         Set<GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(roleName));
-        return new org.springframework.security.core.userdetails.User(user.getUsername(),
-                user.getPassword(),
-                authorities);
+        
+        
+        return new CustomUserDetails(user.getId(), user.getUsername(), user.getPassword(), authorities);
+
     }
 }
