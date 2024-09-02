@@ -7,4 +7,6 @@ public interface CustomerService {
     CustomerProfileResponseDTO getCustomerProfile();
 
     CustomerProfileResponseDTO updateCustomerProfile(CustomerProfileDTO customerProfileDTO);
+
+    CustomerProfileResponseDTO getAllCustomers();
 }

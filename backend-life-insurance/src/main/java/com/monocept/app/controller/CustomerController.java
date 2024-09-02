@@ -23,6 +23,11 @@ public class CustomerController {
         CustomerProfileResponseDTO customerProfileResponseDTO = customerService.getCustomerProfile();
         return new ResponseEntity<>(customerProfileResponseDTO, HttpStatus.OK);
     }
+    @GetMapping("/all-customers")
+    ResponseEntity<CustomerProfileResponseDTO> getAllCustomers() {
+        CustomerProfileResponseDTO customerProfileResponseDTO = customerService.getAllCustomers();
+        return new ResponseEntity<>(customerProfileResponseDTO, HttpStatus.OK);
+    }
 
 
 

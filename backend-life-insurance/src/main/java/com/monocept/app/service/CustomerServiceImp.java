@@ -23,4 +23,9 @@ public class CustomerServiceImp implements CustomerService{
     public CustomerProfileResponseDTO updateCustomerProfile(CustomerProfileDTO customerProfileDTO) {
         return null;
     }
+
+    @Override
+    public CustomerProfileResponseDTO getAllCustomers() {
+        return null;
+    }
 }

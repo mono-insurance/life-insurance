@@ -2,28 +2,23 @@ package com.monocept.app.entity;
 
 import java.time.LocalDate;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Table(name = "employee")
 public class Employee {
-	
 
-    @Id
+
+	@Id
+//	@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name ="employee_id")
     private long employeeId;
     
@@ -47,9 +42,9 @@ public class Employee {
 	private boolean isActive;
 	
 	
-	@OneToOne
-    @MapsId
-    @JoinColumn(name="employee_id")
-    private Credentials credentials;
+//	@OneToOne
+//    @MapsId
+//    @JoinColumn(name="employee_id")
+//    private Credentials credentials;
 
 }
