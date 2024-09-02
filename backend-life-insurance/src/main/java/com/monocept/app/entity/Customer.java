@@ -5,15 +5,9 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import com.monocept.app.utils.GenderType;
+import com.monocept.app.utils.NomineeRelation;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -45,19 +39,22 @@ public class Customer {
 	private LocalDate dateOfBirth;
 	
 	@NotBlank
+	@Enumerated(EnumType.STRING)
 	@Column(name ="gender")
-	private String gender;
+	private GenderType gender;
 	
 	@Column(name ="is_active")
 	private boolean isActive;
 
 	@NotBlank
+
 	@Column(name ="nominee_name")
 	private String nomineeName;
 	
 	@NotBlank
+	@Enumerated(EnumType.STRING)
 	@Column(name ="nominee_relation")
-	private String nomineeRelation;
+	private NomineeRelation nomineeRelation;
 	
 	
 	@Column(name ="is_approved")
