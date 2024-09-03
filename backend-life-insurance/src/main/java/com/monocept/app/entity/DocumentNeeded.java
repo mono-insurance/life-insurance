@@ -1,7 +1,6 @@
 package com.monocept.app.entity;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -36,7 +35,7 @@ public class DocumentNeeded {
 	
 	
 	@ManyToMany(mappedBy = "documentsNeeded",cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH })
-    private Set<Policy> policies = new HashSet<>();
+    private List<Policy> policies;
 	
 	
 

@@ -23,14 +23,17 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        System.out.println("username is "+username);
-        Credentials user =  authRepository.findByUsername(username);
-        String roleName=user.getRole().getName();
+    public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
+
+        Credentials credentials =  authRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+                .orElseThrow(() ->
+                new UsernameNotFoundException("User not found with username or email: "+ usernameOrEmail));
+        
+        String roleName=credentials.getRole().getName();
         Set<GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(roleName));
         
         
-        return new CustomUserDetails(user.getId(), user.getUsername(), user.getPassword(), authorities);
+        return new CustomUserDetails(credentials.getId(), credentials.getUsername(), credentials.getPassword(), authorities);
 
     }
 }

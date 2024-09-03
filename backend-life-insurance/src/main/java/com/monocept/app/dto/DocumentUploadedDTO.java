@@ -24,4 +24,9 @@ public class DocumentUploadedDTO {
     @NotNull(message = "Approved Status is mandatory")
     private Boolean isApproved;
 
+    private Long customerId;
+    
+    private Long agentId;
+    
+    private Long policyId;
 }

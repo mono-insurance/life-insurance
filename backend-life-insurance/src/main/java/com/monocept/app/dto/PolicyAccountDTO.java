@@ -2,6 +2,7 @@ package com.monocept.app.dto;
 
 import java.time.LocalDate;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -34,6 +35,10 @@ public class PolicyAccountDTO {
     @NotNull(message = "Timely balance is mandatory")
     @Positive(message = "Timely balance must be positive")
     private Double timelyBalance;
+    
+    @NotNull(message = "Investment Amount is mandatory")
+    @Positive(message = "Investment Amount must be positive")
+    private Double investmentAmount;
 
     @NotNull(message = "Total amount paid is mandatory")
     @Positive(message = "Total amount paid must be positive")

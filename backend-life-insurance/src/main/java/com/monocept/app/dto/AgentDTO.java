@@ -1,7 +1,7 @@
 package com.monocept.app.dto;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -39,8 +39,8 @@ public class AgentDTO {
     @NotNull(message = "Address is mandatory")
     private AddressDTO address;
     
-    private Set<DocumentUploadedDTO> documents;
+    private List<DocumentUploadedDTO> documents;
     
-    private Set<PolicyAccountDTO> policyAccounts;
+    private List<PolicyAccountDTO> policyAccounts;
 
 }

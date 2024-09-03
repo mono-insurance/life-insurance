@@ -1,5 +1,7 @@
 package com.monocept.app.entity;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -41,8 +43,9 @@ public class State {
 	@Column(name ="is_active")
 	private Boolean isActive;
 	
-	@OneToMany(cascade = {CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH},mappedBy = "state")
+	@OneToMany(cascade = CascadeType.ALL ,mappedBy = "state", orphanRemoval = true)
 	@JsonManagedReference
-    private Set<City> cities;
+    private List<City> cities;
+
 
 }

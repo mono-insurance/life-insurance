@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -63,11 +64,11 @@ public class CustomerDTO {
     private CredentialsResponseDTO credentials;
 
     
-    private Set<DocumentUploadedDTO> documents;
+    private List<DocumentUploadedDTO> documents;
 
     
-    private Set<PolicyAccountDTO> policyAccounts;
+    private List<PolicyAccountDTO> policyAccounts;
 
     
-    private Set<QueryDTO> queries;
+    private List<QueryDTO> queries;
 }

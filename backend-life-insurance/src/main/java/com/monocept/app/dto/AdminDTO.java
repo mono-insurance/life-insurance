@@ -1,6 +1,7 @@
 package com.monocept.app.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,6 @@ public class AdminDTO {
 	
 	private String lastName;
 
-	@NotBlank(message = "Credentials are Mandatory")
+	@NotNull(message = "Credentials are Mandatory")
     private CredentialsResponseDTO credentials;
 }
