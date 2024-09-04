@@ -9,4 +9,12 @@ public interface AuthService {
     LoginResponseDTO updatePassword(String password);
 
 	JWTAuthResponse login(LoginDTO loginDto);
+
+	boolean isAdmin(String token, int userId);
+
+	boolean isEmployee(String token, int userId);
+
+	boolean isAgent(String token, int userId);
+
+	boolean isCustomer(String token, int userId);
 }

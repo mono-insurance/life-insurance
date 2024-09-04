@@ -48,6 +48,11 @@ public class Transactions {
 	@Column(name = "status")
 	private String status;
 	
+	
+	@Column(name = "agent_commission")
+	private Double agentCommission;
+	
+	
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "policy_account_id", nullable = false)
     @JsonBackReference

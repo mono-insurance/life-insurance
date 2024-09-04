@@ -53,6 +53,8 @@ public class StorageServiceImp implements StorageService{
         policyRepository.save(policy);
         return true;
     }
+    
+    
     @Override
     public byte[] downloadFile(String fileName) {
         S3Object s3Object = s3Client.getObject(bucketName, fileName);
@@ -65,6 +67,7 @@ public class StorageServiceImp implements StorageService{
         }
         return null;
     }
+    
 
     private String uploadDocToS3(File fileObj, String fileName) {
         String newFileName = System.currentTimeMillis() + "_" + fileName;
@@ -73,6 +76,7 @@ public class StorageServiceImp implements StorageService{
         return newFileName;
     }
 
+    
     private File convertMultiPartFileToFile(MultipartFile file) {
         File convertedFile = new File(file.getOriginalFilename());
         try (FileOutputStream fos = new FileOutputStream(convertedFile)) {

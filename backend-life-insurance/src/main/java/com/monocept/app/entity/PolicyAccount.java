@@ -82,6 +82,9 @@ public class PolicyAccount {
     @Column(name = "claim_amount")
     private Double claimAmount;
     
+    @Column(name = "agent_commission")
+    private Double agentCommissionForRegistration;
+    
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "policy_id", nullable = false)
@@ -102,7 +105,6 @@ public class PolicyAccount {
     
     @OneToMany(mappedBy = "policyAccount", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
-
     private List<Transactions> transactions;
 
     @OneToMany(mappedBy = "policyAccount", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
