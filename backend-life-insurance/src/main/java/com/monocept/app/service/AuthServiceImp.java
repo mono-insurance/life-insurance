@@ -9,6 +9,13 @@ import com.monocept.app.repository.AuthRepository;
 import com.monocept.app.repository.CustomerRepository;
 import com.monocept.app.security.JwtTokenProvider;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+
+import java.security.Key;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,6 +47,10 @@ public class AuthServiceImp implements AuthService{
         this.accessConService = accessConService;
     }
 
+    @Value("${app.jwt-secret}")
+    private String secretKey;
+    
+    
     @Override
     public JWTAuthResponse login(LoginDTO loginDto) {
     	try {
@@ -93,4 +104,76 @@ public class AuthServiceImp implements AuthService{
 //        return loginUser(loginDTO);
     	return null;
     }
+
+	@Override
+	public boolean isAdmin(String token, int userId) {
+		Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
+		
+		Claims claims = Jwts.parserBuilder()
+	            .setSigningKey(key)
+	            .build()
+                .parseClaimsJws(token)
+                .getBody();
+		Integer tokenUserId = claims.get("id", Integer.class);
+	    if (tokenUserId == null || !tokenUserId.equals(userId)) {
+	        return false;
+	    }
+	    String role = claims.get("role", String.class);
+	    System.out.println("Role: " + role);
+	    return "ROLE_ADMIN".equals(role);
+	}
+
+	@Override
+	public boolean isEmployee(String token, int userId) {
+		Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
+		
+		Claims claims = Jwts.parserBuilder()
+	            .setSigningKey(key)
+	            .build()
+                .parseClaimsJws(token)
+                .getBody();
+		Integer tokenUserId = claims.get("id", Integer.class);
+	    if (tokenUserId == null || !tokenUserId.equals(userId)) {
+	        return false;
+	    }
+	    String role = claims.get("role", String.class);
+	    System.out.println("Role: " + role);
+	    return "ROLE_EMPLOYEE".equals(role);
+	}
+
+	@Override
+	public boolean isAgent(String token, int userId) {
+		Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
+		
+		Claims claims = Jwts.parserBuilder()
+	            .setSigningKey(key)
+	            .build()
+                .parseClaimsJws(token)
+                .getBody();
+		Integer tokenUserId = claims.get("id", Integer.class);
+	    if (tokenUserId == null || !tokenUserId.equals(userId)) {
+	        return false;
+	    }
+	    String role = claims.get("role", String.class);
+	    System.out.println("Role: " + role);
+	    return "ROLE_AGENT".equals(role);
+	}
+
+	@Override
+	public boolean isCustomer(String token, int userId) {
+		Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
+		
+		Claims claims = Jwts.parserBuilder()
+	            .setSigningKey(key)
+	            .build()
+                .parseClaimsJws(token)
+                .getBody();
+		Integer tokenUserId = claims.get("id", Integer.class);
+	    if (tokenUserId == null || !tokenUserId.equals(userId)) {
+	        return false;
+	    }
+	    String role = claims.get("role", String.class);
+	    System.out.println("Role: " + role);
+	    return "ROLE_CUSTOMER".equals(role);
+	}
 }

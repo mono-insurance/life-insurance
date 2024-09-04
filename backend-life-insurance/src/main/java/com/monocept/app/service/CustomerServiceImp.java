@@ -352,10 +352,25 @@ public class CustomerServiceImp implements CustomerService{
 	    policyAccount.setCustomer(customer);
 	    
 	    if (policyAccountDTO.getAgentId() != null) {
-	    	
 	        Agent agent = agentRepository.findById(policyAccountDTO.getAgentId())
 	                .orElseThrow(() -> new UserException("Agent not found"));
-	        policyAccount.setAgent(agent);
+
+	        if (customer.getAddress().getState().getStateId().equals(agent.getAddress().getState().getStateId())) {
+	            policyAccount.setAgent(agent);
+	            
+//	            boolean isFirstPolicy = customer.getPolicyAccounts().isEmpty();
+//
+//	            Double commission = isFirstPolicy ? 
+//	                (policy.getCommissionNewRegistration() / 100) * policyAccountDTO.getInvestmentAmount() :
+//	                (policy.getCommissionInstallment() / 100) * policyAccountDTO.getInvestmentAmount();
+	            
+
+	            Double commission =  ((policy.getCommissionNewRegistration() / 100) * policyAccountDTO.getInvestmentAmount());
+	            
+	            policyAccount.setAgentCommissionForRegistration(commission);
+	        } else {
+	            policyAccount.setAgent(null);
+	        }
 	    }
 	    
 	    PolicyAccount savedPolicyAccount = policyAccountRepository.save(policyAccount);
@@ -365,7 +380,11 @@ public class CustomerServiceImp implements CustomerService{
 	    if (policyAccountDTO.getAgentId() != null) {
 	        Agent agent = agentRepository.findById(policyAccountDTO.getAgentId())
 	                .orElseThrow(() -> new UserException("Agent not found"));
-	        agent.getPolicyAccounts().add(savedPolicyAccount);
+	        if (customer.getAddress().getState().getStateId().equals(agent.getAddress().getState().getStateId())) {
+	            policyAccount.setAgent(agent);
+	        } else {
+	            policyAccount.setAgent(null);
+	        }
 	    }
 	    
 	    return dtoService.convertPolicyAccountToPolicyAccountDTO(savedPolicyAccount);
