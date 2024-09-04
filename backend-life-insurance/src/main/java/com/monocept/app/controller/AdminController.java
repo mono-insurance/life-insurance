@@ -2,6 +2,8 @@ package com.monocept.app.controller;
 
 import java.time.LocalDate;
 
+
+import com.monocept.app.service.StorageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,11 +30,13 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/admin")
 public class AdminController {
 	
-	private AdminService adminService;
+	private final AdminService adminService;
+	private final StorageService storageService;
 	
-	public AdminController(AdminService adminService) {
+	public AdminController(AdminService adminService, StorageService storageService) {
 		super();
 		this.adminService = adminService;
+		this.storageService = storageService;
 	}
 	
 	
@@ -117,6 +121,12 @@ public class AdminController {
 		
 		return new ResponseEntity<StateDTO>(state, HttpStatus.OK);
 
+	@PostMapping("/insurance/{iid}/upload-insurance-images")
+	ResponseEntity<Boolean> addNewInsuranceImages(
+			@PathVariable("iid")Long insuranceId,
+			@RequestParam("file") MultipartFile file){
+		Boolean isAdded=storageService.addNewInsuranceImages(insuranceId,file);
+		return new ResponseEntity<>(isAdded,HttpStatus.OK);
 	}
 	
 	

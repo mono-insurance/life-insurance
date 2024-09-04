@@ -1,5 +1,6 @@
 package com.monocept.app.service;
 
+import com.monocept.app.exception.RoleAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -42,5 +43,19 @@ public class AccessConServiceImp implements AccessConService{
         if(isEmployee(authentication)) return "EMPLOYEE";
         if(isAdmin(authentication)) return "ADMIN";
         return "NOTALLOWED";
+    }
+
+    @Override
+    public void checkSameUserOrRole(Long agentId) {
+
+    }
+
+    @Override
+    public void checkEmployeeServiceAccess(Long employeeId) {
+        CustomUserDetails customUserDetails=checkUserAccess();
+        String userRole= getUserRole();
+        if(!(userRole.equals("ROLE_ADMIN") || customUserDetails.getId().equals(employeeId))){
+            throw new RoleAccessException("you don't have access");
+        }
     }
 }

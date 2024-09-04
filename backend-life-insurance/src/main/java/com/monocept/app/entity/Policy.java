@@ -7,21 +7,8 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -46,10 +33,6 @@ public class Policy {
 	@NotBlank
 	@Column(name ="policy_name")
 	private String policyName;
-	
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "document_id")
-    private DocumentUploaded documentUploaded;
 	
 	@NotNull
     @Min(0)
@@ -127,7 +110,12 @@ public class Policy {
             joinColumns = @JoinColumn(name = "policy_id"),
             inverseJoinColumns = @JoinColumn(name = "document_id")
     )
-    private List<DocumentNeeded> documentsNeeded;
+    private Set<DocumentNeeded> documentsNeeded;
+
+    @OneToMany(mappedBy = "policy", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private Set<Image> images;
+
 	
 	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})

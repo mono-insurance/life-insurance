@@ -1,5 +1,6 @@
 package com.monocept.app.entity;
 
+import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -46,11 +47,12 @@ public class Credentials {
 	@Pattern(regexp = "^\\+91[-\\s]?\\d{5}[-\\s]?\\d{5}$", message = "Mobile number must be in the format +91XXXXXXXXXX")
     @Column(name = "mobile_number", nullable = false, unique = true)
     private String mobileNumber;
+
 	
 	@ManyToOne
     @JoinColumn(name = "role_id", referencedColumnName="id")
 	private Role role;
-	
+
 	@OneToOne(mappedBy = "credentials", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Customer customer;
 	
@@ -62,6 +64,8 @@ public class Credentials {
 	
 	@OneToOne(mappedBy = "credentials", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Employee employee;
-	
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Role role;
 	
 }

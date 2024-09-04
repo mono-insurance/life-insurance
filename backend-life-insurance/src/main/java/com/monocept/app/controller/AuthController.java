@@ -4,6 +4,8 @@ import com.monocept.app.dto.CustomerDTO;
 import com.monocept.app.dto.JWTAuthResponse;
 import com.monocept.app.dto.LoginDTO;
 import com.monocept.app.dto.LoginResponseDTO;
+import com.monocept.app.dto.RegistrationDTO;
+import com.monocept.app.service.AgentService;
 import com.monocept.app.service.AuthService;
 import com.monocept.app.service.CustomerService;
 
@@ -25,11 +27,13 @@ public class AuthController {
     @Autowired
     private AuthService authService;
     private CustomerService customerService;
+    private final AgentService agentService;
     
 
-    public AuthController(AuthService authService, CustomerService customerService) {
+    public AuthController(AuthService authService, CustomerService customerService, AgentService agentService) {
         this.authService = authService;
         this.customerService = customerService;
+        this.agentService = agentService;
     }
     
     
@@ -52,16 +56,15 @@ public class AuthController {
         return new ResponseEntity<>(responseBody, headers, HttpStatus.OK);
     }
     
-    
-    @PostMapping("/update-password")
-    ResponseEntity<LoginResponseDTO> updatePassword(@RequestBody String password) {
-        LoginResponseDTO loginResponseDTO = authService.updatePassword(password);
-        return new ResponseEntity<>(loginResponseDTO, HttpStatus.OK);
-    }
-//    @PostMapping("/register")
-//    ResponseEntity<Long> customerRegisterRequest(@RequestBody @Valid CustomerDTO customerDTO) {
-//        Long id = customerService.customerRegisterRequest(customerDTO);
-//        return new ResponseEntity<>(id, HttpStatus.OK);
-//    }
 
+    @PostMapping("/customer-register")
+    ResponseEntity<Long> customerRegisterRequest(@RequestBody @Valid RegistrationDTO registrationDTO) {
+        Long id = customerService.customerRegisterRequest(registrationDTO);
+        return new ResponseEntity<>(id, HttpStatus.OK);
+    }
+    @PostMapping("/agent-register")
+    ResponseEntity<Long> agentRegisterRequest(@RequestBody @Valid RegistrationDTO registrationDTO) {
+        Long id = agentService.agentRegisterRequest(registrationDTO);
+        return new ResponseEntity<>(id, HttpStatus.OK);
+    }
 }

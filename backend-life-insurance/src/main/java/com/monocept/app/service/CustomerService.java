@@ -35,4 +35,5 @@ public interface CustomerService {
 	PolicyAccountDTO createPolicyAccount(PolicyAccountDTO policyAccountDTO);
 
 	Double paymentToPay(Long id, LocalDate paymentToBeMade);
+
 }

@@ -2,6 +2,11 @@ package com.monocept.app.controller;
 
 import com.monocept.app.dto.AddressDTO;
 import com.monocept.app.dto.CustomerDTO;
+
+import com.monocept.app.dto.LoginResponseDTO;
+import com.monocept.app.service.CustomerService;
+import com.monocept.app.utils.PagedResponse;
+
 import com.monocept.app.dto.FeedbackDTO;
 import com.monocept.app.dto.PolicyAccountDTO;
 import com.monocept.app.dto.QueryDTO;
@@ -60,6 +65,8 @@ public class CustomerController {
 	}
 	
 
+
+
 	@Operation(summary = "By Customer: Add Query")
 	@PostMapping("/query")
 	public ResponseEntity<QueryDTO> addQuery(@RequestBody @Valid QueryDTO queryDTO){
@@ -67,7 +74,6 @@ public class CustomerController {
 		QueryDTO query = customerService.addQuery(queryDTO);
 		
 		return new ResponseEntity<QueryDTO>(query, HttpStatus.OK);
-
 	}
 	
 	

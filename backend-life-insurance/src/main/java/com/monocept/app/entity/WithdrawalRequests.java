@@ -1,12 +1,8 @@
 package com.monocept.app.entity;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -38,10 +34,6 @@ public class WithdrawalRequests {
     private Double amount;
     
     @NotNull
-    @Column(name ="user_id")
-    private Long userId;
-    
-    @NotNull
 	@Column(name ="is_withdraw")
 	private Boolean isWithdraw;
 	
@@ -49,4 +41,13 @@ public class WithdrawalRequests {
 	@Column(name ="is_approved")
 	private Boolean isApproved;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "policy_account_id", nullable = false)
+    @JsonBackReference
+    private PolicyAccount policyAccount;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "agent_id", nullable = false)
+    @JsonBackReference
+    private Agent agent;
 }

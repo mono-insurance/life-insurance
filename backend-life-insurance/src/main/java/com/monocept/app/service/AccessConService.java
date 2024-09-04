@@ -6,4 +6,8 @@ public interface AccessConService {
     CustomUserDetails checkUserAccess();
 
     String getUserRole();
+
+    void checkSameUserOrRole(Long agentId);
+
+    void checkEmployeeServiceAccess(Long employeeId);
 }

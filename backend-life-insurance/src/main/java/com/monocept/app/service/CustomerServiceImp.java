@@ -1,6 +1,7 @@
 package com.monocept.app.service;
 
 import com.monocept.app.dto.AddressDTO;
+
 import com.monocept.app.dto.CustomUserDetails;
 import com.monocept.app.dto.CustomerDTO;
 import com.monocept.app.dto.FeedbackDTO;
@@ -31,6 +32,7 @@ import com.monocept.app.repository.PolicyRepository;
 import com.monocept.app.repository.QueryRepository;
 import com.monocept.app.repository.SettingsRepository;
 import com.monocept.app.repository.StateRepository;
+
 import com.monocept.app.repository.TransactionsRepository;
 import com.monocept.app.utils.GlobalSettings;
 import com.monocept.app.utils.PagedResponse;
@@ -43,6 +45,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -126,6 +129,67 @@ public class CustomerServiceImp implements CustomerService{
 
 
 	@Override
+	public Long 
+  (@Valid RegistrationDTO registrationDTO) {
+        Customer customer=dtoService.convertCustomerDtoToCustomer(registrationDTO);
+        customer=customerRepository.save(customer);
+        Address address=checkAndGetAddress(registrationDTO.getAddress());
+        customer.setAddress(address);
+        customer=customerRepository.save(customer);
+        return customer.getCustomerId();
+	}
+
+    @Override
+    public CustomerDTO getCustomerProfile() {
+        return null;
+    }
+
+    @Override
+    public PagedResponse<CustomerDTO> getAllCustomers() {
+        return null;
+    }
+
+    @Override
+    public CustomerDTO updateCustomerProfile(CustomerDTO customerDTO) {
+        return null;
+    }
+//    @Override
+//    public CustomerProfileResponseDTO getCustomerProfile() {
+//        return null;
+//    }
+//
+//    @Override
+//    public CustomerProfileResponseDTO updateCustomerProfile(CustomerDTO customerDTO) {
+//        return null;
+//    }
+//
+//    @Override
+//    public CustomerProfileResponseDTO getAllCustomers() {
+//        return null;
+//    }
+
+    private Address checkAndGetAddress(AddressDTO addressDTO) {
+        Address address=new Address();
+        if(checkStateAndCity(addressDTO)){
+            State state=stateRepository.findByStateName(addressDTO.getState());
+            City city=cityRepository.findByCityName(addressDTO.getCity());
+            address.setCity(city);
+            address.setState(state);
+            address.setPincode(addressDTO.getPincode());
+            address.setFirstStreet(addressDTO.getFirstStreet());
+            address.setLastStreet(addressDTO.getLastStreet());
+            return addressRepository.save(address);
+        }
+        return address;
+    }
+    private boolean checkStateAndCity(AddressDTO addressDTO) {
+        String state=addressDTO.getState();
+        Boolean isState= stateRepository.existsByStateNameAndIsActiveTrue(state);
+        String city=addressDTO.getCity();
+        Boolean isCity= cityRepository.existsByCityNameAndIsActiveTrue(state);
+        return isCity && isState;
+    }
+  
 	public AddressDTO updateCustomerAddress(AddressDTO addressDTO) {
 		CustomUserDetails userDetails = accessConService.checkUserAccess();
 

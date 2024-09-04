@@ -58,7 +58,6 @@ public class SecurityConfig {
 //                                .requestMatchers(HttpMethod.PATCH, "/private/api/customer/**").hasRole("CUSTOMER")
                                 .requestMatchers("/public/api/auth/**").permitAll()
                                 .requestMatchers("/swagger-ui/**","/v3/api-docs").permitAll()
-//                                .anyRequest().authenticated()
                                 .anyRequest().permitAll()
 
                 ).exceptionHandling( exception -> exception
