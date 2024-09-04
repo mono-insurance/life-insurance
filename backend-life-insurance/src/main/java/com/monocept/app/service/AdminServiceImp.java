@@ -2,28 +2,9 @@ package com.monocept.app.service;
 
 import com.monocept.app.dto.*;
 
-import com.monocept.app.entity.Credentials;
-import com.monocept.app.entity.Customer;
-import com.monocept.app.entity.Employee;
-import com.monocept.app.entity.Feedback;
-import com.monocept.app.entity.InsuranceType;
-import com.monocept.app.entity.Policy;
-import com.monocept.app.entity.PolicyAccount;
-import com.monocept.app.entity.Query;
-import com.monocept.app.entity.Settings;
-import com.monocept.app.entity.State;
-import com.monocept.app.entity.Transactions;
+import com.monocept.app.entity.*;
 import com.monocept.app.exception.UserException;
-import com.monocept.app.repository.EmployeeRepository;
-import com.monocept.app.repository.FeedbackRepository;
-import com.monocept.app.repository.InsuranceTypeRepository;
-import com.monocept.app.repository.PolicyAccountRepository;
-import com.monocept.app.repository.PolicyRepository;
-import com.monocept.app.repository.QueryRepository;
-import com.monocept.app.repository.RoleRepository;
-import com.monocept.app.repository.SettingsRepository;
-import com.monocept.app.repository.StateRepository;
-import com.monocept.app.repository.TransactionsRepository;
+import com.monocept.app.repository.*;
 import com.monocept.app.utils.GlobalSettings;
 import com.monocept.app.utils.PagedResponse;
 
@@ -35,15 +16,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.monocept.app.entity.Admin;
-import com.monocept.app.entity.City;
-import com.monocept.app.repository.AdminRepository;
-import com.monocept.app.repository.AuthRepository;
-import com.monocept.app.repository.CityRepository;
-import com.monocept.app.repository.CustomerRepository;
-
 import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -57,6 +32,7 @@ public class AdminServiceImp implements AdminService{
 	private PasswordEncoder passwordEncoder;
 	private RoleRepository roleRepository;
 	private AuthRepository authRepository;
+	private final AgentRepository agentRepository;
 	
 	@Autowired
     private StateRepository stateRepository;
@@ -92,7 +68,7 @@ public class AdminServiceImp implements AdminService{
 	@Autowired
     public AdminServiceImp(AccessConService accessConService, AdminRepository adminRepository,
 						   DtoService dtoService, EmployeeRepository employeeRepository, RoleRepository roleRepository,
-						   AuthRepository authRepository, PasswordEncoder passwordEncoder) {
+						   AuthRepository authRepository, PasswordEncoder passwordEncoder, AgentRepository agentRepository) {
 		this.employeeRepository = employeeRepository;
 		this.accessConService = accessConService;
         this.adminRepository = adminRepository;
@@ -100,7 +76,8 @@ public class AdminServiceImp implements AdminService{
         this.roleRepository = roleRepository;
         this.authRepository = authRepository;
         this.passwordEncoder = passwordEncoder;
-    }
+		this.agentRepository = agentRepository;
+	}
 
 	@Override
 	public AdminDTO getAdminProfile() {
@@ -157,25 +134,26 @@ public class AdminServiceImp implements AdminService{
 		return employeeDTO;
 	}
 
-	@Override
-	public EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO) {
-		Employee existingEmployee = employeeRepository.findById(id)
-	            .orElseThrow(() -> new UserException("Employee not found"));
-		
-		existingEmployee.setFirstName(employeeDTO.getFirstName());
-	    existingEmployee.setLastName(employeeDTO.getLastName());
-	    existingEmployee.setDateOfBirth(employeeDTO.getDateOfBirth());
-	    existingEmployee.setQualification(employeeDTO.getQualification());
-	    existingEmployee.setIsActive(employeeDTO.getIsActive());
-	    existingEmployee.getCredentials().setUsername(employeeDTO.getCredentials().getUsername());
-	    existingEmployee.getCredentials().setEmail(employeeDTO.getCredentials().getEmail());
-	    existingEmployee.getCredentials().setMobileNumber(employeeDTO.getCredentials().getMobileNumber());
-		
-		Employee updatedEmployee = employeeRepository.save(existingEmployee);
-		
-		
-		return dtoService.converEmployeeToEmployeeResponseDTO(updatedEmployee);
-	}
+//
+//	@Override
+//	public EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO) {
+//		Employee existingEmployee = employeeRepository.findById(id)
+//	            .orElseThrow(() -> new UserException("Employee not found"));
+//
+//		existingEmployee.setFirstName(employeeDTO.getFirstName());
+//	    existingEmployee.setLastName(employeeDTO.getLastName());
+//	    existingEmployee.setDateOfBirth(employeeDTO.getDateOfBirth());
+//	    existingEmployee.setQualification(employeeDTO.getQualification());
+//	    existingEmployee.setIsActive(employeeDTO.getIsActive());
+//	    existingEmployee.getCredentials().setUsername(employeeDTO.getCredentials().getUsername());
+//	    existingEmployee.getCredentials().setEmail(employeeDTO.getCredentials().getEmail());
+//	    existingEmployee.getCredentials().setMobileNumber(employeeDTO.getCredentials().getMobileNumber());
+//
+//		Employee updatedEmployee = employeeRepository.save(existingEmployee);
+//
+//
+//		return dtoService.converEmployeeToEmployeeResponseDTO(updatedEmployee);
+//	}
 
 
 	@Override
@@ -201,17 +179,7 @@ public class AdminServiceImp implements AdminService{
 	    return dtoService.convertStateToStateDTO(savedState);
 	}
 
-	@Override
-	public StateDTO updateState(Long id, StateDTO stateDTO) {
-		State existingState = stateRepository.findById(id)
-	            .orElseThrow(() -> new UserException("State not found"));
 
-        existingState.setStateName(stateDTO.getStateName());
-        existingState.setIsActive(stateDTO.getIsActive());
-
-        State updatedState = stateRepository.save(existingState);
-        return dtoService.convertStateToStateDTO(updatedState);
-	}
 
 	@Override
 	public void deleteState(Long id) {
@@ -243,38 +211,6 @@ public class AdminServiceImp implements AdminService{
 	    return dtoService.convertCityToDTO(savedCity);
 	}
 
-	@Override
-	public CityDTO updateCity(Long id, CityDTO cityDTO) {
-		City existingCity = cityRepository.findById(id)
-	            .orElseThrow(() -> new UserException("City not found"));
-
-
-	    State state = stateRepository.findById(cityDTO.getStateId())
-	            .orElseThrow(() -> new UserException("State not found"));
-	    
-	    if (!state.getIsActive()) {
-	        throw new UserException("Cannot update city in an inactive state");
-	    }
-	    
-	    if (!existingCity.getIsActive()) {
-	        throw new UserException("Cannot update city as it is inactive");
-	    }
-	    
-	    
-	    existingCity.setCityName(cityDTO.getCityName());
-	    existingCity.setIsActive(cityDTO.getIsActive());
-	    if (!existingCity.getState().equals(state)) {
-	    	
-	        existingCity.getState().getCities().remove(existingCity);
-	        
-	        existingCity.setState(state);
-	        state.getCities().add(existingCity);
-	    }
-	    
-	    City updatedCity = cityRepository.save(existingCity);
-
-	    return dtoService.convertCityToDTO(updatedCity);
-	}
 
 	@Override
 	public void deleteCity(Long id) {
@@ -423,45 +359,8 @@ public class AdminServiceImp implements AdminService{
 		
 	}
 
-	@Override
-	public PagedResponse<StateDTO> getAllStates(int page, int size, String sortBy, String direction) {
-		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-		
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
-		
-		Page<State> pages = stateRepository.findAll(pageable);
-		List<State> allStates = pages.getContent();
-//		System.out.println(allStates);
-		List<StateDTO> allStatesDTO = dtoService.convertStateListEntityToDTO(allStates);
-		
-		return new PagedResponse<StateDTO>(allStatesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
-	}
 
-	@Override
-	public PagedResponse<CityDTO> getAllCities(int page, int size, String sortBy, String direction) {
-		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-		
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
-		
-		Page<City> pages = cityRepository.findAll(pageable);
-		List<City> allCities = pages.getContent();
-		List<CityDTO> allCitiesDTO = dtoService.convertCityListEntityToDTO(allCities);
-		
-		return new PagedResponse<CityDTO>(allCitiesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
-	}
 
-	@Override
-	public PagedResponse<InsuranceTypeDTO> getAllInsuranceTypes(int page, int size, String sortBy, String direction) {
-		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-		
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
-		
-		Page<InsuranceType> pages = insuranceTypeRepository.findAll(pageable);
-		List<InsuranceType> allInsuranceTypes = pages.getContent();
-		List<InsuranceTypeDTO> allInsuranceTypesDTO = dtoService.convertInsuranceTypeListEntityToDTO(allInsuranceTypes);
-		
-		return new PagedResponse<InsuranceTypeDTO>(allInsuranceTypesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
-	}
 
 	@Override
 	public PagedResponse<PolicyDTO> getAllPolicies(int page, int size, String sortBy, String direction) {
@@ -546,75 +445,12 @@ public class AdminServiceImp implements AdminService{
 		return new PagedResponse<EmployeeDTO>(allEmployeesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
 	}
 
-	@Override
-	public PagedResponse<QueryDTO> getAllQueries(int page, int size, String sortBy, String direction) {
-		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-		
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
-		
-		Page<Query> pages = queryRepository.findAll(pageable);
-		List<Query> allQueries = pages.getContent();
-		List<QueryDTO> allQueriesDTO = dtoService.convertQueryListEntityToDTO(allQueries);
-		
-		return new PagedResponse<QueryDTO>(allQueriesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
-	}
+
 	
-	@Override
-	public PagedResponse<QueryDTO> getAllResolvedQueries(int page, int size, String sortBy, String direction) {
-		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-		
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
-		
-		Page<Query> pages = queryRepository.findByIsResolvedTrue(pageable);
-		List<Query> allQueries = pages.getContent();
-		List<QueryDTO> allQueriesDTO = dtoService.convertQueryListEntityToDTO(allQueries);
-		
-		return new PagedResponse<QueryDTO>(allQueriesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
-	}
-
-	@Override
-	public PagedResponse<QueryDTO> getAllUnresolvedQueries(int page, int size, String sortBy, String direction) {
-		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-		
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
-		
-		Page<Query> pages = queryRepository.findByIsResolvedFalse(pageable);
-		List<Query> allQueries = pages.getContent();
-		List<QueryDTO> allQueriesDTO = dtoService.convertQueryListEntityToDTO(allQueries);
-		
-		return new PagedResponse<QueryDTO>(allQueriesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
-	}
-
-	@Override
-	public PagedResponse<QueryDTO> getAllQueriesByCustomer(int page, int size, String sortBy, String direction, Long id) {
-		Customer customer = customerRepository.findById(id).orElseThrow(()-> new UserException("Customer not found"));
-		
-		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-		
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
-		
-		Page<Query> pages = queryRepository.findByCustomer(customer, pageable);
-		List<Query> allQueries = pages.getContent();
-		List<QueryDTO> allQueriesDTO = dtoService.convertQueryListEntityToDTO(allQueries);
-		
-		return new PagedResponse<QueryDTO>(allQueriesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
-	}
 
 
 
-	@Override
-	public QueryDTO updateQuery(Long id, QueryDTO queryDTO) {
-		Query existingQuery = queryRepository.findById(id)
-	            .orElseThrow(() -> new UserException("Query not found"));
 
-	    existingQuery.setQuestion(queryDTO.getQuestion());
-	    existingQuery.setResponse(queryDTO.getResponse());
-	    existingQuery.setIsResolved(queryDTO.getIsResolved());
-	    
-	    Query updatedQuery = queryRepository.save(existingQuery);
-
-	    return dtoService.convertQueryToQueryDTO(updatedQuery);
-	}
 
 	@Override
 	public void deleteQuery(Long id) {
@@ -626,98 +462,17 @@ public class AdminServiceImp implements AdminService{
 	}
 
 	@Override
-	public PagedResponse<TransactionsDTO> getAllTransactions(int page, int size, String sortBy, String direction) {
-		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-	    Pageable pageable = PageRequest.of(page, size, sort);
-	    
-	    Page<Transactions> pages = transactionsRepository.findAll(pageable);
-	    List<Transactions> allTransactions = pages.getContent();
-	    List<TransactionsDTO> allTransactionsDTO = dtoService.convertTransactionListEntityToDTO(allTransactions);
-	    
-	    return new PagedResponse<TransactionsDTO>(allTransactionsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	public Boolean approveAgent(Long agentId) {
+		Agent agent=findAgentById(agentId);
+		agent.setIsApproved(true);
+		agentRepository.save(agent);
+//		send email to agent
+		return true;
 	}
 
-	@Override
-	public PagedResponse<TransactionsDTO> getAllTransactionsByPolicyAccount(int page, int size, String sortBy,
-			String direction, Long id) {
-		PolicyAccount policyAccount = policyAccountRepository.findById(id)
-		        .orElseThrow(() -> new UserException("Policy account not found"));
-		    
-	    Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-	    Pageable pageable = PageRequest.of(page, size, sort);
-	    
-	    Page<Transactions> pages = transactionsRepository.findByPolicyAccount(policyAccount, pageable);
-	    List<Transactions> allTransactions = pages.getContent();
-	    List<TransactionsDTO> allTransactionsDTO = dtoService.convertTransactionListEntityToDTO(allTransactions);
-	    
-	    return new PagedResponse<TransactionsDTO>(allTransactionsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	private Agent findAgentById(Long agentId) {
+		return agentRepository.findById(agentId).orElseThrow(()->new NoSuchElementException("agent not found"));
 	}
-
-	@Override
-	public PagedResponse<TransactionsDTO> getAllTransactionsByCustomer(int page, int size, String sortBy,
-			String direction, Long id) {
-		Customer customer = customerRepository.findById(id)
-		        .orElseThrow(() -> new UserException("Customer not found"));
-
-	    Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-	    Pageable pageable = PageRequest.of(page, size, sort);
-
-	    List<PolicyAccount> policyAccounts = policyAccountRepository.findByCustomer(customer);
-
-	    Page<Transactions> pages = transactionsRepository.findByPolicyAccountIn(policyAccounts, pageable);
-	    List<Transactions> allTransactions = pages.getContent();
-	    List<TransactionsDTO> allTransactionsDTO = dtoService.convertTransactionListEntityToDTO(allTransactions);
-
-	    return new PagedResponse<TransactionsDTO>(allTransactionsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
-	}
-
-	@Override
-	public PagedResponse<TransactionsDTO> getAllTransactionsBetweenDate(int page, int size, String sortBy,
-			String direction, LocalDate startDate, LocalDate endDate) {
-		
-		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-		
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
-		
-		Page<Transactions> pages = transactionsRepository.findByTransactionDateBetween(startDate, endDate, pageable);
-		List<Transactions> allTransactions = pages.getContent();
-		List<TransactionsDTO> allTransactionsDTO = dtoService.convertTransactionListEntityToDTO(allTransactions);
-		
-		return new PagedResponse<TransactionsDTO>(allTransactionsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
-	}
-
-	@Override
-	public PagedResponse<FeedbackDTO> getAllFeedbacks(int page, int size, String sortBy, String direction) {
-		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-		
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
-		
-		Page<Feedback> pages = feedbackRepository.findAll(pageable);
-		List<Feedback> allFeedbacks = pages.getContent();
-		List<FeedbackDTO> allFeedbacksDTO = dtoService.convertFeedbackListEntityToDTO(allFeedbacks);
-		
-		return new PagedResponse<FeedbackDTO>(allFeedbacksDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
-	}
-
-	@Override
-	public PagedResponse<FeedbackDTO> getAllFeedbacksByCustomer(int page, int size, String sortBy, String direction,
-			Long id) {
-		Customer customer = customerRepository.findById(id).orElseThrow(()-> new UserException("Customer not found"));
-		
-		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-		
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
-		
-		Page<Feedback> pages = feedbackRepository.findByCustomer(customer, pageable);
-		List<Feedback> allFeedbacks = pages.getContent();
-		List<FeedbackDTO> allFeedbacksDTO = dtoService.convertFeedbackListEntityToDTO(allFeedbacks);
-		
-		return new PagedResponse<FeedbackDTO>(allFeedbacksDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
-	}
-
-
-
-
 
 
 }

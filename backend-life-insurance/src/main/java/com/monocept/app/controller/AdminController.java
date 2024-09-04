@@ -80,15 +80,15 @@ public class AdminController {
 
     }
 
-    @Operation(summary = "By Admin: Update Employee")
-    @PutMapping("/employee/{id}")
-    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable(name = "id") Long id, @RequestBody @Valid EmployeeDTO employeeDTO) {
-
-        EmployeeDTO employee = adminService.updateEmployee(id, employeeDTO);
-
-        return new ResponseEntity<EmployeeDTO>(employee, HttpStatus.OK);
-
-    }
+//    @Operation(summary = "By Admin: Update Employee")
+//    @PutMapping("/employee/{id}")
+//    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable(name = "id") Long id, @RequestBody @Valid EmployeeDTO employeeDTO) {
+//
+//        EmployeeDTO employee = adminService.updateEmployee(id, employeeDTO);
+//
+//        return new ResponseEntity<EmployeeDTO>(employee, HttpStatus.OK);
+//
+//    }
 
 
     @Operation(summary = "By Admin: Delete Employee")
@@ -112,14 +112,7 @@ public class AdminController {
 
     }
 
-    @Operation(summary = "By Admin: update State")
-    @PutMapping("/state/{id}")
-    public ResponseEntity<StateDTO> updateState(@PathVariable(name = "id") Long id, @RequestBody @Valid StateDTO stateDTO) {
 
-        StateDTO state = adminService.updateState(id, stateDTO);
-
-        return new ResponseEntity<StateDTO>(state, HttpStatus.OK);
-    }
 
     @PostMapping("/insurance/{iid}/upload-insurance-images")
     ResponseEntity<Boolean> addNewInsuranceImages(
@@ -150,15 +143,7 @@ public class AdminController {
 
     }
 
-    @Operation(summary = "By Admin: update City")
-    @PutMapping("/city/{id}")
-    public ResponseEntity<CityDTO> updateCity(@PathVariable(name = "id") Long id, @RequestBody @Valid CityDTO cityDTO) {
 
-        CityDTO city = adminService.updateCity(id, cityDTO);
-
-        return new ResponseEntity<CityDTO>(city, HttpStatus.OK);
-
-    }
 
 
     @Operation(summary = "By Admin: Delete City")
@@ -236,49 +221,7 @@ public class AdminController {
     }
 
 
-    @Operation(summary = "By Admin: Get All States")
-    @GetMapping("/state")
-    public ResponseEntity<PagedResponse<StateDTO>> getAllStates(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "stateId") String sortBy,
-            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
-        PagedResponse<StateDTO> states = adminService.getAllStates(page, size, sortBy, direction);
-
-        return new ResponseEntity<PagedResponse<StateDTO>>(states, HttpStatus.OK);
-
-    }
-
-
-    @Operation(summary = "By Admin: Get All Cities")
-    @GetMapping("/city")
-    public ResponseEntity<PagedResponse<CityDTO>> getAllCities(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "cityId") String sortBy,
-            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
-
-        PagedResponse<CityDTO> cities = adminService.getAllCities(page, size, sortBy, direction);
-
-        return new ResponseEntity<PagedResponse<CityDTO>>(cities, HttpStatus.OK);
-
-    }
-
-
-    @Operation(summary = "By Admin: Get All Insurance types")
-    @GetMapping("/insurance/type")
-    public ResponseEntity<PagedResponse<InsuranceTypeDTO>> getAllInsuranceTypes(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "typeId") String sortBy,
-            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
-
-        PagedResponse<InsuranceTypeDTO> insuranceCategories = adminService.getAllInsuranceTypes(page, size, sortBy, direction);
-
-        return new ResponseEntity<PagedResponse<InsuranceTypeDTO>>(insuranceCategories, HttpStatus.OK);
-
-    }
 
     @Operation(summary = "By Admin: Get All Policies")
     @GetMapping("/policy")
@@ -357,75 +300,9 @@ public class AdminController {
     }
 
 
-    @Operation(summary = "By Admin: Get All queries")
-    @GetMapping("/queries")
-    public ResponseEntity<PagedResponse<QueryDTO>> getAllQueries(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "queryId") String sortBy,
-            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
-
-        PagedResponse<QueryDTO> queries = adminService.getAllQueries(page, size, sortBy, direction);
-
-        return new ResponseEntity<PagedResponse<QueryDTO>>(queries, HttpStatus.OK);
-
-    }
 
 
-    @Operation(summary = "By Admin: Get All Resolved queries")
-    @GetMapping("/queries/resolved")
-    public ResponseEntity<PagedResponse<QueryDTO>> getAllResolvedQueries(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "queryId") String sortBy,
-            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
-        PagedResponse<QueryDTO> queries = adminService.getAllResolvedQueries(page, size, sortBy, direction);
-
-        return new ResponseEntity<PagedResponse<QueryDTO>>(queries, HttpStatus.OK);
-
-    }
-
-    @Operation(summary = "By Admin: Get All Unresolved queries")
-    @GetMapping("/queries/unresolved")
-    public ResponseEntity<PagedResponse<QueryDTO>> getAllUnresolvedQueries(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "queryId") String sortBy,
-            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
-
-        PagedResponse<QueryDTO> queries = adminService.getAllUnresolvedQueries(page, size, sortBy, direction);
-
-        return new ResponseEntity<PagedResponse<QueryDTO>>(queries, HttpStatus.OK);
-
-    }
-
-
-    @Operation(summary = "By Admin: Get All Queries By Customer")
-    @GetMapping("/queries/customer/{id}")
-    public ResponseEntity<PagedResponse<QueryDTO>> getAllQueriesByCustomer(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "queryId") String sortBy,
-            @RequestParam(name = "direction", defaultValue = "asc") String direction,
-            @PathVariable(name = "id") Long id) {
-
-        PagedResponse<QueryDTO> queries = adminService.getAllQueriesByCustomer(page, size, sortBy, direction, id);
-
-        return new ResponseEntity<PagedResponse<QueryDTO>>(queries, HttpStatus.OK);
-
-    }
-
-
-    @Operation(summary = "By Admin: Update Query")
-    @PutMapping("/query/{id}")
-    public ResponseEntity<QueryDTO> updateQuery(@PathVariable(name = "id") Long id, @RequestBody @Valid QueryDTO queryDTO) {
-
-        QueryDTO query = adminService.updateQuery(id, queryDTO);
-
-        return new ResponseEntity<QueryDTO>(query, HttpStatus.OK);
-
-    }
 
 
     @Operation(summary = "By Admin: Delete Query")
@@ -439,97 +316,11 @@ public class AdminController {
     }
 
 
-    @Operation(summary = "By Admin: Get All Transactions")
-    @GetMapping("/transactions")
-    public ResponseEntity<PagedResponse<TransactionsDTO>> getAllTransactions(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "transactionId") String sortBy,
-            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
-        PagedResponse<TransactionsDTO> transactions = adminService.getAllTransactions(page, size, sortBy, direction);
-
-        return new ResponseEntity<PagedResponse<TransactionsDTO>>(transactions, HttpStatus.OK);
-
-    }
-
-
-    @Operation(summary = "By Admin: Get All Transactions by Customer Policy Account")
-    @GetMapping("/transactions/policy-account/{id}")
-    public ResponseEntity<PagedResponse<TransactionsDTO>> getAllTransactionsByPolicyAccount(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "transactionId") String sortBy,
-            @RequestParam(name = "direction", defaultValue = "asc") String direction,
-            @PathVariable(name = "id") Long id) {
-
-        PagedResponse<TransactionsDTO> transactions = adminService.getAllTransactionsByPolicyAccount(page, size, sortBy, direction, id);
-
-        return new ResponseEntity<PagedResponse<TransactionsDTO>>(transactions, HttpStatus.OK);
-
-    }
-
-    @Operation(summary = "By Admin: Get All Transactions by Customer")
-    @GetMapping("/transactions/customer/{id}")
-    public ResponseEntity<PagedResponse<TransactionsDTO>> getAllTransactionsByCustomer(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "transactionId") String sortBy,
-            @RequestParam(name = "direction", defaultValue = "asc") String direction,
-            @PathVariable(name = "id") Long id) {
-
-        PagedResponse<TransactionsDTO> transactions = adminService.getAllTransactionsByCustomer(page, size, sortBy, direction, id);
-
-        return new ResponseEntity<PagedResponse<TransactionsDTO>>(transactions, HttpStatus.OK);
-
-    }
-
-
-    @Operation(summary = "By Admin: Get All the Transactions between Start date and End Date")
-    @GetMapping("/transactions/date")
-    public ResponseEntity<PagedResponse<TransactionsDTO>> getAllTransactionsBetweenDate(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
-            @RequestParam(name = "direction", defaultValue = "asc") String direction,
-            @RequestParam(name = "startDate") LocalDate startDate,
-            @RequestParam(name = "endDate") LocalDate endDate) {
-
-        PagedResponse<TransactionsDTO> transactions = adminService.getAllTransactionsBetweenDate(page, size, sortBy, direction, startDate, endDate);
-
-        return new ResponseEntity<PagedResponse<TransactionsDTO>>(transactions, HttpStatus.OK);
-
-    }
-
-
-    @Operation(summary = "By Admin: Get All feedback")
-    @GetMapping("/feedback")
-    public ResponseEntity<PagedResponse<FeedbackDTO>> getAllFeedbacks(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "feedbackId") String sortBy,
-            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
-
-        PagedResponse<FeedbackDTO> feedbacks = adminService.getAllFeedbacks(page, size, sortBy, direction);
-
-        return new ResponseEntity<PagedResponse<FeedbackDTO>>(feedbacks, HttpStatus.OK);
-
-    }
-
-
-    @Operation(summary = "By Admin: Get All feedbacks By Customer")
-    @GetMapping("/feedback/customer/{id}")
-    public ResponseEntity<PagedResponse<FeedbackDTO>> getAllFeedbacksByCustomer(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "feedbackId") String sortBy,
-            @RequestParam(name = "direction", defaultValue = "asc") String direction,
-            @PathVariable(name = "id") Long id) {
-
-        PagedResponse<FeedbackDTO> queries = adminService.getAllFeedbacksByCustomer(page, size, sortBy, direction, id);
-
-        return new ResponseEntity<PagedResponse<FeedbackDTO>>(queries, HttpStatus.OK);
-
+    @PostMapping("/approve-agent/{aid}")
+    ResponseEntity<Boolean> approveAgent(@PathVariable("aid")Long agentId) {
+        Boolean isSuccess = adminService.approveAgent(agentId);
+        return new ResponseEntity<>(isSuccess, HttpStatus.OK);
     }
 
 }

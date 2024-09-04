@@ -37,8 +37,10 @@ public class CustomerDTO {
     @NotNull(message = "Gender is mandatory")
     private GenderType gender;
 
+
     @NotNull(message = "Active status is mandatory")
     private Boolean isActive;
+
 
     @NotBlank(message = "Nominee name is mandatory")
     @Size(max = 50, message = "Nominee name can be at most 50 characters long")
@@ -56,16 +58,8 @@ public class CustomerDTO {
     @NotNull(message = "Address is mandatory")
     private AddressDTO address;
 
-    
+
     @NotNull(message = "Credentials are mandatory")
     private CredentialsResponseDTO credentials;
 
-    
-    private List<DocumentUploadedDTO> documents;
-
-    
-    private List<PolicyAccountDTO> policyAccounts;
-
-    
-    private List<QueryDTO> queries;
 }
