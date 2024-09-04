@@ -78,7 +78,7 @@ public class Agent {
 
 	@OneToMany(mappedBy = "agent", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference
-	private Set<WithdrawalRequests> withdrawalRequests;
+	private List<WithdrawalRequests> withdrawalRequests;
 
 
 }

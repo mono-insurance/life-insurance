@@ -7,7 +7,6 @@ import com.monocept.app.repository.StateRepository;
 import com.monocept.app.utils.GenderType;
 import com.monocept.app.utils.NomineeRelation;
 import com.monocept.app.utils.PageResult;
-import org.apache.poi.ss.formula.functions.T;
 
 import com.monocept.app.dto.AddressDTO;
 import com.monocept.app.dto.AdminDTO;
@@ -27,24 +26,16 @@ import com.monocept.app.dto.QueryDTO;
 import com.monocept.app.dto.SettingsDTO;
 import com.monocept.app.dto.StateDTO;
 import com.monocept.app.dto.TransactionsDTO;
-import com.monocept.app.entity.*;
 import com.monocept.app.repository.RoleRepository;
 import com.monocept.app.utils.GlobalSettings;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class DtoServiceImp implements DtoService{
@@ -68,16 +59,7 @@ public class DtoServiceImp implements DtoService{
         );
     }
 
-    @Override
-    public Employee convertEmployeeDtoToEmployee(EmployeeDTO employeeDTO) {
-        Employee employee=new Employee();
-//        employee.setFirstName(employeeDTO.getFirstName());
-//        employee.setLastName(employeeDTO.getLastName());
-//        employee.setQualification(employeeDTO.getQualification());
-//        employee.setDateOfBirth(employeeDTO.getDateOfBirth());
-//        employee.setIsActive(true);
-        return employee;
-    }
+
 
     @Override
     public Customer convertCustomerDtoToCustomer(RegistrationDTO customerDTO) {
@@ -93,12 +75,6 @@ public class DtoServiceImp implements DtoService{
         return customer;
     }
 
-    @Override
-    public Agent convertAgentDtoToAgent(AgentDTO agentDTO) {
-//        Agent agent=new Agent();
-//        agent
-        return null;
-    }
 
     @Override
     public AgentDTO convertAgentToAgentDto(Agent agent) {
@@ -140,10 +116,9 @@ public class DtoServiceImp implements DtoService{
     @Override
     public void updateCityAndState(Address agentAddress, AddressDTO address) {
         if(!agentAddress.getState().getStateName().equals(address.getState())){
-            State state= stateRepository.findByStateName(address.getState());
-            if(state==null) {
-                throw new NoSuchElementException("state not found");
-            }
+            Optional<State> statecheck= stateRepository.findByStateName(address.getState());
+            if(statecheck.isEmpty()) throw new NoSuchElementException("state not found");
+            State state=statecheck.get();
             agentAddress.setState(state);
         }
         City cityInState = agentAddress.getState().getCities().stream()
@@ -443,8 +418,9 @@ public class DtoServiceImp implements DtoService{
 	    
 	    return admin;
 	}
-    
-	private Employee convertEmployeeDtoToEmployee(EmployeeDTO employeeDTO) {
+
+    @Override
+	public Employee convertEmployeeDtoToEmployee(EmployeeDTO employeeDTO) {
 		Employee employee = new Employee();
 		employee.setEmployeeId(employeeDTO.getEmployeeId());
 	    employee.setFirstName(employeeDTO.getFirstName());
@@ -457,8 +433,8 @@ public class DtoServiceImp implements DtoService{
 	}
 	
 
-    
-	private Agent convertAgentDtoToAgent(AgentDTO agentDTO) {
+    @Override
+	public Agent convertAgentDtoToAgent(AgentDTO agentDTO) {
 		return null;
 	}
 
@@ -601,9 +577,9 @@ public class DtoServiceImp implements DtoService{
         policy.setProfitRatio(policyDTO.getProfitRatio());
         policy.setCreatedDate(policyDTO.getCreatedDate());
 
-        if (policyDTO.getDocumentUploaded() != null) {
-            policy.setDocumentUploaded(convertDocumentUploadedDtoToEntity(policyDTO.getDocumentUploaded()));
-        }
+//        if (policyDTO.getDocumentUploaded() != null) {
+//            policy.setDocumentUploaded(convertDocumentUploadedDtoToEntity(policyDTO.getDocumentUploaded()));
+//        }
 
         if (policyDTO.getDocumentsNeeded() != null) {
             policy.setDocumentsNeeded(
@@ -635,9 +611,9 @@ public class DtoServiceImp implements DtoService{
         policyDTO.setProfitRatio(policy.getProfitRatio());
         policyDTO.setCreatedDate(policy.getCreatedDate());
 
-        if (policy.getDocumentUploaded() != null) {
-            policyDTO.setDocumentUploaded(convertDocumentUploadedToDTO(policy.getDocumentUploaded()));
-        }
+//        if (policy.getDocumentUploaded() != null) {
+//            policyDTO.setDocumentUploaded(convertDocumentUploadedToDTO(policy.getDocumentUploaded()));
+//        }
 
         if (policy.getDocumentsNeeded() != null) {
             policyDTO.setDocumentsNeeded(
@@ -672,7 +648,6 @@ public class DtoServiceImp implements DtoService{
     public DocumentUploaded convertDocumentUploadedDtoToEntity(DocumentUploadedDTO documentUploadedDTO) {
         DocumentUploaded documentUploaded = new DocumentUploaded();
         documentUploaded.setDocumentId(documentUploadedDTO.getDocumentId());
-        documentUploaded.setBlobId(documentUploadedDTO.getBlobId());
         documentUploaded.setName(documentUploadedDTO.getName());
         documentUploaded.setIsApproved(documentUploadedDTO.getIsApproved());
 
@@ -683,7 +658,6 @@ public class DtoServiceImp implements DtoService{
     public DocumentUploadedDTO convertDocumentUploadedToDTO(DocumentUploaded documentUploaded) {
         DocumentUploadedDTO documentUploadedDTO = new DocumentUploadedDTO();
         documentUploadedDTO.setDocumentId(documentUploaded.getDocumentId());
-        documentUploadedDTO.setBlobId(documentUploaded.getBlobId());
         documentUploadedDTO.setName(documentUploaded.getName());
         documentUploadedDTO.setIsApproved(documentUploaded.getIsApproved());
 
@@ -695,9 +669,9 @@ public class DtoServiceImp implements DtoService{
             documentUploadedDTO.setAgentId(documentUploaded.getAgent().getAgentId());
         }
 
-        if (documentUploaded.getPolicy() != null) {
-            documentUploadedDTO.setPolicyId(documentUploaded.getPolicy().getPolicyId());
-        }
+//        if (documentUploaded.getPolicy() != null) {
+//            documentUploadedDTO.setPolicyId(documentUploaded.getPolicy().getPolicyId());
+//        }
 
         return documentUploadedDTO;
     }

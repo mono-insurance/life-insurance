@@ -59,7 +59,7 @@ public class AuthController {
 
     @PostMapping("/customer-register")
     ResponseEntity<Long> customerRegisterRequest(@RequestBody @Valid RegistrationDTO registrationDTO) {
-        Long id = customerService.customerRegisterRequest(registrationDTO);
+        Long id = customerService.customerRegistrationRequest(registrationDTO);
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
     @PostMapping("/agent-register")

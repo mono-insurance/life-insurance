@@ -1,13 +1,7 @@
 package com.monocept.app.service;
 
-import com.monocept.app.dto.AddressDTO;
+import com.monocept.app.dto.*;
 
-import com.monocept.app.dto.CustomUserDetails;
-import com.monocept.app.dto.CustomerDTO;
-import com.monocept.app.dto.FeedbackDTO;
-import com.monocept.app.dto.PolicyAccountDTO;
-import com.monocept.app.dto.QueryDTO;
-import com.monocept.app.dto.TransactionsDTO;
 import com.monocept.app.entity.Address;
 import com.monocept.app.entity.Agent;
 import com.monocept.app.entity.City;
@@ -40,6 +34,7 @@ import com.monocept.app.utils.PagedResponse;
 import java.time.LocalDate;
 import java.util.List;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -129,8 +124,7 @@ public class CustomerServiceImp implements CustomerService{
 
 
 	@Override
-	public Long 
-  (@Valid RegistrationDTO registrationDTO) {
+	public Long customerRegistrationRequest(@Valid RegistrationDTO registrationDTO) {
         Customer customer=dtoService.convertCustomerDtoToCustomer(registrationDTO);
         customer=customerRepository.save(customer);
         Address address=checkAndGetAddress(registrationDTO.getAddress());
@@ -139,40 +133,11 @@ public class CustomerServiceImp implements CustomerService{
         return customer.getCustomerId();
 	}
 
-    @Override
-    public CustomerDTO getCustomerProfile() {
-        return null;
-    }
-
-    @Override
-    public PagedResponse<CustomerDTO> getAllCustomers() {
-        return null;
-    }
-
-    @Override
-    public CustomerDTO updateCustomerProfile(CustomerDTO customerDTO) {
-        return null;
-    }
-//    @Override
-//    public CustomerProfileResponseDTO getCustomerProfile() {
-//        return null;
-//    }
-//
-//    @Override
-//    public CustomerProfileResponseDTO updateCustomerProfile(CustomerDTO customerDTO) {
-//        return null;
-//    }
-//
-//    @Override
-//    public CustomerProfileResponseDTO getAllCustomers() {
-//        return null;
-//    }
-
     private Address checkAndGetAddress(AddressDTO addressDTO) {
         Address address=new Address();
         if(checkStateAndCity(addressDTO)){
-            State state=stateRepository.findByStateName(addressDTO.getState());
-            City city=cityRepository.findByCityName(addressDTO.getCity());
+            State state=stateRepository.findByStateName(addressDTO.getState()).get();
+            City city=cityRepository.findByCityName(addressDTO.getCity()).get();
             address.setCity(city);
             address.setState(state);
             address.setPincode(addressDTO.getPincode());

@@ -39,7 +39,7 @@ public class AgentServiceImp implements AgentService {
 //        first set credentials
         CredentialsResponseDTO credentialsResponseDTO = registrationDTO.getCredentials();
         Credentials credentials = new Credentials();
-        Role role = roleRepository.findByName("ROLE_AGENT");
+        Role role = roleRepository.findByName("ROLE_AGENT").get();
         credentials.setRole(role);
         credentials.setMobileNumber(credentialsResponseDTO.getMobileNumber());
         credentials.setEmail(credentialsResponseDTO.getEmail());
@@ -110,8 +110,7 @@ public class AgentServiceImp implements AgentService {
                                                                  String sortBy, String sortDirection) {
         Long agentId = accessConService.checkUserAccess().getId();
         Agent agent = findAgent(agentId);
-        Set<PolicyAccount> policyAccountSet = agent.getPolicyAccounts();
-        List<PolicyAccount> policyAccounts = new ArrayList<>(policyAccountSet);
+        List<PolicyAccount> policyAccounts = agent.getPolicyAccounts();
         PageResult pageResult = dtoService.convertToPage(policyAccounts, pageNo, sort, sortBy, sortDirection, size);
         List policyAccountDTOS = dtoService.convertPolicyAccountsToDto(pageResult.getContent());
         int end = pageResult.getTotalElements();
@@ -130,8 +129,7 @@ public class AgentServiceImp implements AgentService {
                                                                    String sortBy, String sortDirection) {
         Long agentId = accessConService.checkUserAccess().getId();
         Agent agent = findAgent(agentId);
-        Set<WithdrawalRequests> withdrawalRequestsSet = agent.getWithdrawalRequests();
-        List<WithdrawalRequests> withdrawalRequests = new ArrayList<>(withdrawalRequestsSet);
+        List<WithdrawalRequests> withdrawalRequests = agent.getWithdrawalRequests();
         PageResult pageResult = dtoService.convertWithdrawalsToPage(withdrawalRequests, pageNo, sort, sortBy, sortDirection, size);
         List withDrawalDTO = dtoService.convertWithdrawalsToDto(pageResult.getContent());
         int end = pageResult.getTotalElements();
@@ -170,7 +168,7 @@ public class AgentServiceImp implements AgentService {
     public PagedResponse<WithdrawalRequestsDTO> getAllPolicyClaims(int pageNo, int size, String sort, String sortBy, String sortDirection) {
         Long agentId = accessConService.checkUserAccess().getId();
         Agent agent = findAgent(agentId);
-        Set<PolicyAccount> policyAccounts=agent.getPolicyAccounts();
+        List<PolicyAccount> policyAccounts=agent.getPolicyAccounts();
         List<WithdrawalRequests> withdrawalRequests=new ArrayList<>();
         for(PolicyAccount policyAccount:policyAccounts){
             withdrawalRequests.addAll(policyAccount.getWithdrawalRequests());
@@ -192,7 +190,7 @@ public class AgentServiceImp implements AgentService {
     public PagedResponse<CustomerDTO> getAllCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection) {
         Long agentId = accessConService.checkUserAccess().getId();
         Agent agent = findAgent(agentId);
-        Set<PolicyAccount> policyAccounts=agent.getPolicyAccounts();
+        List<PolicyAccount> policyAccounts=agent.getPolicyAccounts();
         List<Customer> customerList=new ArrayList<>();
         for(PolicyAccount policyAccount:policyAccounts){
             customerList.add(policyAccount.getCustomer());

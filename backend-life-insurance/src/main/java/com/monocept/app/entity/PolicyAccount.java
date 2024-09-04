@@ -103,7 +103,7 @@ public class PolicyAccount {
     @OneToMany(mappedBy = "policyAccount", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
 
-    private Listt<Transactions> transactions;
+    private List<Transactions> transactions;
 
     @OneToMany(mappedBy = "policyAccount", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference

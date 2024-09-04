@@ -110,7 +110,7 @@ public class Policy {
             joinColumns = @JoinColumn(name = "policy_id"),
             inverseJoinColumns = @JoinColumn(name = "document_id")
     )
-    private Set<DocumentNeeded> documentsNeeded;
+    private List<DocumentNeeded> documentsNeeded;
 
     @OneToMany(mappedBy = "policy", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference
