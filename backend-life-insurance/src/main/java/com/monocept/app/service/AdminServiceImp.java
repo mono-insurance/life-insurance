@@ -381,9 +381,9 @@ public class AdminServiceImp implements AdminService{
 	    existingPolicy.setCreatedDate(policyDTO.getCreatedDate());
 	    
 	    
-	    if (policyDTO.getDocumentUploaded() != null) {
-	    	existingPolicy.setDocumentUploaded(dtoService.convertDocumentUploadedDtoToEntity(policyDTO.getDocumentUploaded()));
-        }
+//	    if (policyDTO.getDocumentUploaded() != null) {
+//	    	existingPolicy.setDocumentUploaded(dtoService.convertDocumentUploadedDtoToEntity(policyDTO.getDocumentUploaded()));
+//        }
 
 	    if (policyDTO.getDocumentsNeeded() != null) {
 	        

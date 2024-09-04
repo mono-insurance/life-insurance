@@ -48,10 +48,6 @@ public class Credentials {
     @Column(name = "mobile_number", nullable = false, unique = true)
     private String mobileNumber;
 
-	
-	@ManyToOne
-    @JoinColumn(name = "role_id", referencedColumnName="id")
-	private Role role;
 
 	@OneToOne(mappedBy = "credentials", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Customer customer;

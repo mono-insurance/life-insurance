@@ -111,7 +111,11 @@ public interface DtoService {
 	List<PolicyAccountDTO> convertPolicyAccountListEntityToDTO(List<PolicyAccount> allPolicyAccounts);
 
 
-    Customer convertCustomerDtoToCustomer(RegistrationDTO registrationDTO);
+	AdminDTO convertToAdminResponseDTO(Admin admin);
+
+	Employee convertEmployeeDtoToEmployee(EmployeeDTO employeeDTO);
+
+	Customer convertCustomerDtoToCustomer(RegistrationDTO registrationDTO);
 
     Agent convertAgentDtoToAgent(AgentDTO agentDTO);
 

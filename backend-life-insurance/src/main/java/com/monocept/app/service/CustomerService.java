@@ -2,19 +2,17 @@ package com.monocept.app.service;
 
 import java.time.LocalDate;
 
-import com.monocept.app.dto.AddressDTO;
-import com.monocept.app.dto.CustomerDTO;
-import com.monocept.app.dto.FeedbackDTO;
-import com.monocept.app.dto.PolicyAccountDTO;
-import com.monocept.app.dto.QueryDTO;
-import com.monocept.app.dto.TransactionsDTO;
+import com.monocept.app.dto.*;
 import com.monocept.app.utils.PagedResponse;
+import jakarta.validation.Valid;
 
 public interface CustomerService {
 
 	CustomerDTO getCustomerProfile();
 
 	CustomerDTO updateCustomerProfile(CustomerDTO customerDTO);
+
+	Long customerRegistrationRequest(@Valid RegistrationDTO registrationDTO);
 
 	AddressDTO updateCustomerAddress(AddressDTO addressDTO);
 
