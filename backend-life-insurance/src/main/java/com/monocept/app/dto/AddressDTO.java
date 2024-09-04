@@ -27,5 +27,10 @@ public class AddressDTO {
     
     @NotBlank(message = "City is mandatory")
     private String city;
+    
+    
+    private Long customerId;
+    
+    private Long agentId;
 
 }

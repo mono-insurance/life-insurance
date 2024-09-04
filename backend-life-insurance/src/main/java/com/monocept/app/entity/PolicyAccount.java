@@ -1,7 +1,7 @@
 package com.monocept.app.entity;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -65,6 +65,11 @@ public class PolicyAccount {
     @Column(name = "timely_balance")
     private Double timelyBalance;
     
+    @NotNull
+    @Positive
+    @Column(name = "investment_amount")
+    private Double investmentAmount;
+    
     
     @NotNull
     @Positive
@@ -80,6 +85,7 @@ public class PolicyAccount {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "policy_id", nullable = false)
+    @JsonBackReference
     private Policy policy;
 
 
@@ -96,11 +102,13 @@ public class PolicyAccount {
     
     @OneToMany(mappedBy = "policyAccount", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
-    private Set<Transactions> transactions;
+
+    private Listt<Transactions> transactions;
 
     @OneToMany(mappedBy = "policyAccount", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
-    private Set<WithdrawalRequests> withdrawalRequests;
+    private List<WithdrawalRequests> withdrawalRequests;
+
     
 
 }

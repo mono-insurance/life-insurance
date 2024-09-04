@@ -1,6 +1,16 @@
 package com.monocept.app.entity;
 
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -18,6 +28,7 @@ public class Credentials {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name ="id")
+	
 	private Long id;
 	
 	@NotBlank
@@ -38,6 +49,10 @@ public class Credentials {
     private String mobileNumber;
 
 	
+	@ManyToOne
+    @JoinColumn(name = "role_id", referencedColumnName="id")
+	private Role role;
+
 	@OneToOne(mappedBy = "credentials", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Customer customer;
 	

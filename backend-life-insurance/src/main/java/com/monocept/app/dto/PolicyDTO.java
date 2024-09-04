@@ -1,6 +1,7 @@
 package com.monocept.app.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 import jakarta.validation.constraints.Max;
@@ -72,8 +73,11 @@ public class PolicyDTO {
     private Float profitRatio;
 
     private LocalDate createdDate;
+    
+    private List<PolicyAccountDTO> policyAccounts;
 
-    private Set<DocumentNeededDTO> documentsNeeded;
+    private List<DocumentNeededDTO> documentsNeeded;
 
-    private String insuranceCategory;
+    @NotNull
+    private Long insuranceTypeId;
 }

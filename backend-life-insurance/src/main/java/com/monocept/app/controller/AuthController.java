@@ -1,13 +1,18 @@
 package com.monocept.app.controller;
 
+import com.monocept.app.dto.CustomerDTO;
+import com.monocept.app.dto.JWTAuthResponse;
 import com.monocept.app.dto.LoginDTO;
 import com.monocept.app.dto.LoginResponseDTO;
 import com.monocept.app.dto.RegistrationDTO;
 import com.monocept.app.service.AgentService;
 import com.monocept.app.service.AuthService;
 import com.monocept.app.service.CustomerService;
+
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("public/api/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 	
     @Autowired
@@ -32,10 +37,23 @@ public class AuthController {
     }
     
     
-    @PostMapping("/login")
-    ResponseEntity<LoginResponseDTO>login(@RequestBody @Valid LoginDTO loginDTO){
-        LoginResponseDTO loginResponseDTO=authService.loginUser(loginDTO);
-        return new ResponseEntity<>(loginResponseDTO, HttpStatus.OK);
+    @Operation(summary = "By Anyone: Login the user or admin if have registered and if active")
+    @PostMapping(value = {"/login"})
+    public ResponseEntity<JWTAuthResponse> login(@RequestBody LoginDTO loginDto){
+    	JWTAuthResponse jwtAuthResponse = authService.login(loginDto);
+        System.out.println(loginDto);
+
+        String token = jwtAuthResponse.getAccessToken();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", token);
+
+
+        JWTAuthResponse responseBody = new JWTAuthResponse();
+        responseBody.setTokenType(jwtAuthResponse.getTokenType());
+        responseBody.setRole(jwtAuthResponse.getRole());
+        responseBody.setId(jwtAuthResponse.getId());
+
+        return new ResponseEntity<>(responseBody, headers, HttpStatus.OK);
     }
     
 
@@ -49,5 +67,4 @@ public class AuthController {
         Long id = agentService.agentRegisterRequest(registrationDTO);
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
-
 }

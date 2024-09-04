@@ -1,13 +1,5 @@
 package com.monocept.app.dto;
 
-import com.monocept.app.entity.Admin;
-import com.monocept.app.entity.Agent;
-import com.monocept.app.entity.Customer;
-import com.monocept.app.entity.Employee;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;

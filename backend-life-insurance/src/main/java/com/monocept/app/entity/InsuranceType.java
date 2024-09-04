@@ -1,5 +1,6 @@
 package com.monocept.app.entity;
 
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -43,6 +44,6 @@ public class InsuranceType {
 	
 	@OneToMany(mappedBy = "insuranceType", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	@JsonManagedReference
-	private Set<Policy> policies;
+	private List<Policy> policies;
 	
 }

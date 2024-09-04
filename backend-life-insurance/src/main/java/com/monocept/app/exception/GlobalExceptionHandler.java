@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
 		// create a Student Error Message
 		ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST.value(),exception.getClass().getSimpleName(),
 				LocalDateTime.now());
-		System.out.println("printing error");
+		System.out.println(exception.getMessage());
 		exception.printStackTrace();
 
 		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);

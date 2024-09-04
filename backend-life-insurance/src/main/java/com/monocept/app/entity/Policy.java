@@ -1,9 +1,11 @@
 package com.monocept.app.entity;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -98,6 +100,10 @@ public class Policy {
 	@Column(name = "created_date")
 	private LocalDate createdDate = LocalDate.now();
 	
+	@OneToMany(mappedBy = "policy", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<PolicyAccount> policyAccounts;
+	
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "policy_documents",
@@ -116,5 +122,8 @@ public class Policy {
     @JoinColumn(name = "type_id")
     @JsonBackReference
     private InsuranceType insuranceType;
+	
+	
+	
 
 }

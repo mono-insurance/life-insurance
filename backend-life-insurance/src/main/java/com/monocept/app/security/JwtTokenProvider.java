@@ -1,15 +1,19 @@
 package com.monocept.app.security;
 
+import com.monocept.app.entity.Credentials;
 import com.monocept.app.exception.RoleAccessException;
+import com.monocept.app.exception.UserException;
+import com.monocept.app.repository.AuthRepository;
+
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import com.monocept.app.exception.RoleAccessException;
 
 import java.security.Key;
 import java.util.Date;
@@ -22,17 +26,26 @@ public class JwtTokenProvider {
 
     @Value("${app-jwt-expiration-milliseconds}")
     private long jwtExpirationDate;
+    
+    @Autowired
+    private AuthRepository authRepository;
 
     // generate JWT token
     public String generateToken(Authentication authentication){
         String username = authentication.getName();
 
+        Credentials credentials =  authRepository.findByUsernameOrEmail(username, username)
+        		.orElseThrow(() -> new UserException("User not found with username or email: " + username));
+        
+        
         Date currentDate = new Date();
 
         Date expireDate = new Date(currentDate.getTime() + jwtExpirationDate);
 
         String token = Jwts.builder()
                 .setSubject(username)
+                .claim("roles", credentials.getRole())
+                .claim("id", credentials.getId())
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
                 .signWith(key())
