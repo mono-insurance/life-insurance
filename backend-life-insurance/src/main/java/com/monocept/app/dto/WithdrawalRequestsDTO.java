@@ -31,4 +31,5 @@ public class WithdrawalRequestsDTO {
     @NotNull(message = "Approved Status is mandatory")
     private Boolean isApproved;
 
+
 }

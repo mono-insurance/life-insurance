@@ -22,22 +22,18 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "document_uploaded")
-public class DocumentUploaded {
+@Table(name = "image")
+public class Image {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "document_id")
-    private Long documentId;
+    @Column(name = "image_id")
+    private Long imageId;
 
 
     @NotBlank
-    @Column(name = "name")
-    private String name;
-
-    @NotNull
-    @Column(name = "is_approved")
-    private Boolean isApproved;
+    @Column(name = "cloud_image_name")
+    private String cloudImageName;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -48,5 +44,8 @@ public class DocumentUploaded {
     @JsonBackReference
     private Agent agent;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    private Policy policy;
 
 }

@@ -4,6 +4,7 @@ package com.monocept.app.controller;
 import com.monocept.app.dto.EmployeeDTO;
 import com.monocept.app.dto.PolicyDTO;
 import com.monocept.app.dto.InsuranceTypeDTO;
+import com.monocept.app.service.StorageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +21,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/admin")
 public class AdminController {
 	
-	private AdminService adminService;
+	private final AdminService adminService;
+	private final StorageService storageService;
 	
-	
-	public AdminController(AdminService adminService) {
+	public AdminController(AdminService adminService, StorageService storageService) {
 		super();
 		this.adminService = adminService;
+		this.storageService = storageService;
 	}
 	
 	
@@ -60,8 +62,10 @@ public class AdminController {
 	}
 
 	@PostMapping("/insurance/{iid}/upload-insurance-images")
-	ResponseEntity<Boolean> addNewInsuranceImages(@PathVariable("iid")int insuranceId,@RequestParam("file") MultipartFile file){
-		Boolean isAdded=adminService.addNewInsuranceImages(insuranceId,file);
+	ResponseEntity<Boolean> addNewInsuranceImages(
+			@PathVariable("iid")Long insuranceId,
+			@RequestParam("file") MultipartFile file){
+		Boolean isAdded=storageService.addNewInsuranceImages(insuranceId,file);
 		return new ResponseEntity<>(isAdded,HttpStatus.OK);
 	}
 	

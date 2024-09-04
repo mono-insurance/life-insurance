@@ -97,6 +97,10 @@ public class PolicyAccount {
     @OneToMany(mappedBy = "policyAccount", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private Set<Transactions> transactions;
+
+    @OneToMany(mappedBy = "policyAccount", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private Set<WithdrawalRequests> withdrawalRequests;
     
 
 }

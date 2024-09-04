@@ -27,8 +27,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(name = "agent")
 public class Agent {
-	
-	
+
     @Id
     @Column(name ="agent_id")
     private Long agentId;
@@ -76,6 +75,10 @@ public class Agent {
     @OneToMany(mappedBy = "agent", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private Set<PolicyAccount> policyAccounts;
+
+	@OneToMany(mappedBy = "agent", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonManagedReference
+	private Set<WithdrawalRequests> withdrawalRequests;
 
 
 }

@@ -1,10 +1,9 @@
 package com.monocept.app.repository;
 
-import com.monocept.app.entity.Role;
+import com.monocept.app.entity.Image;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RoleRepository extends JpaRepository<Role,Long> {
-    Role findByName(String roleAgent);
+public interface ImageRepository extends JpaRepository<Image,Long> {
 }

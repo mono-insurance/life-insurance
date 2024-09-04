@@ -37,12 +37,12 @@ public class CredentialsDTO {
 	@NotBlank(message = "Role is Mandatory")
 	private String role;
 	
-	private Customer customer;
+	private CustomerDTO customerDTO;
 	
-	private Admin admin;
+	private AdminDTO adminDTO;
 	
-	private Agent agent;
+	private AgentDTO agentDTO;
 	
-	private Employee employee;
+	private EmployeeDTO employeeDTO;
 	
 }
