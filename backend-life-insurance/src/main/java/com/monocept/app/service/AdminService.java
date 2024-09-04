@@ -18,86 +18,55 @@ import com.monocept.app.dto.InsuranceTypeDTO;
 
 public interface AdminService {
 
-	AdminDTO getAdminProfile();
-	
-	AdminDTO makeAnotherAdmin(CredentialsDTO credentials);
-	
-	AdminDTO updateAdminProfile(AdminDTO adminDTO);
+    AdminDTO getAdminProfile();
 
-	EmployeeDTO createEmployee(CredentialsDTO credentials);
+    AdminDTO makeAnotherAdmin(CredentialsDTO credentials);
 
-	EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO);
+    AdminDTO updateAdminProfile(AdminDTO adminDTO);
 
-	void deleteEmployee(Long id);
+    EmployeeDTO createEmployee(CredentialsDTO credentials);
 
-	StateDTO addState(StateDTO stateDTO);
+//	EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO);
 
-	StateDTO updateState(Long id, StateDTO stateDTO);
+    void deleteEmployee(Long id);
 
-	void deleteState(Long id);
+    StateDTO addState(StateDTO stateDTO);
 
-	CityDTO addCity(CityDTO cityDTO);
 
-	CityDTO updateCity(Long id, CityDTO cityDTO);
+    void deleteState(Long id);
 
-	void deleteCity(Long id);
+    CityDTO addCity(CityDTO cityDTO);
 
-	InsuranceTypeDTO addInsuranceType(InsuranceTypeDTO insuranceTypeDTO);
 
-	InsuranceTypeDTO updateInsuranceType(Long id, InsuranceTypeDTO insuranceTypeDTO);
+    void deleteCity(Long id);
 
-	void deleteInsuranceType(Long id);
+    InsuranceTypeDTO addInsuranceType(InsuranceTypeDTO insuranceTypeDTO);
 
-	PolicyDTO addPolicy(PolicyDTO policyDTO);
+    InsuranceTypeDTO updateInsuranceType(Long id, InsuranceTypeDTO insuranceTypeDTO);
 
-	PolicyDTO updatePolicy(Long id, PolicyDTO policyDTO);
+    void deleteInsuranceType(Long id);
 
-	void deletePolicy(Long id);
+    PolicyDTO addPolicy(PolicyDTO policyDTO);
 
-	PagedResponse<StateDTO> getAllStates(int page, int size, String sortBy, String direction);
+    PolicyDTO updatePolicy(Long id, PolicyDTO policyDTO);
 
-	PagedResponse<CityDTO> getAllCities(int page, int size, String sortBy, String direction);
+    void deletePolicy(Long id);
 
-	PagedResponse<InsuranceTypeDTO> getAllInsuranceTypes(int page, int size, String sortBy, String direction);
+    PagedResponse<PolicyDTO> getAllPolicies(int page, int size, String sortBy, String direction);
 
-	PagedResponse<PolicyDTO> getAllPolicies(int page, int size, String sortBy, String direction);
+    SettingsDTO addOrUpdateSetting(SettingsDTO settingDTO);
 
-	SettingsDTO addOrUpdateSetting(SettingsDTO settingDTO);
+    SettingsDTO getSetting(String settingKey);
 
-	SettingsDTO getSetting(String settingKey);
+    PagedResponse<EmployeeDTO> getAllEmployees(int page, int size, String sortBy, String direction);
 
-	PagedResponse<EmployeeDTO> getAllEmployees(int page, int size, String sortBy, String direction);
+    PagedResponse<EmployeeDTO> getAllActiveEmployees(int page, int size, String sortBy, String direction);
 
-	PagedResponse<QueryDTO> getAllQueries(int page, int size, String sortBy, String direction);
+    PagedResponse<EmployeeDTO> getAllInactiveEmployees(int page, int size, String sortBy, String direction);
 
-	PagedResponse<EmployeeDTO> getAllActiveEmployees(int page, int size, String sortBy, String direction);
 
-	PagedResponse<EmployeeDTO> getAllInactiveEmployees(int page, int size, String sortBy, String direction);
+    void deleteQuery(Long id);
 
-	QueryDTO updateQuery(Long id, QueryDTO queryDTO);
 
-	void deleteQuery(Long id);
-
-	PagedResponse<QueryDTO> getAllResolvedQueries(int page, int size, String sortBy, String direction);
-
-	PagedResponse<QueryDTO> getAllUnresolvedQueries(int page, int size, String sortBy, String direction);
-
-	PagedResponse<QueryDTO> getAllQueriesByCustomer(int page, int size, String sortBy, String direction,Long id);
-
-	PagedResponse<TransactionsDTO> getAllTransactions(int page, int size, String sortBy, String direction);
-
-	PagedResponse<TransactionsDTO> getAllTransactionsByPolicyAccount(int page, int size, String sortBy,
-			String direction, Long id);
-
-	PagedResponse<TransactionsDTO> getAllTransactionsByCustomer(int page, int size, String sortBy, String direction,
-			Long id);
-
-	PagedResponse<TransactionsDTO> getAllTransactionsBetweenDate(int page, int size, String sortBy, String direction,
-			LocalDate startDate, LocalDate endDate);
-
-	PagedResponse<FeedbackDTO> getAllFeedbacks(int page, int size, String sortBy, String direction);
-
-	PagedResponse<FeedbackDTO> getAllFeedbacksByCustomer(int page, int size, String sortBy, String direction, Long id);
-
-	
+    Boolean approveAgent(Long agentId);
 }
