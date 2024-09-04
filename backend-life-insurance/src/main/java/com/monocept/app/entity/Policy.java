@@ -1,9 +1,11 @@
 package com.monocept.app.entity;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -17,6 +19,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
@@ -114,18 +117,25 @@ public class Policy {
 	@Column(name = "created_date")
 	private LocalDate createdDate = LocalDate.now();
 	
+	@OneToMany(mappedBy = "policy", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<PolicyAccount> policyAccounts;
+	
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "policy_documents",
             joinColumns = @JoinColumn(name = "policy_id"),
             inverseJoinColumns = @JoinColumn(name = "document_id")
     )
-    private Set<DocumentNeeded> documentsNeeded;
+    private List<DocumentNeeded> documentsNeeded;
 	
 	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "type_id")
     @JsonBackReference
     private InsuranceType insuranceType;
+	
+	
+	
 
 }

@@ -1,6 +1,9 @@
 package com.monocept.app.repository;
 
 import com.monocept.app.entity.State;
+
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,5 +11,5 @@ import org.springframework.stereotype.Repository;
 public interface StateRepository extends JpaRepository<State,Long> {
     Boolean existsByStateNameAndIsActiveTrue(String state);
 
-    State findByStateName(String state);
+    Optional<State> findByStateName(String state);
 }

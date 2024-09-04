@@ -11,8 +11,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LoginDTO {
-    @NotBlank
-    private String username;
-    @NotBlank
-    private String password;
+	
+	@NotBlank(message = "Username or Email is Mandatory")
+	private String usernameOrEmail;
+	
+	@NotBlank(message = "Password is Mandatory")
+	private String password;
+	
 }

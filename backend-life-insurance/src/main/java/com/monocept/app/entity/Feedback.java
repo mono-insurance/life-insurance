@@ -1,7 +1,5 @@
 package com.monocept.app.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,10 +7,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,25 +21,32 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "city")
-public class City {
+@Table(name = "feedback")
+public class Feedback {
+
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name ="city_id")
-	private Long cityId;
+    @Column(name = "feedback_id")
+    private Long feedbackId;
 	
-
 	@NotBlank
-	@Column(name ="city_name")
-	private String cityName;
+    @Column(name = "title")
+    private String title;
 	
-	@NotNull
-	@Column(name ="is_active")
-	private Boolean isActive;
+	@NotBlank
+	@Min(0)
+	@Max(5)
+    @Column(name = "rating")
+    private Integer rating;
+	
+	@NotBlank
+	@Lob
+	@Column(name ="description")
+	private String description;
+	
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "state_id")
-	@JsonBackReference
-    private State state;
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
 }

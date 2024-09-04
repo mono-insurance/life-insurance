@@ -1,7 +1,11 @@
 package com.monocept.app.entity;
 
+import com.monocept.app.utils.GlobalSettings;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,8 +31,9 @@ public class Settings {
     private Long settingId;
 
     @NotBlank
+    @Enumerated(EnumType.STRING)
     @Column(name = "setting_key")
-    private String settingKey;
+    private GlobalSettings settingKey;
 
     @NotNull
     @Min(0)

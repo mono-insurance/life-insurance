@@ -1,5 +1,6 @@
 package com.monocept.app.dto;
 
+import java.util.List;
 import java.util.Set;
 
 import jakarta.validation.constraints.NotBlank;
@@ -21,5 +22,5 @@ public class InsuranceTypeDTO {
     @NotNull(message = "Active status is mandatory")
     private Boolean isActive;
 
-    private Set<PolicyDTO> policies;
+    private List<PolicyDTO> policies;
 }

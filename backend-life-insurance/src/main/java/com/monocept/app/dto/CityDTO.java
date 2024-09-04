@@ -1,8 +1,5 @@
 package com.monocept.app.dto;
 
-import com.monocept.app.entity.City;
-import com.monocept.app.entity.State;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -22,6 +19,6 @@ public class CityDTO {
     @NotNull(message = "Active Status is mandatory")
     private Boolean isActive;
 
-    private String state;
+    private Long stateId;
 
 }

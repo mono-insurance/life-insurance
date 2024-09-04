@@ -1,18 +1,20 @@
 package com.monocept.app.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
-public class LoginResponseDTO {
-
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+public class JWTAuthResponse {
+	
 	private String accessToken;
 	private String tokenType = "Bearer";
 	private String role;
-	private int id;
+	private Long id;
+
 }

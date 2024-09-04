@@ -1,7 +1,7 @@
 package com.monocept.app.entity;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -72,15 +72,19 @@ public class Customer {
     
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private Set<DocumentUploaded> documents;
+    private List<DocumentUploaded> documents;
     
     
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private Set<PolicyAccount> policyAccounts;
+    private List<PolicyAccount> policyAccounts;
     
     
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private Set<Query> queries;
+    private List<Query> queries;
+    
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Feedback> feedbacks;
 }
