@@ -13,6 +13,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,7 +35,7 @@ public class Feedback {
     @Column(name = "title")
     private String title;
 	
-	@NotBlank
+	@NotNull
 	@Min(0)
 	@Max(5)
     @Column(name = "rating")

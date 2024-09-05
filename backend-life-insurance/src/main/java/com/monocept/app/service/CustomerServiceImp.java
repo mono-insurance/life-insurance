@@ -5,6 +5,7 @@ import com.monocept.app.dto.*;
 import com.monocept.app.entity.Address;
 import com.monocept.app.entity.Agent;
 import com.monocept.app.entity.City;
+import com.monocept.app.entity.Credentials;
 import com.monocept.app.entity.Customer;
 import com.monocept.app.entity.DocumentNeeded;
 import com.monocept.app.entity.DocumentUploaded;
@@ -12,27 +13,35 @@ import com.monocept.app.entity.Feedback;
 import com.monocept.app.entity.Policy;
 import com.monocept.app.entity.PolicyAccount;
 import com.monocept.app.entity.Query;
+import com.monocept.app.entity.Role;
 import com.monocept.app.entity.Settings;
 import com.monocept.app.entity.State;
 import com.monocept.app.entity.Transactions;
+import com.monocept.app.entity.WithdrawalRequests;
 import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.AddressRepository;
 import com.monocept.app.repository.AgentRepository;
+import com.monocept.app.repository.AuthRepository;
 import com.monocept.app.repository.CityRepository;
 import com.monocept.app.repository.CustomerRepository;
 import com.monocept.app.repository.FeedbackRepository;
 import com.monocept.app.repository.PolicyAccountRepository;
 import com.monocept.app.repository.PolicyRepository;
 import com.monocept.app.repository.QueryRepository;
+import com.monocept.app.repository.RoleRepository;
 import com.monocept.app.repository.SettingsRepository;
 import com.monocept.app.repository.StateRepository;
 
 import com.monocept.app.repository.TransactionsRepository;
+import com.monocept.app.repository.WithdrawalRequestsRepository;
+import com.monocept.app.utils.GenderType;
 import com.monocept.app.utils.GlobalSettings;
+import com.monocept.app.utils.NomineeRelation;
 import com.monocept.app.utils.PagedResponse;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +49,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -59,9 +68,6 @@ public class CustomerServiceImp implements CustomerService{
     private QueryRepository queryRepository;
     
     @Autowired
-    private FeedbackRepository feedbackRepository;
-    
-    @Autowired
     private PolicyAccountRepository policyAccountRepository;
     
     @Autowired
@@ -75,6 +81,18 @@ public class CustomerServiceImp implements CustomerService{
     
     @Autowired
     private SettingsRepository settingsRepository;
+    
+    @Autowired
+    private AuthRepository credentialsRepository;
+    
+    @Autowired
+	private RoleRepository roleRepository;
+    
+    @Autowired
+	private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private WithdrawalRequestsRepository withdrawalRequestsRepository;
 
     public CustomerServiceImp(CustomerRepository customerRepository, DtoService dtoService,
                               StateRepository stateRepository, CityRepository cityRepository,
@@ -93,6 +111,7 @@ public class CustomerServiceImp implements CustomerService{
 
 	    Customer customer = customerRepository.findById(userDetails.getId())
 	            .orElseThrow(() -> new UserException("Customer not found"));
+
 
 	    return dtoService.convertCustomerToCustomerResponseDTO(customer);
 	}
@@ -124,13 +143,55 @@ public class CustomerServiceImp implements CustomerService{
 
 
 	@Override
-	public Long customerRegistrationRequest(@Valid RegistrationDTO registrationDTO) {
-        Customer customer=dtoService.convertCustomerDtoToCustomer(registrationDTO);
-        customer=customerRepository.save(customer);
-        Address address=checkAndGetAddress(registrationDTO.getAddress());
+	public Long customerRegistration(RegistrationDTO registrationDTO) {
+		Customer customer = new Customer();
+        customer.setFirstName(registrationDTO.getFirstName());
+        customer.setLastName(registrationDTO.getLastName());
+        customer.setDateOfBirth(registrationDTO.getDateOfBirth());
+        customer.setGender(GenderType.valueOf(registrationDTO.getGender()));
+        customer.setIsActive(true);
+        customer.setNomineeName(registrationDTO.getNomineeName());
+        customer.setNomineeRelation(NomineeRelation.valueOf(registrationDTO.getNomineeRelation()));
+        customer.setIsApproved(false);
+        
+        Address address = new Address();
+        address.setFirstStreet(registrationDTO.getFirstStreet());
+        address.setLastStreet(registrationDTO.getLastStreet());
+        address.setPincode(registrationDTO.getPincode());
+        
+        State state = stateRepository.findById(registrationDTO.getStateId())
+            .orElseThrow(() -> new UserException("State not found"));
+        if (!state.getIsActive()) {
+            throw new UserException("Selected state is inactive");
+        }
+
+        City city = cityRepository.findById(registrationDTO.getCityId())
+            .orElseThrow(() -> new UserException("City not found"));
+        if (!city.getIsActive()) {
+            throw new UserException("Selected city is inactive");
+        }
+        
+        address.setState(state);
+        address.setCity(city);
+        
+        address = addressRepository.save(address);
         customer.setAddress(address);
-        customer=customerRepository.save(customer);
-        return customer.getCustomerId();
+        
+        Credentials credentials = new Credentials();
+        credentials.setUsername(registrationDTO.getUsername());
+        credentials.setEmail(registrationDTO.getEmail());
+        credentials.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
+        credentials.setMobileNumber(registrationDTO.getMobileNumber());
+        credentials.setCustomer(customer);
+        
+        Role role = roleRepository.findByName("ROLE_CUSTOMER")
+                .orElseThrow(() -> new RuntimeException("Role admin not found"));
+    	credentials.setRole(role);
+        
+        customer.setCredentials(credentials);
+        credentials = credentialsRepository.save(credentials);
+        
+        return credentials.getCustomer().getCustomerId();
 	}
 
     private Address checkAndGetAddress(AddressDTO addressDTO) {
@@ -155,58 +216,10 @@ public class CustomerServiceImp implements CustomerService{
         return isCity && isState;
     }
   
-	public AddressDTO updateCustomerAddress(AddressDTO addressDTO) {
-		CustomUserDetails userDetails = accessConService.checkUserAccess();
-
-	    Customer customer = customerRepository.findById(userDetails.getId())
-	            .orElseThrow(() -> new UserException("Customer not found"));
-	    
-	    if (!customer.getCustomerId().equals(addressDTO.getCustomerId())) {
-	        throw new UserException("Unauthorized action: You can only update your own address.");
-	    }
-	    
-	    Address currentAddress = customer.getAddress();
-	    
-	    currentAddress.setFirstStreet(addressDTO.getFirstStreet());
-	    currentAddress.setLastStreet(addressDTO.getLastStreet());
-	    currentAddress.setPincode(addressDTO.getPincode());
-	    
-	    if (!currentAddress.getState().getStateName().equals(addressDTO.getState())) {
-	        State newState = stateRepository.findByStateName(addressDTO.getState())
-	                .orElseThrow(() -> new UserException("State not found"));
-	        currentAddress.setState(newState);
-	    }
-
-	    if (!currentAddress.getCity().getCityName().equals(addressDTO.getCity())) {
-	        City newCity = cityRepository.findByCityName(addressDTO.getCity())
-	                .orElseThrow(() -> new UserException("City not found"));
-	        currentAddress.setCity(newCity);
-	    }
-	    
-	    customerRepository.save(customer);
-
-	    return dtoService.convertEntityToAddressDTO(currentAddress);
-	}
 
 
-	@Override
-	public QueryDTO addQuery(QueryDTO queryDTO) {
-		CustomUserDetails userDetails = accessConService.checkUserAccess();
 
-	    Customer customer = customerRepository.findById(userDetails.getId())
-	            .orElseThrow(() -> new UserException("Customer not found"));
-	    
-	    queryDTO.setQueryId(0L);
-	    Query newQuery = dtoService.convertQueryDTOToEntity(queryDTO);
-	    newQuery.setIsResolved(false);
-	    newQuery.setCustomer(customer);
-	    
-	    Query savedQuery = queryRepository.save(newQuery);
-	    customer.getQueries().add(savedQuery);
-	    
-	    return dtoService.convertQueryToQueryDTO(savedQuery);
-	    
-	}
+
 
 
 	@Override
@@ -223,23 +236,7 @@ public class CustomerServiceImp implements CustomerService{
 	}
 	
 	
-	@Override
-	public FeedbackDTO addFeedback(FeedbackDTO feedbackDTO) {
-		CustomUserDetails userDetails = accessConService.checkUserAccess();
 
-	    Customer customer = customerRepository.findById(userDetails.getId())
-	            .orElseThrow(() -> new UserException("Customer not found"));
-	    
-	    feedbackDTO.setFeedbackId(0L);
-	    Feedback newFeedback = dtoService.convertFeedbackDTOToEntity(feedbackDTO);
-	    newFeedback.setCustomer(customer);
-	    
-	    Feedback savedFeedback = feedbackRepository.save(newFeedback);
-	    customer.getFeedbacks().add(savedFeedback);
-	    
-	    return dtoService.convertFeedbackToFeedbackDTO(savedFeedback);
-	    
-	}
 
 
 	@Override
@@ -326,11 +323,44 @@ public class CustomerServiceImp implements CustomerService{
 	    Policy policy = policyRepository.findById(policyAccountDTO.getPolicyId())
 	            .orElseThrow(() -> new UserException("Policy not found"));
 	    
+	    if (!policy.getIsActive()) {
+	        throw new UserException("The policy is not active");
+	    }
+
+	    // Validate the policy term and investment amount
+	    if (policyAccountDTO.getPolicyTerm() < policy.getMinPolicyTerm() || 
+	        policyAccountDTO.getPolicyTerm() > policy.getMaxPolicyTerm()) {
+	        throw new UserException("Policy term is not within the allowed range");
+	    }
+	    
+	    if (policyAccountDTO.getInvestmentAmount() < policy.getMinInvestmentAmount() || 
+	        policyAccountDTO.getInvestmentAmount() > policy.getMaxInvestmentAmount()) {
+	        throw new UserException("Investment amount is not within the allowed range");
+	    }
+
+	    // Validate the customer's age
+	    int age = LocalDate.now().getYear() - customer.getDateOfBirth().getYear();
+	    if (age < policy.getMinAge() || age > policy.getMaxAge()) {
+	        throw new UserException("Customer's age is not within the allowed range for this policy");
+	    }
+
+	    // Validate the customer's gender
+	    if (!policy.getEligibleGender().equalsIgnoreCase("BOTH") && 
+	        !policy.getEligibleGender().equalsIgnoreCase(customer.getGender().toString())) {
+	        throw new UserException("Customer's gender is not eligible for this policy");
+	    }
+	    
 	    List<DocumentNeeded> requiredDocuments = policy.getDocumentsNeeded();
 	    List<DocumentUploaded> customerDocuments = customer.getDocuments();
 	    
-	    if (!customerDocuments.containsAll(requiredDocuments)) {
-	        throw new UserException("Customer does not have all required documents for the policy");
+	    for (DocumentNeeded requiredDocument : requiredDocuments) {
+	        boolean documentApproved = customerDocuments.stream()
+	                .filter(doc -> doc.getDocumentId().equals(requiredDocument.getDocumentId()))
+	                .anyMatch(DocumentUploaded::getIsApproved);
+
+	        if (!documentApproved) {
+	            throw new UserException("Customer does not have all required approved documents for the policy");
+	        }
 	    }
 	    
 	    policyAccountDTO.setPolicyAccountId(0L);
@@ -358,12 +388,6 @@ public class CustomerServiceImp implements CustomerService{
 	        if (customer.getAddress().getState().getStateId().equals(agent.getAddress().getState().getStateId())) {
 	            policyAccount.setAgent(agent);
 	            
-//	            boolean isFirstPolicy = customer.getPolicyAccounts().isEmpty();
-//
-//	            Double commission = isFirstPolicy ? 
-//	                (policy.getCommissionNewRegistration() / 100) * policyAccountDTO.getInvestmentAmount() :
-//	                (policy.getCommissionInstallment() / 100) * policyAccountDTO.getInvestmentAmount();
-	            
 
 	            Double commission =  ((policy.getCommissionNewRegistration() / 100) * policyAccountDTO.getInvestmentAmount());
 	            
@@ -373,6 +397,8 @@ public class CustomerServiceImp implements CustomerService{
 	        }
 	    }
 	    
+	    createFutureTransactions(policyAccount, policyAccountDTO.getPaymentTimeInMonths(), balancePerPayment);
+	   
 	    PolicyAccount savedPolicyAccount = policyAccountRepository.save(policyAccount);
 	    
 	    policy.getPolicyAccounts().add(savedPolicyAccount);
@@ -390,6 +416,33 @@ public class CustomerServiceImp implements CustomerService{
 	    return dtoService.convertPolicyAccountToPolicyAccountDTO(savedPolicyAccount);
 	    
 	}
+	
+	private void createFutureTransactions(PolicyAccount policyAccount, int paymentTimeInMonths, Double balancePerPayment) {
+	    LocalDate currentDate = LocalDate.now();
+	    LocalDate nextPaymentDate = currentDate.plusMonths(paymentTimeInMonths);
+
+	    // Create the initial payment
+	    Transactions initialPayment = new Transactions();
+	    initialPayment.setAmount(balancePerPayment);
+	    initialPayment.setTransactionDate(currentDate);
+	    initialPayment.setStatus("pending");
+	    initialPayment.setPolicyAccount(policyAccount);
+	    transactionsRepository.save(initialPayment);
+
+	    // Create future scheduled payments
+	    while (nextPaymentDate.isBefore(policyAccount.getMaturedDate()) || nextPaymentDate.isEqual(policyAccount.getMaturedDate())) {
+	        Transactions transaction = new Transactions();
+	        transaction.setAmount(balancePerPayment);
+	        transaction.setTransactionDate(nextPaymentDate);
+	        transaction.setStatus("pending");
+	        transaction.setPolicyAccount(policyAccount);
+	        transactionsRepository.save(transaction);
+
+	        // Move to the next payment date
+	        nextPaymentDate = nextPaymentDate.plusMonths(paymentTimeInMonths);
+	    }
+	}
+
 
 
 	@Override
@@ -427,5 +480,109 @@ public class CustomerServiceImp implements CustomerService{
 	    
 	    return totalAmountToPay;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+    @Override
+    public PagedResponse<WithdrawalRequestsDTO> getAllPolicyClaimsRequest(int pageNo, int size, String sort,
+                                                                          String sortBy, String sortDirection) {
+        Sort sorting = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, size, sorting);
+        Page<WithdrawalRequests> withdrawalRequestsPage = withdrawalRequestsRepository.findAllByIsApprovedFalse(pageable);
+        List<WithdrawalRequests> withdrawalRequests = withdrawalRequestsPage.getContent();
+        List<WithdrawalRequestsDTO> withdrawalRequestsDTOS=dtoService.convertWithdrawalsToDto(withdrawalRequests);
+        return new PagedResponse<>(withdrawalRequestsDTOS, withdrawalRequestsPage.getNumber(),
+                withdrawalRequestsPage.getSize(), withdrawalRequestsPage.getTotalElements(), withdrawalRequestsPage.getTotalPages(),
+                withdrawalRequestsPage.isLast());
+    }
+
+    @Override
+    public PagedResponse<WithdrawalRequestsDTO> getAllPolicyClaimsApproved(int pageNo, int size, String sort,
+                                                                           String sortBy, String sortDirection) {
+        Sort sorting = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, size, sorting);
+        Page<WithdrawalRequests> withdrawalRequestsPage = withdrawalRequestsRepository.findAllByIsApprovedTrue(pageable);
+        List<WithdrawalRequests> withdrawalRequests = withdrawalRequestsPage.getContent();
+        List<WithdrawalRequestsDTO> withdrawalRequestsDTOS=dtoService.convertWithdrawalsToDto(withdrawalRequests);
+        return new PagedResponse<>(withdrawalRequestsDTOS, withdrawalRequestsPage.getNumber(),
+                withdrawalRequestsPage.getSize(), withdrawalRequestsPage.getTotalElements(), withdrawalRequestsPage.getTotalPages(),
+                withdrawalRequestsPage.isLast());
+    }
+    
+    
+    
+    @Override
+    public Boolean deleteCustomer(Long customerId) {
+        accessConService.checkEmployeeServiceAccess(customerId);
+        Customer customer=findCustomerById(customerId);
+        if(!customer.getIsActive()) throw new NoSuchElementException("customer is already deleted");
+        customer.setIsActive(false);
+        customerRepository.save(customer);
+        return true;
+    }
+    
+    
+
+    private Customer findCustomerById(Long customerId) {
+        return customerRepository.findById(customerId).orElseThrow(()->new NoSuchElementException("customer not found"));
+    }
+    
+    
+    @Override
+    public Boolean activateCustomer(Long customerId) {
+        Customer customer=findCustomerById(customerId);
+        if(customer.getIsActive()) throw new NoSuchElementException("customer is already activated");
+        customer.setIsActive(true);
+        customerRepository.save(customer);
+        return true;
+    }
+    
+    
+
+    @Override
+    public PagedResponse<CustomerDTO> getAllCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection) {
+        Sort sorting = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, size, sorting);
+        Page<Customer> customerPage = customerRepository.findAllByIsActiveTrue(pageable);
+        List<Customer> customers = customerPage.getContent();
+        List<CustomerDTO> customerDTOS=dtoService.convertCustomersToDto(customers);
+        return new PagedResponse<>(customerDTOS, customerPage.getNumber(),
+                customerPage.getSize(), customerPage.getTotalElements(), customerPage.getTotalPages(),
+                customerPage.isLast());
+    }
+
+    @Override
+    public PagedResponse<CustomerDTO> getAllInActiveCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection) {
+        Sort sorting = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, size, sorting);
+        Page<Customer> customerPage = customerRepository.findAllByIsActiveFalse(pageable);
+        List<Customer> customers = customerPage.getContent();
+        List<CustomerDTO> customerDTOS=dtoService.convertCustomersToDto(customers);
+        return new PagedResponse<>(customerDTOS, customerPage.getNumber(),
+                customerPage.getSize(), customerPage.getTotalElements(), customerPage.getTotalPages(),
+                customerPage.isLast());
+    }
+
+
+
+
+
+
 	
 }

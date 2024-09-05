@@ -38,7 +38,7 @@ public class Customer {
 	@Column(name = "date_of_birth")
 	private LocalDate dateOfBirth;
 	
-	@NotBlank
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name ="gender")
 	private GenderType gender;
@@ -51,7 +51,7 @@ public class Customer {
 	@Column(name ="nominee_name")
 	private String nomineeName;
 	
-	@NotBlank
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name ="nominee_relation")
 	private NomineeRelation nomineeRelation;
@@ -87,4 +87,8 @@ public class Customer {
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Feedback> feedbacks;
+    
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonManagedReference
+	private List<WithdrawalRequests> withdrawalRequests;
 }

@@ -22,7 +22,7 @@ public class QueryDTO {
     @NotNull(message = "Approved Status is mandatory")
     private Boolean isResolved;
 
-    @NotBlank(message = "Customer ID is mandatory")
+    @NotNull(message = "Customer ID is mandatory")
     private Long customerId;
 
 }

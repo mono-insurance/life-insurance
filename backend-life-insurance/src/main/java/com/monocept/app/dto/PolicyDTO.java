@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
+import com.monocept.app.entity.DocumentNeeded;
+
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -24,8 +26,6 @@ public class PolicyDTO {
 
     @NotBlank(message = "Policy name is mandatory")
     private String policyName;
-
-    private DocumentUploadedDTO documentUploaded;
 
     @NotNull(message = "Commission for new registration is mandatory")
     @Min(value = 0, message = "Commission for new registration cannot be less than 0")
@@ -72,12 +72,12 @@ public class PolicyDTO {
     @Max(value = 100, message = "Profit ratio cannot be more than 100")
     private Float profitRatio;
 
-    private LocalDate createdDate;
-    
+    private LocalDate createdDate = LocalDate.now();
+
     private List<PolicyAccountDTO> policyAccounts;
 
     private List<DocumentNeededDTO> documentsNeeded;
 
-    @NotNull
+    @NotNull(message = "Insurance type ID is mandatory")
     private Long insuranceTypeId;
 }

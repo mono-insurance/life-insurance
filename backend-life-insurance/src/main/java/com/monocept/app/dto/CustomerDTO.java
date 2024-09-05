@@ -55,7 +55,6 @@ public class CustomerDTO {
     private Boolean isApproved;
 
     
-    @NotNull(message = "Address is mandatory")
     private AddressDTO address;
 
 

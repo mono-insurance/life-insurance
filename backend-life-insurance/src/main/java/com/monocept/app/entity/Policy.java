@@ -112,9 +112,10 @@ public class Policy {
     )
     private List<DocumentNeeded> documentsNeeded;
 
-    @OneToMany(mappedBy = "policy", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonManagedReference
-    private Set<Image> images;
+	@ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "image_id")
+    @JsonBackReference
+    private Image image;
 
 	
 	
