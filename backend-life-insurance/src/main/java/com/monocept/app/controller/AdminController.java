@@ -1,24 +1,15 @@
 package com.monocept.app.controller;
 
 import java.time.LocalDate;
+import java.util.List;
 
 
+import com.monocept.app.dto.*;
 import com.monocept.app.service.StorageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.monocept.app.dto.AdminDTO;
-import com.monocept.app.dto.CityDTO;
-import com.monocept.app.dto.CredentialsDTO;
-import com.monocept.app.dto.EmployeeDTO;
-import com.monocept.app.dto.FeedbackDTO;
-import com.monocept.app.dto.InsuranceTypeDTO;
-import com.monocept.app.dto.PolicyDTO;
-import com.monocept.app.dto.QueryDTO;
-import com.monocept.app.dto.SettingsDTO;
-import com.monocept.app.dto.StateDTO;
-import com.monocept.app.dto.TransactionsDTO;
 import com.monocept.app.service.AdminService;
 import com.monocept.app.utils.PagedResponse;
 
@@ -47,6 +38,14 @@ public class AdminController {
 
         AdminDTO admin = adminService.getAdminProfile();
         return new ResponseEntity<AdminDTO>(admin, HttpStatus.OK);
+    }
+
+    @Operation(summary = "By Admin: Get all the documentNeeded")
+    @GetMapping("/documentTypes")
+    public ResponseEntity<List<InsuranceTypeDTO>> getInsuranceTypes() {
+
+        List<InsuranceTypeDTO> documentNeededDTOS = adminService.getInsuranceTypes();
+        return new ResponseEntity<>(documentNeededDTOS, HttpStatus.OK);
     }
 
 

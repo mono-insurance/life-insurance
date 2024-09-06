@@ -150,4 +150,6 @@ public interface DtoService {
 
 
     List<AgentDTO> convertAgentsToDto(List<Agent> agents);
+
+    List<DocumentNeededDTO> convertDocumentNeededToDto(List<DocumentNeeded> documentNeededs);
 }

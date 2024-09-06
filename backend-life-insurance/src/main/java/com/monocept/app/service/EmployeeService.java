@@ -2,6 +2,7 @@ package com.monocept.app.service;
 
 import com.monocept.app.dto.*;
 import com.monocept.app.utils.PagedResponse;
+import jakarta.validation.Valid;
 
 import java.time.LocalDate;
 
@@ -59,4 +60,8 @@ public interface EmployeeService {
     PagedResponse<WithdrawalRequestsDTO> getAllPolicyClaimsRequest(int pageNo, int size, String sort, String sortBy, String sortDirection);
 
     PagedResponse<WithdrawalRequestsDTO> getAllPolicyClaimsApproved(int pageNo, int size, String sort, String sortBy, String sortDirection);
+
+    Boolean approveCustomerProfile(Long customerId, Boolean isApproved);
+
+    Boolean approveDocument(Long documentId, Boolean isApproved);
 }

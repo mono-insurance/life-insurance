@@ -1,14 +1,32 @@
 package com.monocept.app.service;
 
+import com.monocept.app.entity.Agent;
+import com.monocept.app.entity.Customer;
+import com.monocept.app.entity.PolicyAccount;
 import com.monocept.app.exception.RoleAccessException;
+import com.monocept.app.repository.AgentRepository;
+import com.monocept.app.repository.CustomerRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.monocept.app.dto.CustomUserDetails;
 
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+
 @Service
 public class AccessConServiceImp implements AccessConService{
+
+    private final AgentRepository agentRepository;
+    private final CustomerRepository customerRepository;
+
+    public AccessConServiceImp(AgentRepository agentRepository, CustomerRepository customerRepository) {
+        this.agentRepository = agentRepository;
+        this.customerRepository = customerRepository;
+    }
+
     @Override
     public CustomUserDetails checkUserAccess() {
         return (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -51,11 +69,87 @@ public class AccessConServiceImp implements AccessConService{
     }
 
     @Override
-    public void checkEmployeeServiceAccess(Long employeeId) {
+    public void checkEmployeeServiceAccess(Long customerId) {
+        CustomUserDetails customUserDetails=checkUserAccess();
+        String userRole= getUserRole();
+        if(!(userRole.equals("ROLE_ADMIN") || userRole.equals("ROLE_EMPLOYEE") || customUserDetails.getId().equals(customerId))){
+            throw new RoleAccessException("you don't have access");
+        }
+    }
+
+    @Override
+    public void checkEmployeeAdminAccess(Long employeeId) {
         CustomUserDetails customUserDetails=checkUserAccess();
         String userRole= getUserRole();
         if(!(userRole.equals("ROLE_ADMIN") || customUserDetails.getId().equals(employeeId))){
             throw new RoleAccessException("you don't have access");
         }
+    }
+
+    @Override
+    public void checkAdminAccess() {
+        CustomUserDetails customUserDetails=checkUserAccess();
+        String userRole= getUserRole();
+        if(!(userRole.equals("ROLE_ADMIN"))){
+            throw new RoleAccessException("you don't have access");
+        }
+    }
+
+    @Override
+    public void checkDocumentAccess(Long documentId) {
+        String role=getUserRole();
+        if(!(Objects.equals(role, "ADMIN")|| Objects.equals(role, "EMPLOYEE") || checkUserAccess(documentId))){
+            throw new RoleAccessException("you don't have access to this document");
+        }
+    }
+
+    @Override
+    public void checkDocumentDeleteAccess(Long documentId) {
+        String role=getUserRole();
+        if(!(Objects.equals(role, "ADMIN")|| Objects.equals(role, "EMPLOYEE") || customerDocumentAccess(documentId))){
+            throw new RoleAccessException("you don't have access to this document");
+        }
+    }
+
+    private boolean checkUserAccess(Long documentId) {
+        CustomUserDetails customUserDetails= checkUserAccess();
+        String role= getUserRole();
+        if(role.equals("AGENT")){
+            Long agentId=customUserDetails.getId();
+            Agent agent=findAgent(agentId);
+            boolean hisDocument= agent.getDocuments()
+                    .stream()
+                    .anyMatch(doc -> Objects.equals(doc.getDocumentId(), documentId));
+            if(hisDocument) return  true;
+
+            List<PolicyAccount> policyAccountList = agent.getPolicyAccounts();
+            return policyAccountList.stream()
+                    .map(PolicyAccount::getCustomer)                  // Get the Customer from each PolicyAccount
+                    .filter(Objects::nonNull)                         // Filter out null Customers
+                    .flatMap(customer -> customer.getDocuments().stream())  // Flatten the stream of List<DocumentUploaded>
+                    .anyMatch(document -> Objects.equals(document.getDocumentId(), documentId));
+
+        }
+       return customerDocumentAccess(documentId);
+    }
+
+    private boolean customerDocumentAccess(Long documentId) {
+        CustomUserDetails customUserDetails= checkUserAccess();
+        String role= getUserRole();
+        if(role.equals("CUSTOMER")){
+            Long customerId=customUserDetails.getId();
+            Customer customer=findCustomer(customerId);
+            return customer.getDocuments()
+                    .stream()
+                    .anyMatch(doc -> Objects.equals(doc.getDocumentId(), documentId));
+        }
+        return false;
+    }
+
+    private Agent findAgent(Long agentId) {
+        return agentRepository.findById(agentId).orElseThrow(()->new NoSuchElementException("agent not found"));
+    }
+    private Customer findCustomer(Long customerId) {
+        return customerRepository.findById(customerId).orElseThrow(()->new NoSuchElementException("agent not found"));
     }
 }

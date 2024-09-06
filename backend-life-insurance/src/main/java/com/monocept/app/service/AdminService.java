@@ -1,20 +1,9 @@
 package com.monocept.app.service;
 
-import java.time.LocalDate;
+import java.util.List;
 
-import com.monocept.app.dto.AdminDTO;
-import com.monocept.app.dto.CityDTO;
-import com.monocept.app.dto.CredentialsDTO;
-import com.monocept.app.dto.EmployeeDTO;
-import com.monocept.app.dto.FeedbackDTO;
-import com.monocept.app.dto.PolicyDTO;
-import com.monocept.app.dto.QueryDTO;
-import com.monocept.app.dto.SettingsDTO;
-import com.monocept.app.dto.StateDTO;
-import com.monocept.app.dto.TransactionsDTO;
+import com.monocept.app.dto.*;
 import com.monocept.app.utils.PagedResponse;
-
-import com.monocept.app.dto.InsuranceTypeDTO;
 
 public interface AdminService {
 
@@ -25,8 +14,6 @@ public interface AdminService {
     AdminDTO updateAdminProfile(AdminDTO adminDTO);
 
     EmployeeDTO createEmployee(CredentialsDTO credentials);
-
-//	EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO);
 
     void deleteEmployee(Long id);
 
@@ -69,4 +56,6 @@ public interface AdminService {
 
 
     Boolean approveAgent(Long agentId);
+
+    List<InsuranceTypeDTO> getInsuranceTypes();
 }

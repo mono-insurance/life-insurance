@@ -43,4 +43,23 @@ public class EmailServiceImp implements EmailService{
         }
         return true;
     }
+
+    @Override
+    public void sendAccountCreationEmail(EmailDTO emailDTO) {
+        MimeMessage mimeMessage
+                = javaMailSender.createMimeMessage();
+        MimeMessageHelper mimeMessageHelper;
+        try {
+            mimeMessageHelper
+                    = new MimeMessageHelper(mimeMessage, true);
+            mimeMessageHelper.setFrom(sender);
+            mimeMessageHelper.setTo(emailDTO.getEmailId());
+            mimeMessageHelper.setText(emailDTO.getBody());
+            mimeMessageHelper.setSubject(emailDTO.getTitle());
+            javaMailSender.send(mimeMessage);
+        }
+        catch (MessagingException e) {
+            throw new EmailNotSendException("can't send email to user with subject: account creation");
+        }
+    }
 }

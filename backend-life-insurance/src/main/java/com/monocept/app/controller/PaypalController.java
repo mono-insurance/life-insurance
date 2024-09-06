@@ -20,41 +20,37 @@ public class PaypalController {
     @Autowired
     PaymentService paymentService;
 
-    public static final String SUCCESS_URL = "pay/success";
-    public static final String CANCEL_URL = "pay/cancel";
-
-    @GetMapping("/")
-    public String home() {
-        return "home";
-    }
-
-    @PostMapping("/pay")
-    public ResponseEntity<String> payment(@RequestBody @Valid PaymentOrder paymentOrder) {
+    @PostMapping("transaction/{tid}/pay")
+    public ResponseEntity<String> payment(
+            @PathVariable("tid") Long transactionId,
+            @RequestBody @Valid PaymentOrder paymentOrder) {
         try {
-            Payment payment = paymentService.createPayment(paymentOrder);
-            for(Links link:payment.getLinks()) {
-                if(link.getRel().equals("approval_url")) {
-                    return new ResponseEntity<>("redirect:"+link.getHref(), HttpStatus.BAD_REQUEST);
+            Payment payment = paymentService.createPayment(transactionId, paymentOrder);
+            for (Links link : payment.getLinks()) {
+                if (link.getRel().equals("approval_url")) {
+                    return new ResponseEntity<>("redirect:" + link.getHref(), HttpStatus.OK);
                 }
             }
 
         } catch (PayPalRESTException e) {
-
             e.printStackTrace();
         }
         return new ResponseEntity<>("redirect:", HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping(value = CANCEL_URL)
+    @PostMapping("status-failed/{tid}")
     public String cancelPay() {
         return "cancel";
     }
 
-    @GetMapping(value = SUCCESS_URL)
-    public String successPay(@RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String payerId) {
+    @PostMapping("/status-success/{tid}")
+    public String successPay(
+            @PathVariable("tid") Long transactionId,
+            @RequestParam("paymentId") String paymentId,
+            @RequestParam("PayerID") String payerId) {
         try {
-            Payment payment = paymentService.executePayment(paymentId, payerId);
-            System.out.println(payment.toJSON());
+            Payment payment = paymentService.executePayment(transactionId, paymentId, payerId);
+            System.out.println("payment details are : " + payment.toJSON());
             if (payment.getState().equals("approved")) {
                 return "success";
             }

@@ -16,7 +16,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -33,6 +32,8 @@ public class AdminServiceImp implements AdminService{
 	private RoleRepository roleRepository;
 	private AuthRepository authRepository;
 	private final AgentRepository agentRepository;
+	private final DocumentNeededRepository documentNeededRepository;
+	private final EmailService emailService;
 	
 	@Autowired
     private StateRepository stateRepository;
@@ -68,7 +69,8 @@ public class AdminServiceImp implements AdminService{
 	@Autowired
     public AdminServiceImp(AccessConService accessConService, AdminRepository adminRepository,
 						   DtoService dtoService, EmployeeRepository employeeRepository, RoleRepository roleRepository,
-						   AuthRepository authRepository, PasswordEncoder passwordEncoder, AgentRepository agentRepository) {
+						   AuthRepository authRepository, PasswordEncoder passwordEncoder, AgentRepository agentRepository,
+						   DocumentNeededRepository documentNeededRepository, EmailService emailService) {
 		this.employeeRepository = employeeRepository;
 		this.accessConService = accessConService;
         this.adminRepository = adminRepository;
@@ -77,6 +79,8 @@ public class AdminServiceImp implements AdminService{
         this.authRepository = authRepository;
         this.passwordEncoder = passwordEncoder;
 		this.agentRepository = agentRepository;
+		this.documentNeededRepository = documentNeededRepository;
+		this.emailService = emailService;
 	}
 
 	@Override
@@ -128,10 +132,15 @@ public class AdminServiceImp implements AdminService{
 		Credentials credentials = dtoService.convertCredentialsDtoToCredentials(credentialsDTO);
 		credentials.getEmployee().setIsActive(true);
 		Credentials newCredentials = authRepository.save(credentials);
+		EmailDTO emailDTO=new EmailDTO();
+		emailDTO.setEmailId(credentialsDTO.getEmail());
+		emailDTO.setTitle("Employee created");
+		emailDTO.setBody("Congrats!! your account has been created by admin.\n Now, you are employee of our company\n" +
+				"your username is "+credentials.getUsername()+"\nPlease login and change your password and start working");
+		emailService.sendAccountCreationEmail(emailDTO);
 		
-		EmployeeDTO employeeDTO = dtoService.converEmployeeToEmployeeResponseDTO(newCredentials.getEmployee());
-		
-		return employeeDTO;
+		return dtoService.converEmployeeToEmployeeResponseDTO(newCredentials.getEmployee());
+
 	}
 
 //
@@ -166,8 +175,16 @@ public class AdminServiceImp implements AdminService{
 		}
 		
 		existingEmployee.setIsActive(false);
-		
-		employeeRepository.save(existingEmployee);
+		existingEmployee=employeeRepository.save(existingEmployee);
+
+		EmailDTO emailDTO=new EmailDTO();
+		emailDTO.setEmailId(existingEmployee.getCredentials().getEmail());
+		emailDTO.setTitle("Employee Deleted");
+		emailDTO.setBody("Congrats!! your account has been deleted by admin.\n" +
+				" Now, you are no longer an employee of our company\n" +
+				"your username is "+existingEmployee.getCredentials().getUsername()+
+				"\nPlease Contact admin if it is a mistake");
+		emailService.sendAccountCreationEmail(emailDTO);
 	}
 
 	@Override
@@ -466,8 +483,23 @@ public class AdminServiceImp implements AdminService{
 		Agent agent=findAgentById(agentId);
 		agent.setIsApproved(true);
 		agentRepository.save(agent);
+		EmailDTO emailDTO=new EmailDTO();
+		emailDTO.setEmailId(agent.getCredentials().getEmail());
+		emailDTO.setTitle("Agent Approved");
+		emailDTO.setBody("Congrats!! your account has been activated by admin.\n" +
+				" Now, you are an agent of our company\n" +
+				"your username is "+agent.getCredentials().getUsername()+
+				"\nPlease Start working to get new customers to us.");
+		emailService.sendAccountCreationEmail(emailDTO);
 //		send email to agent
 		return true;
+	}
+
+	@Override
+	public List<InsuranceTypeDTO> getInsuranceTypes() {
+		List<InsuranceType> insuranceTypes=insuranceTypeRepository.findAll();
+		return dtoService.convertInsuranceTypeListEntityToDTO(insuranceTypes);
+
 	}
 
 	private Agent findAgentById(Long agentId) {

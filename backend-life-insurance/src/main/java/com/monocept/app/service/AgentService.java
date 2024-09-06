@@ -2,9 +2,10 @@ package com.monocept.app.service;
 
 import com.monocept.app.dto.*;
 import com.monocept.app.utils.PagedResponse;
+import jakarta.validation.Valid;
 
 public interface AgentService {
-    Long agentRegisterRequest(RegistrationDTO registrationDTO);
+    Long agentRegisterRequest(@Valid CredentialsDTO registrationDTO);
 
     AgentDTO updateAgent(AgentDTO agentDTO);
 
@@ -19,4 +20,6 @@ public interface AgentService {
     PagedResponse<WithdrawalRequestsDTO> getAllPolicyClaims(int pageNo, int size, String sort, String sortBy, String sortDirection);
 
     PagedResponse<CustomerDTO> getAllCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection);
+
+    Boolean withdrawalRequest(Double agentCommission);
 }

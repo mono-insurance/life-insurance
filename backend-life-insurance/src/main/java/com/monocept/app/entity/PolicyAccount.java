@@ -30,17 +30,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(name = "policy_account")
 public class PolicyAccount {
-	
-	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "policy_account_id")
     private Long policyAccountId;
-	
-	
+
 	@Column(name = "created_date")
 	private LocalDate createdDate = LocalDate.now();
-	
+
 	@NotNull
 	@Column(name = "matured_date")
 	private LocalDate maturedDate;

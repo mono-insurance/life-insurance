@@ -10,4 +10,12 @@ public interface AccessConService {
     void checkSameUserOrRole(Long agentId);
 
     void checkEmployeeServiceAccess(Long employeeId);
+
+    void checkEmployeeAdminAccess(Long employeeId);
+
+    void checkAdminAccess();
+
+    void checkDocumentAccess(Long documentId);
+
+    void checkDocumentDeleteAccess(Long documentId);
 }

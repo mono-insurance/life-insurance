@@ -5,6 +5,9 @@ import com.monocept.app.entity.*;
 import com.monocept.app.repository.*;
 import com.monocept.app.utils.PageResult;
 import com.monocept.app.utils.PagedResponse;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -12,6 +15,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class AgentServiceImp implements AgentService {
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     private final DtoService dtoService;
     private final AccessConService accessConService;
     private final AgentRepository agentRepository;
@@ -20,10 +25,13 @@ public class AgentServiceImp implements AgentService {
     private final AuthRepository authRepository;
     private final AddressRepository addressRepository;
     private final RoleRepository roleRepository;
+    private final EmailService emailService;
+    private final WithdrawalRequestsRepository withdrawalRequestsRepository;
 
     public AgentServiceImp(DtoService dtoService, AccessConService accessConService, AgentRepository agentRepository,
                            CityRepository cityRepository, StateRepository stateRepository, AuthRepository authRepository,
-                           AddressRepository addressRepository, RoleRepository roleRepository) {
+                           AddressRepository addressRepository, RoleRepository roleRepository, EmailService emailService,
+                           WithdrawalRequestsRepository withdrawalRequestsRepository) {
         this.dtoService = dtoService;
         this.accessConService = accessConService;
         this.agentRepository = agentRepository;
@@ -32,33 +40,25 @@ public class AgentServiceImp implements AgentService {
         this.authRepository = authRepository;
         this.addressRepository = addressRepository;
         this.roleRepository = roleRepository;
+        this.emailService = emailService;
+        this.withdrawalRequestsRepository = withdrawalRequestsRepository;
     }
 
     @Override
-    public Long agentRegisterRequest(RegistrationDTO registrationDTO) {
-//        first set credentials
-        CredentialsResponseDTO credentialsResponseDTO = registrationDTO.getCredentials();
-        Credentials credentials = new Credentials();
-        Role role = roleRepository.findByName("ROLE_AGENT").get();
-        credentials.setRole(role);
-        credentials.setMobileNumber(credentialsResponseDTO.getMobileNumber());
-        credentials.setEmail(credentialsResponseDTO.getEmail());
-        credentials.setUsername(credentialsResponseDTO.getUsername());
-        credentials = authRepository.save(credentials);
-        role.getCredentials().add(credentials);
-        roleRepository.save(role);
+    public Long agentRegisterRequest(@Valid CredentialsDTO credentialsDTO) {
+        Credentials credentials = dtoService.convertCredentialsDtoToCredentials(credentialsDTO);
+        credentials.getAgent().setIsActive(false);
 
-        Agent agent = new Agent();
-        agent.setCredentials(credentials);
-        AddressDTO addressDTO = registrationDTO.getAddress();
-        Address address = dtoService.convertDtoToAddress(addressDTO);
-        agent.setAddress(address);
-        agent.setIsActive(false);
-        agent.setIsApproved(false);
-        agent.setFirstName(registrationDTO.getFirstName());
-        agent.setLastName(registrationDTO.getLastName());
-        agent = agentRepository.save(agent);
-        return agent.getAgentId();
+        Long id= authRepository.save(credentials).getId();
+        EmailDTO emailDTO=new EmailDTO();
+        emailDTO.setEmailId(credentialsDTO.getEmail());
+        emailDTO.setTitle("Registration Success");
+        emailDTO.setBody("Congrats!! you have registered with our company as an agent.\n" +
+                " Now, your details will be verified by our company employees" +
+                " and your account will be activated\n We will inform you once details verified" +
+                "your username is "+credentialsDTO.getUsername());
+        emailService.sendAccountCreationEmail(emailDTO);
+        return id;
     }
 
     @Override
@@ -206,5 +206,25 @@ public class AgentServiceImp implements AgentService {
                 (customerList.size() + size - 1) / size,
                 end == customerList.size()
         );
+    }
+
+    @Override
+    public Boolean withdrawalRequest(Double agentCommission) {
+        CustomUserDetails customUserDetails=accessConService.checkUserAccess();
+        Long agentId=customUserDetails.getId();
+        Agent agent=findAgent(agentId);
+        if(agent.getBalance()<agentCommission){
+            throw new NoSuchElementException("your balance is less than requested");
+        }
+        WithdrawalRequests withdrawalRequests=new WithdrawalRequests();
+        withdrawalRequests.setAgent(agent);
+        withdrawalRequests.setIsWithdraw(false);
+        withdrawalRequests.setRequestType("Commission");
+        withdrawalRequests.setIsApproved(false);
+        withdrawalRequests.setAmount(agentCommission);
+        withdrawalRequests=withdrawalRequestsRepository.save(withdrawalRequests);
+        agent.getWithdrawalRequests().add(withdrawalRequests);
+        agentRepository.save(agent);
+        return true;
     }
 }

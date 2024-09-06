@@ -61,7 +61,7 @@ public class Credentials {
 	@OneToOne(mappedBy = "credentials", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Employee employee;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Role role;
 	
 }

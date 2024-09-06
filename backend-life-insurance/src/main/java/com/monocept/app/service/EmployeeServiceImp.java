@@ -18,6 +18,7 @@ import java.util.NoSuchElementException;
 @Service
 public class EmployeeServiceImp implements EmployeeService{
 
+    private final DocumentUploadedRepository documentUploadedRepository;
     private final AccessConService accessConService;
     private final EmployeeRepository employeeRepository;
     private final DtoService dtoService;
@@ -31,8 +32,10 @@ public class EmployeeServiceImp implements EmployeeService{
     private final FeedbackRepository feedbackRepository;
     private final PolicyAccountRepository policyAccountRepository;
     private final WithdrawalRequestsRepository withdrawalRequestsRepository;
+    private final AuthRepository authRepository;
 
-    public EmployeeServiceImp(AccessConService accessConService, EmployeeRepository employeeRepository,
+    public EmployeeServiceImp(DocumentUploadedRepository documentUploadedRepository, AccessConService accessConService,
+                              EmployeeRepository employeeRepository,
                               DtoService dtoService, CustomerRepository customerRepository,
                               AgentRepository agentRepository, QueryRepository queryRepository,
                               StateRepository stateRepository, CityRepository cityRepository,
@@ -40,7 +43,8 @@ public class EmployeeServiceImp implements EmployeeService{
                               TransactionsRepository transactionsRepository,
                               FeedbackRepository feedbackRepository,
                               PolicyAccountRepository policyAccountRepository,
-                              WithdrawalRequestsRepository withdrawalRequestsRepository) {
+                              WithdrawalRequestsRepository withdrawalRequestsRepository, AuthRepository authRepository) {
+        this.documentUploadedRepository = documentUploadedRepository;
         this.accessConService = accessConService;
         this.employeeRepository = employeeRepository;
         this.dtoService = dtoService;
@@ -54,6 +58,7 @@ public class EmployeeServiceImp implements EmployeeService{
         this.feedbackRepository = feedbackRepository;
         this.policyAccountRepository = policyAccountRepository;
         this.withdrawalRequestsRepository = withdrawalRequestsRepository;
+        this.authRepository = authRepository;
     }
 
     @Override
@@ -69,20 +74,35 @@ public class EmployeeServiceImp implements EmployeeService{
 
     @Override
     public EmployeeDTO updateEmployeeProfile(EmployeeDTO employeeDTO) {
-        accessConService.checkEmployeeServiceAccess(employeeDTO.getEmployeeId());
+        accessConService.checkEmployeeAdminAccess(employeeDTO.getEmployeeId());
         Employee employee=findEmpById(employeeDTO.getEmployeeId());
+        updateEmployee(employee,employeeDTO);
+        employeeRepository.save(employee);
         return dtoService.convertEmployeeToDTO(employee);
     }
 
+    private void updateEmployee(Employee employee, EmployeeDTO employeeDTO) {
+        updateCredentials(employee.getCredentials(),employeeDTO.getCredentials());
+        employee.setQualification(employeeDTO.getQualification());
+        employee.setDateOfBirth(employeeDTO.getDateOfBirth());
+        employee.setFirstName(employeeDTO.getFirstName());
+        employee.setLastName(employeeDTO.getLastName());
+
+    }
+
+    private void updateCredentials(Credentials credentials, CredentialsResponseDTO credentialsResponseDTO) {
+        credentials.setUsername(credentialsResponseDTO.getUsername());
+        credentials.setEmail(credentialsResponseDTO.getEmail());
+        credentials.setMobileNumber(credentialsResponseDTO.getMobileNumber());
+        authRepository.save(credentials);
+    }
 
     @Override
     public Boolean deleteCustomer(Long customerId) {
-        accessConService.checkEmployeeServiceAccess(customerId);
+//        accessConService.checkEmployeeServiceAccess(customerId);
         Customer customer=findCustomerById(customerId);
         if(!customer.getIsActive()) throw new NoSuchElementException("customer is already deleted");
-        customer.setIsActive(false);
-        customerRepository.save(customer);
-        return true;
+        return customerRepository.findByIdAndSetIsActiveFalse(customerId)==1;
     }
 
     private Customer findCustomerById(Long customerId) {
@@ -130,10 +150,8 @@ public class EmployeeServiceImp implements EmployeeService{
     @Override
     public Boolean activateCustomer(Long customerId) {
         Customer customer=findCustomerById(customerId);
-        if(customer.getIsActive()) throw new NoSuchElementException("customer is already activated");
-        customer.setIsActive(true);
-        customerRepository.save(customer);
-        return true;
+        if(customer.getIsActive()) throw new NoSuchElementException("customer is already deleted");
+        return customerRepository.findByIdAndSetIsActiveTrue(customerId)==1;
     }
 
     @Override
@@ -439,5 +457,39 @@ public class EmployeeServiceImp implements EmployeeService{
         return new PagedResponse<>(withdrawalRequestsDTOS, withdrawalRequestsPage.getNumber(),
                 withdrawalRequestsPage.getSize(), withdrawalRequestsPage.getTotalElements(), withdrawalRequestsPage.getTotalPages(),
                 withdrawalRequestsPage.isLast());
+    }
+
+    @Override
+    public Boolean approveCustomerProfile(Long customerId, Boolean isApproved) {
+        Customer customer=findCustomerById(customerId);
+
+        if(!isApproved){
+//            send email to customer that your profile not approved, please update correct info
+        }
+        if(isApproved){
+            isApproved= customerRepository.findByIdAndSetIsApprovedTrue(customerId)==1;
+        }
+//        send email to customer that your profile is approved
+
+        return isApproved;
+    }
+
+    @Override
+    public Boolean approveDocument(Long documentId, Boolean isApproved) {
+        DocumentUploaded documentUploaded=findDocumentById(documentId);
+
+        if(!isApproved){
+//            send email to customer that your document not approved, please update correct info
+        }
+        if(isApproved){
+            isApproved= documentUploadedRepository.findByIdAndSetIsApprovedTrue(documentId)==1;
+        }
+//        send email to customer that your document is approved
+
+        return isApproved;
+    }
+
+    private DocumentUploaded findDocumentById(Long documentId) {
+        return documentUploadedRepository.findById(documentId).orElseThrow(()->new NoSuchElementException("document not found"));
     }
 }

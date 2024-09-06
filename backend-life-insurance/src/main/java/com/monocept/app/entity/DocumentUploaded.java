@@ -30,10 +30,13 @@ public class DocumentUploaded {
     @Column(name = "document_id")
     private Long documentId;
 
-
     @NotBlank
     @Column(name = "name")
     private String name;
+
+    @NotBlank
+    @Column(name = "cloud_file_name")
+    private String cloudFileName;
 
     @NotNull
     @Column(name = "is_approved")

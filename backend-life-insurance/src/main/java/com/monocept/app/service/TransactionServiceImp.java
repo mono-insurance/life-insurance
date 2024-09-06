@@ -10,4 +10,9 @@ public class TransactionServiceImp implements TransactionService{
     public PagedResponse<WithdrawalRequestsDTO> getAllCommissions(int pageNo, int size, String sort, String sortBy, String sortDirection) {
         return null;
     }
+
+    @Override
+    public Boolean reviewCommissionWithdrawalRequest(Boolean isApproved) {
+        return null;
+    }
 }

@@ -55,7 +55,10 @@ public class Agent {
 	@NotNull
 	@Column(name ="is_approved")
 	private Boolean isApproved;
-	
+
+	@NotNull
+	@Column(name ="balance")
+	private Double balance;
 	
     @OneToOne
     @MapsId
