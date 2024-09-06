@@ -18,18 +18,22 @@ public class WithdrawalRequestsDTO {
     @NotBlank(message = "Request type is mandatory")
     private String requestType;
 
-    @NotNull(message = "Amount is mandatory")
-    @Positive(message = "Amount must be positive")
     private Double amount;
 
-    @NotNull(message = "User ID is mandatory")
-    private Long userId;
-
-    @NotNull(message = "Withdraw Status is mandatory")
     private Boolean isWithdraw;
 
-    @NotNull(message = "Approved Status is mandatory")
     private Boolean isApproved;
 
+    @NotNull
+    private Long policyAccountId;
+    
 
+    private Long agentId;
+
+    private Long customerId;
+    
+    
+    private Long transactionId;
+    
+    
 }

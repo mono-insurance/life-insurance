@@ -2,11 +2,19 @@ package com.monocept.app.service;
 
 import com.monocept.app.dto.*;
 import com.monocept.app.entity.*;
+import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.*;
 import com.monocept.app.utils.PageResult;
 import com.monocept.app.utils.PagedResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +33,10 @@ public class AgentServiceImp implements AgentService {
     private final AuthRepository authRepository;
     private final AddressRepository addressRepository;
     private final RoleRepository roleRepository;
+
     private final EmailService emailService;
     private final WithdrawalRequestsRepository withdrawalRequestsRepository;
+
 
     public AgentServiceImp(DtoService dtoService, AccessConService accessConService, AgentRepository agentRepository,
                            CityRepository cityRepository, StateRepository stateRepository, AuthRepository authRepository,
@@ -67,12 +77,17 @@ public class AgentServiceImp implements AgentService {
         Agent agent = findAgent(agentDTO.getAgentId());
         agent = updatethisAgent(agent, agentDTO);
         agent = agentRepository.save(agent);
+        EmailDTO emailDTO=new EmailDTO();
+        emailDTO.setEmailId(agent.getCredentials().getEmail());
+        emailDTO.setTitle("Profile update");
+        emailDTO.setBody("You have updated your profile, now your account is under review" +
+                "your username is "+agent.getCredentials().getUsername());
         return dtoService.convertAgentToAgentDto(agent);
     }
 
     private Agent findAgent(Long agentId) {
         return agentRepository.findById(agentId).
-                orElseThrow(() -> new NoSuchElementException("agent not found"));
+                orElseThrow(() -> new UserException("agent not found"));
     }
 
     private Agent updatethisAgent(Agent agent, AgentDTO agentDTO) {
@@ -101,6 +116,7 @@ public class AgentServiceImp implements AgentService {
 
     @Override
     public AgentDTO viewProfile(Long agentId) {
+        accessConService.checkSameUserOrRole(agentId);
         Agent agent = findAgent(agentId);
         return dtoService.convertAgentToAgentDto(agent);
     }
@@ -207,14 +223,13 @@ public class AgentServiceImp implements AgentService {
                 end == customerList.size()
         );
     }
-
     @Override
     public Boolean withdrawalRequest(Double agentCommission) {
         CustomUserDetails customUserDetails=accessConService.checkUserAccess();
         Long agentId=customUserDetails.getId();
         Agent agent=findAgent(agentId);
         if(agent.getBalance()<agentCommission){
-            throw new NoSuchElementException("your balance is less than requested");
+            throw new UserException("your balance is less than requested");
         }
         WithdrawalRequests withdrawalRequests=new WithdrawalRequests();
         withdrawalRequests.setAgent(agent);
@@ -227,4 +242,86 @@ public class AgentServiceImp implements AgentService {
         agentRepository.save(agent);
         return true;
     }
+    @Override
+    public PagedResponse<AgentDTO> getAllAgents(int pageNo, int size, String sort, String sortBy, String sortDirection) {
+        accessConService.checkEmployeeAccess();
+        Sort sorting = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, size, sorting);
+        Page<Agent> agentPage = agentRepository.findAll(pageable);
+        List<Agent> agents = agentPage.getContent();
+        List<AgentDTO> agentDTOS=dtoService.convertAgentsToDto(agents);
+        return new PagedResponse<>(agentDTOS, agentPage.getNumber(),
+                agentPage.getSize(), agentPage.getTotalElements(), agentPage.getTotalPages(),
+                agentPage.isLast());
+    }
+
+    @Override
+    public Boolean deleteAgent(Long agentId) {
+        accessConService.checkEmployeeAccess();
+        Agent agent=findAgentById(agentId);
+        if(!agent.getIsActive()){
+            throw new UserException("agent is already deleted");
+        }
+        agent.setIsActive(false);
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setEmailId(agent.getCredentials().getEmail());
+        emailDTO.setTitle("Account Deleted");
+        emailDTO.setBody("Oops!! your account has been deleted by us.\n" +
+                "if this is a mistake, please contact to our employees");
+        emailService.sendAccountCreationEmail(emailDTO);
+        agentRepository.save(agent);
+        return true;
+    }
+
+    private Agent findAgentById(Long agentId) {
+        return agentRepository.findById(agentId).orElseThrow(()->new UserException("agent not found"));
+    }
+
+    @Override
+    public Boolean activateAgent(Long agentId) {
+        accessConService.checkEmployeeAccess();
+        Agent agent=findAgentById(agentId);
+        if(agent.getIsActive()) throw new UserException("agent is already activated");
+        agent.setIsActive(true);
+
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setEmailId(agent.getCredentials().getEmail());
+        emailDTO.setTitle("Account activated");
+        emailDTO.setBody("Congrats!! your account has been activated by admin.\n" +
+                "your username is " + agent.getCredentials().getUsername() +
+                "\nPlease Start working to get new customers to us.");
+        emailService.sendAccountCreationEmail(emailDTO);
+        agentRepository.save(agent);
+        return true;
+    }
+    
+    
+    
+	@Override
+	public Boolean approveAgent(Long agentId, Boolean isApproved) {
+        accessConService.checkAdminAccess();
+		Agent agent=findAgentById(agentId);
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setEmailId(agent.getCredentials().getEmail());
+        if(isApproved){
+            agent.setIsApproved(true);
+            agentRepository.save(agent);
+
+            emailDTO.setTitle("Agent Approved");
+            emailDTO.setBody("Congrats!! your account has been activated by admin.\n" +
+                    " Now, you are an agent of our company\n" +
+                    "your username is " + agent.getCredentials().getUsername() +
+                    "\nPlease Start working to get new customers to us.");
+        }
+        else{
+            emailDTO.setTitle("Agent Not Approved");
+            emailDTO.setBody("Oops!! your registration request has been rejected by admin.\n");
+        }
+
+        emailService.sendAccountCreationEmail(emailDTO);
+//		send email to agent
+		return true;
+	}
 }

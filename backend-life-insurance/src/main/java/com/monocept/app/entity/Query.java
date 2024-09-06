@@ -32,7 +32,7 @@ public class Query {
 	@Column(name = "question")
 	private String question;
 	
-	@NotBlank
+
 	@Column(name = "response")
 	private String response;
 	

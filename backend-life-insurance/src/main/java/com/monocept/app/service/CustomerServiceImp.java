@@ -5,76 +5,97 @@ import com.monocept.app.dto.*;
 import com.monocept.app.entity.Address;
 import com.monocept.app.entity.Agent;
 import com.monocept.app.entity.City;
+import com.monocept.app.entity.Credentials;
 import com.monocept.app.entity.Customer;
 import com.monocept.app.entity.DocumentNeeded;
 import com.monocept.app.entity.DocumentUploaded;
-import com.monocept.app.entity.Feedback;
 import com.monocept.app.entity.Policy;
 import com.monocept.app.entity.PolicyAccount;
 import com.monocept.app.entity.Query;
+import com.monocept.app.entity.Role;
 import com.monocept.app.entity.Settings;
 import com.monocept.app.entity.State;
 import com.monocept.app.entity.Transactions;
+import com.monocept.app.entity.WithdrawalRequests;
 import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.AddressRepository;
 import com.monocept.app.repository.AgentRepository;
+import com.monocept.app.repository.AuthRepository;
 import com.monocept.app.repository.CityRepository;
 import com.monocept.app.repository.CustomerRepository;
-import com.monocept.app.repository.FeedbackRepository;
 import com.monocept.app.repository.PolicyAccountRepository;
 import com.monocept.app.repository.PolicyRepository;
 import com.monocept.app.repository.QueryRepository;
+import com.monocept.app.repository.RoleRepository;
 import com.monocept.app.repository.SettingsRepository;
 import com.monocept.app.repository.StateRepository;
 
 import com.monocept.app.repository.TransactionsRepository;
+import com.monocept.app.repository.WithdrawalRequestsRepository;
+import com.monocept.app.utils.GenderType;
 import com.monocept.app.utils.GlobalSettings;
+import com.monocept.app.utils.NomineeRelation;
 import com.monocept.app.utils.PagedResponse;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CustomerServiceImp implements CustomerService{
-
+public class CustomerServiceImp implements CustomerService {
+    @Autowired
     private CustomerRepository customerRepository;
+    @Autowired
     private DtoService dtoService;
+    @Autowired
     private StateRepository stateRepository;
+    @Autowired
     private CityRepository cityRepository;
+    @Autowired
     private AddressRepository addressRepository;
-    
+
     @Autowired
     private AccessConService accessConService;
-    
+
     @Autowired
     private QueryRepository queryRepository;
-    
-    @Autowired
-    private FeedbackRepository feedbackRepository;
-    
+
     @Autowired
     private PolicyAccountRepository policyAccountRepository;
-    
+
     @Autowired
     private TransactionsRepository transactionsRepository;
-    
+
     @Autowired
     private PolicyRepository policyRepository;
-    
+
     @Autowired
     private AgentRepository agentRepository;
-    
+
     @Autowired
     private SettingsRepository settingsRepository;
+
+    @Autowired
+    private AuthRepository credentialsRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private WithdrawalRequestsRepository withdrawalRequestsRepository;
+    @Autowired
+    private EmailService emailService;
 
     public CustomerServiceImp(CustomerRepository customerRepository, DtoService dtoService,
                               StateRepository stateRepository, CityRepository cityRepository,
@@ -86,346 +107,520 @@ public class CustomerServiceImp implements CustomerService{
         this.addressRepository = addressRepository;
     }
 
-
-	@Override
-	public CustomerDTO getCustomerProfile() {
-		CustomUserDetails userDetails = accessConService.checkUserAccess();
-
-	    Customer customer = customerRepository.findById(userDetails.getId())
-	            .orElseThrow(() -> new UserException("Customer not found"));
-
-	    return dtoService.convertCustomerToCustomerResponseDTO(customer);
-	}
-
-	@Override
-	public CustomerDTO updateCustomerProfile(CustomerDTO customerDTO) {
-		CustomUserDetails userDetails = accessConService.checkUserAccess();
-
-	    // Find the customer by ID
-	    Customer customer = customerRepository.findById(userDetails.getId())
-	            .orElseThrow(() -> new UserException("Customer not found"));
-
-	    customer.setFirstName(customerDTO.getFirstName());
-	    customer.setLastName(customerDTO.getLastName());
-	    customer.setDateOfBirth(customerDTO.getDateOfBirth());
-	    customer.setGender(customerDTO.getGender());
-	    customer.setIsActive(customerDTO.getIsActive());
-	    customer.setNomineeName(customerDTO.getNomineeName());
-	    customer.setNomineeRelation(customerDTO.getNomineeRelation());
-	    customer.setIsApproved(customerDTO.getIsApproved());
-	    customer.getCredentials().setUsername(customerDTO.getCredentials().getUsername());
-	    customer.getCredentials().setEmail(customerDTO.getCredentials().getEmail());
-	    customer.getCredentials().setMobileNumber(customerDTO.getCredentials().getMobileNumber());
-
-	    Customer updatedCustomer = customerRepository.save(customer);
-
-	    return dtoService.convertCustomerToCustomerResponseDTO(updatedCustomer);
-	}
-
-
-	@Override
-	public Long customerRegistrationRequest(@Valid RegistrationDTO registrationDTO) {
-        Customer customer=dtoService.convertCustomerDtoToCustomer(registrationDTO);
-        customer=customerRepository.save(customer);
-        Address address=checkAndGetAddress(registrationDTO.getAddress());
-        customer.setAddress(address);
-        customer=customerRepository.save(customer);
-        return customer.getCustomerId();
-	}
-
-    private Address checkAndGetAddress(AddressDTO addressDTO) {
-        Address address=new Address();
-        if(checkStateAndCity(addressDTO)){
-            State state=stateRepository.findByStateName(addressDTO.getState()).get();
-            City city=cityRepository.findByCityName(addressDTO.getCity()).get();
-            address.setCity(city);
-            address.setState(state);
-            address.setPincode(addressDTO.getPincode());
-            address.setFirstStreet(addressDTO.getFirstStreet());
-            address.setLastStreet(addressDTO.getLastStreet());
-            return addressRepository.save(address);
+    @Override
+    public CustomerDTO getCustomerProfile(Long customerId) {
+        accessConService.checkCustomerAccess(customerId);
+        String role = accessConService.getUserRole();
+        if (role.equals("AGENT")) {
+            isHisCustomer(customerId);
         }
-        return address;
+        Customer customer = findCustomerById(customerId);
+
+
+        return dtoService.convertCustomerToCustomerResponseDTO(customer);
     }
+
+    private void isHisCustomer(Long customerId) {
+        CustomUserDetails customUserDetails = accessConService.checkUserAccess();
+        Agent agent = findAgentById(customUserDetails.getId());
+
+        boolean isSuccess = agent.getPolicyAccounts().stream().anyMatch(account ->
+                account.getCustomer().getCustomerId().equals(customerId)
+        );
+        if (!isSuccess) {
+            throw new UserException("this is not your customer");
+        }
+    }
+
+    private Agent findAgentById(Long id) {
+        return agentRepository.findById(id).orElseThrow(() -> new UserException("agent not found"));
+    }
+
+    @Override
+    public CustomerDTO updateCustomerProfile(CustomerDTO customerDTO) {
+        CustomUserDetails userDetails = accessConService.checkUserAccess();
+        accessConService.checkCustomerAccess(userDetails.getId());
+        // Find the customer by ID
+        Customer customer = findCustomerById(userDetails.getId());
+
+        customer.setFirstName(customerDTO.getFirstName());
+        customer.setLastName(customerDTO.getLastName());
+        customer.setDateOfBirth(customerDTO.getDateOfBirth());
+        customer.setGender(customerDTO.getGender());
+        customer.setIsActive(customerDTO.getIsActive());
+        customer.setNomineeName(customerDTO.getNomineeName());
+        customer.setNomineeRelation(customerDTO.getNomineeRelation());
+        customer.setIsApproved(customerDTO.getIsApproved());
+        customer.getCredentials().setUsername(customerDTO.getCredentials().getUsername());
+        customer.getCredentials().setEmail(customerDTO.getCredentials().getEmail());
+        customer.getCredentials().setMobileNumber(customerDTO.getCredentials().getMobileNumber());
+
+        Customer updatedCustomer = customerRepository.save(customer);
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setEmailId(updatedCustomer.getCredentials().getEmail());
+        emailDTO.setTitle("Profile updated");
+        emailDTO.setBody("your profile has been updated, now we will verify your profile from our end, it could take some time" +
+                "your username is " + updatedCustomer.getCredentials().getUsername());
+        emailService.sendAccountCreationEmail(emailDTO);
+
+        return dtoService.convertCustomerToCustomerResponseDTO(updatedCustomer);
+    }
+
+
+    @Override
+    public Long customerRegistration(RegistrationDTO registrationDTO) {
+        Customer customer = new Customer();
+        customer.setFirstName(registrationDTO.getFirstName());
+        customer.setLastName(registrationDTO.getLastName());
+        customer.setDateOfBirth(registrationDTO.getDateOfBirth());
+        customer.setGender(GenderType.valueOf(registrationDTO.getGender()));
+        customer.setIsActive(true);
+        customer.setNomineeName(registrationDTO.getNomineeName());
+        customer.setNomineeRelation(NomineeRelation.valueOf(registrationDTO.getNomineeRelation()));
+        customer.setIsApproved(false);
+
+        Address address = new Address();
+        address.setFirstStreet(registrationDTO.getFirstStreet());
+        address.setLastStreet(registrationDTO.getLastStreet());
+        address.setPincode(registrationDTO.getPincode());
+
+        State state = stateRepository.findById(registrationDTO.getStateId())
+                .orElseThrow(() -> new UserException("State not found"));
+        if (!state.getIsActive()) {
+            throw new UserException("Selected state is inactive");
+        }
+
+        City city = cityRepository.findById(registrationDTO.getCityId())
+                .orElseThrow(() -> new UserException("City not found"));
+        if (!city.getIsActive()) {
+            throw new UserException("Selected city is inactive");
+        }
+
+        address.setState(state);
+        address.setCity(city);
+
+        address = addressRepository.save(address);
+        customer.setAddress(address);
+
+        Credentials credentials = new Credentials();
+        credentials.setUsername(registrationDTO.getUsername());
+        credentials.setEmail(registrationDTO.getEmail());
+        credentials.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
+        credentials.setMobileNumber(registrationDTO.getMobileNumber());
+        credentials.setCustomer(customer);
+
+        Role role = roleRepository.findByName("ROLE_CUSTOMER")
+                .orElseThrow(() -> new RuntimeException("Role admin not found"));
+        credentials.setRole(role);
+
+        customer.setCredentials(credentials);
+        credentials = credentialsRepository.save(credentials);
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setEmailId(credentials.getEmail());
+        emailDTO.setTitle("Registration Success");
+        emailDTO.setBody("Congrats!! you have registered with our company as an employee.\n" +
+                " Now, your details will be verified by our company employees" +
+                " and your account will be activated\n We will inform you once details verified" +
+                "your username is " + credentials.getUsername());
+        emailService.sendAccountCreationEmail(emailDTO);
+
+        return credentials.getCustomer().getCustomerId();
+    }
+
     private boolean checkStateAndCity(AddressDTO addressDTO) {
-        String state=addressDTO.getState();
-        Boolean isState= stateRepository.existsByStateNameAndIsActiveTrue(state);
-        String city=addressDTO.getCity();
-        Boolean isCity= cityRepository.existsByCityNameAndIsActiveTrue(state);
+        String state = addressDTO.getState();
+        Boolean isState = stateRepository.existsByStateNameAndIsActiveTrue(state);
+        String city = addressDTO.getCity();
+        Boolean isCity = cityRepository.existsByCityNameAndIsActiveTrue(state);
         return isCity && isState;
     }
-  
-	public AddressDTO updateCustomerAddress(AddressDTO addressDTO) {
-		CustomUserDetails userDetails = accessConService.checkUserAccess();
 
-	    Customer customer = customerRepository.findById(userDetails.getId())
-	            .orElseThrow(() -> new UserException("Customer not found"));
-	    
-	    if (!customer.getCustomerId().equals(addressDTO.getCustomerId())) {
-	        throw new UserException("Unauthorized action: You can only update your own address.");
-	    }
-	    
-	    Address currentAddress = customer.getAddress();
-	    
-	    currentAddress.setFirstStreet(addressDTO.getFirstStreet());
-	    currentAddress.setLastStreet(addressDTO.getLastStreet());
-	    currentAddress.setPincode(addressDTO.getPincode());
-	    
-	    if (!currentAddress.getState().getStateName().equals(addressDTO.getState())) {
-	        State newState = stateRepository.findByStateName(addressDTO.getState())
-	                .orElseThrow(() -> new UserException("State not found"));
-	        currentAddress.setState(newState);
-	    }
+    @Override
+    public PagedResponse<QueryDTO> getAllResolvedQueries(int page, int size, String sortBy, String direction) {
+        Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
 
-	    if (!currentAddress.getCity().getCityName().equals(addressDTO.getCity())) {
-	        City newCity = cityRepository.findByCityName(addressDTO.getCity())
-	                .orElseThrow(() -> new UserException("City not found"));
-	        currentAddress.setCity(newCity);
-	    }
-	    
-	    customerRepository.save(customer);
+        Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
 
-	    return dtoService.convertEntityToAddressDTO(currentAddress);
-	}
+        String role = accessConService.getUserRole();
+        Page<Query> pages;
+        if (role.equals("CUSTOMER")) {
+            CustomUserDetails customUserDetails = accessConService.checkUserAccess();
+            Customer customer = findCustomerById(customUserDetails.getId());
+            pages = queryRepository.findByIsResolvedTrueAndCustomer(pageable, customer);
+        } else {
+            pages = queryRepository.findByIsResolvedTrue(pageable);
+        }
+
+        List<Query> allQueries = pages.getContent();
+        List<QueryDTO> allQueriesDTO = dtoService.convertQueryListEntityToDTO(allQueries);
+
+        return new PagedResponse<>(allQueriesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+    }
 
 
-	@Override
-	public QueryDTO addQuery(QueryDTO queryDTO) {
-		CustomUserDetails userDetails = accessConService.checkUserAccess();
+    @Override
+    public PagedResponse<PolicyAccountDTO> getAllPolicyAccounts(int page, int size, String sortBy, String direction) {
+        Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-	    Customer customer = customerRepository.findById(userDetails.getId())
-	            .orElseThrow(() -> new UserException("Customer not found"));
-	    
-	    queryDTO.setQueryId(0L);
-	    Query newQuery = dtoService.convertQueryDTOToEntity(queryDTO);
-	    newQuery.setIsResolved(false);
-	    newQuery.setCustomer(customer);
-	    
-	    Query savedQuery = queryRepository.save(newQuery);
-	    customer.getQueries().add(savedQuery);
-	    
-	    return dtoService.convertQueryToQueryDTO(savedQuery);
-	    
-	}
+        CustomUserDetails userDetails = accessConService.checkUserAccess();
+        String role = accessConService.getUserRole();
+        Page<PolicyAccount> pages;
+        if (role.equals("CUSTOMER")) {
+            Customer customer = findCustomerById(userDetails.getId());
+            pages = policyAccountRepository.findByCustomer(customer, pageable);
+        } else if (role.equals("AGENT")) {
+            Agent agent = findAgentById(userDetails.getId());
+            pages = policyAccountRepository.findByAgent(agent, pageable);
+        } else {
+            pages = policyAccountRepository.findAll(pageable);
+        }
 
+        List<PolicyAccount> allPolicyAccounts = pages.getContent();
+        List<PolicyAccountDTO> allPolicyAccountDTO = dtoService.convertPolicyAccountListEntityToDTO(allPolicyAccounts);
 
-	@Override
-	public PagedResponse<QueryDTO> getAllResolvedQueries(int page, int size, String sortBy, String direction) {
-		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-		
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
-		
-		Page<Query> pages = queryRepository.findByIsResolvedTrue(pageable);
-		List<Query> allQueries = pages.getContent();
-		List<QueryDTO> allQueriesDTO = dtoService.convertQueryListEntityToDTO(allQueries);
-		
-		return new PagedResponse<QueryDTO>(allQueriesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
-	}
-	
-	
-	@Override
-	public FeedbackDTO addFeedback(FeedbackDTO feedbackDTO) {
-		CustomUserDetails userDetails = accessConService.checkUserAccess();
+        return new PagedResponse<>(allPolicyAccountDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
 
-	    Customer customer = customerRepository.findById(userDetails.getId())
-	            .orElseThrow(() -> new UserException("Customer not found"));
-	    
-	    feedbackDTO.setFeedbackId(0L);
-	    Feedback newFeedback = dtoService.convertFeedbackDTOToEntity(feedbackDTO);
-	    newFeedback.setCustomer(customer);
-	    
-	    Feedback savedFeedback = feedbackRepository.save(newFeedback);
-	    customer.getFeedbacks().add(savedFeedback);
-	    
-	    return dtoService.convertFeedbackToFeedbackDTO(savedFeedback);
-	    
-	}
+    }
 
 
-	@Override
-	public PagedResponse<TransactionsDTO> getAllTransactionsByPolicyAccount(int page, int size, String sortBy,
-			String direction, Long id) {
-		
-		CustomUserDetails userDetails = accessConService.checkUserAccess();
+    @Override
+    public PolicyAccountDTO getPolicyAccountByAccountNumber(Long id) {
+        CustomUserDetails userDetails = accessConService.checkUserAccess();
+        String role = accessConService.getUserRole();
+        checkAccountAccess(userDetails, id, role);
+        PolicyAccount policyAccount = policyAccountRepository.findById(id).
+                orElseThrow(() -> new UserException("account not found"));
+        return dtoService.convertPolicyAccountToPolicyAccountDTO(policyAccount);
+    }
 
-	    Customer customer = customerRepository.findById(userDetails.getId())
-	            .orElseThrow(() -> new UserException("Customer not found"));
-		
-		PolicyAccount policyAccount = policyAccountRepository.findById(id)
-		        .orElseThrow(() -> new UserException("Policy account not found"));
-		
-		if (!policyAccount.getCustomer().equals(customer)) {
-	        throw new UserException("Policy account does not belong to the current customer");
-	    }
-		    
-	    Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-	    Pageable pageable = PageRequest.of(page, size, sort);
-	    
-	    Page<Transactions> pages = transactionsRepository.findByPolicyAccount(policyAccount, pageable);
-	    List<Transactions> allTransactions = pages.getContent();
-	    List<TransactionsDTO> allTransactionsDTO = dtoService.convertTransactionListEntityToDTO(allTransactions);
-	    
-	    return new PagedResponse<TransactionsDTO>(allTransactionsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
-	}
-
-
-	@Override
-	public PagedResponse<PolicyAccountDTO> getAllPolicyAccounts(int page, int size, String sortBy, String direction) {
-		
-		CustomUserDetails userDetails = accessConService.checkUserAccess();
-
-	    Customer customer = customerRepository.findById(userDetails.getId())
-	            .orElseThrow(() -> new UserException("Customer not found"));
-	    
-	    Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-	    Pageable pageable = PageRequest.of(page, size, sort);
-	    
-	    Page<PolicyAccount> pages = policyAccountRepository.findByCustomer(customer, pageable);
-	    List<PolicyAccount> allPolicyAccounts = pages.getContent();
-	    List<PolicyAccountDTO> allPolicyAccountDTO = dtoService.convertPolicyAccountListEntityToDTO(allPolicyAccounts);
-	    
-	    return new PagedResponse<PolicyAccountDTO>(allPolicyAccountDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
-		
-	}
+    private void checkAccountAccess(CustomUserDetails userDetails, Long accountId, String role) {
+        if (role.equals("AGENT")) {
+            Agent agent = findAgentById(userDetails.getId());
+            boolean isSuccess = agent.getPolicyAccounts().stream().
+                    anyMatch(account -> account.getPolicyAccountId().equals(accountId));
+            if (!isSuccess) throw new UserException("this is not your customer account");
+        }
+        if (role.equals("CUSTOMER")) {
+            Customer customer = findCustomerById(userDetails.getId());
+            boolean isSuccess = customer.getPolicyAccounts().stream().
+                    anyMatch(account -> account.getPolicyAccountId().equals(accountId));
+            if (!isSuccess) throw new UserException("this is not your account");
+        }
+    }
 
 
-	@Override
-	public PagedResponse<PolicyAccountDTO> getPolicyAccountsByAccountNumber(int page, int size, String sortBy,
-			String direction, Long id) {
-		
-		CustomUserDetails userDetails = accessConService.checkUserAccess();
+    @Override
+    public PolicyAccountDTO createPolicyAccount(PolicyAccountDTO policyAccountDTO) {
+        String role = accessConService.getUserRole();
+        if (!role.equals("CUSTOMER")) throw new UserException("only customer can create account");
 
-	    Customer customer = customerRepository.findById(userDetails.getId())
-	            .orElseThrow(() -> new UserException("Customer not found"));
-	    
-	    PolicyAccount policyAccount = policyAccountRepository.findById(id)
-	            .orElseThrow(() -> new UserException("Policy account not found"));
+        CustomUserDetails userDetails = accessConService.checkUserAccess();
 
-	    if (!policyAccount.getCustomer().getCustomerId().equals(customer.getCustomerId())) {
-	        throw new UserException("Policy account does not belong to the customer");
-	    }
-	    
-	    Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-	    Pageable pageable = PageRequest.of(page, size, sort);
-	    
-	    Page<PolicyAccount> pages = policyAccountRepository.findByCustomerAndPolicyAccountId(customer, id, pageable);
-	    List<PolicyAccount> allPolicyAccounts = pages.getContent();
-	    List<PolicyAccountDTO> allPolicyAccountDTO = dtoService.convertPolicyAccountListEntityToDTO(allPolicyAccounts);
-	    
-	    return new PagedResponse<PolicyAccountDTO>(allPolicyAccountDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
-	}
+        Customer customer = findCustomerById(userDetails.getId());
 
+        Policy policy = policyRepository.findById(policyAccountDTO.getPolicyId())
+                .orElseThrow(() -> new UserException("Policy not found"));
 
-	@Override
-	public PolicyAccountDTO createPolicyAccount(PolicyAccountDTO policyAccountDTO) {
-		CustomUserDetails userDetails = accessConService.checkUserAccess();
+        checkEligibility(customer, policy, policyAccountDTO);
 
-	    Customer customer = customerRepository.findById(userDetails.getId())
-	            .orElseThrow(() -> new UserException("Customer not found"));
+        policyAccountDTO.setPolicyAccountId(0L);
+        PolicyAccount policyAccount = dtoService.convertPolicyAccountDtoToPolicyAccount(policyAccountDTO);
 
-	    Policy policy = policyRepository.findById(policyAccountDTO.getPolicyId())
-	            .orElseThrow(() -> new UserException("Policy not found"));
-	    
-	    List<DocumentNeeded> requiredDocuments = policy.getDocumentsNeeded();
-	    List<DocumentUploaded> customerDocuments = customer.getDocuments();
-	    
-	    if (!customerDocuments.containsAll(requiredDocuments)) {
-	        throw new UserException("Customer does not have all required documents for the policy");
-	    }
-	    
-	    policyAccountDTO.setPolicyAccountId(0L);
-	    PolicyAccount policyAccount = dtoService.convertPolicyAccountDtoToPolicyAccount(policyAccountDTO);
-	    
-	    LocalDate maturedDate = LocalDate.now().plusYears(policyAccountDTO.getPolicyTerm());
-	    policyAccount.setMaturedDate(maturedDate);
-	    policyAccount.setIsActive(true);
-	    
-	    int totalMonths = policyAccountDTO.getPolicyTerm() * 12;
-	    int numberOfPayments = totalMonths / policyAccountDTO.getPaymentTimeInMonths();
-	    Double balancePerPayment = policyAccountDTO.getInvestmentAmount() / numberOfPayments;
-	    policyAccount.setTimelyBalance(balancePerPayment);
-	    policyAccount.setTotalAmountPaid(0.0);
-	    
-	    Double claimAmount = policyAccountDTO.getInvestmentAmount() * (1 + policy.getProfitRatio() / 100);
-	    policyAccount.setClaimAmount(claimAmount);
-	    policyAccount.setPolicy(policy);
-	    policyAccount.setCustomer(customer);
-	    
-	    if (policyAccountDTO.getAgentId() != null) {
-	        Agent agent = agentRepository.findById(policyAccountDTO.getAgentId())
-	                .orElseThrow(() -> new UserException("Agent not found"));
+        LocalDate maturedDate = LocalDate.now().plusYears(policyAccountDTO.getPolicyTerm());
+        policyAccount.setMaturedDate(maturedDate);
+        policyAccount.setIsActive(true);
 
-	        if (customer.getAddress().getState().getStateId().equals(agent.getAddress().getState().getStateId())) {
-	            policyAccount.setAgent(agent);
-	            
-//	            boolean isFirstPolicy = customer.getPolicyAccounts().isEmpty();
-//
-//	            Double commission = isFirstPolicy ? 
-//	                (policy.getCommissionNewRegistration() / 100) * policyAccountDTO.getInvestmentAmount() :
-//	                (policy.getCommissionInstallment() / 100) * policyAccountDTO.getInvestmentAmount();
-	            
+        int totalMonths = policyAccountDTO.getPolicyTerm() * 12;
+        int numberOfPayments = totalMonths / policyAccountDTO.getPaymentTimeInMonths();
+        Double balancePerPayment = policyAccountDTO.getInvestmentAmount() / numberOfPayments;
+        policyAccount.setTimelyBalance(balancePerPayment);
+        policyAccount.setTotalAmountPaid(0.0);
 
-	            Double commission =  ((policy.getCommissionNewRegistration() / 100) * policyAccountDTO.getInvestmentAmount());
-	            
-	            policyAccount.setAgentCommissionForRegistration(commission);
-	        } else {
-	            policyAccount.setAgent(null);
-	        }
-	    }
-	    
-	    PolicyAccount savedPolicyAccount = policyAccountRepository.save(policyAccount);
-	    
-	    policy.getPolicyAccounts().add(savedPolicyAccount);
-	    customer.getPolicyAccounts().add(savedPolicyAccount);
-	    if (policyAccountDTO.getAgentId() != null) {
-	        Agent agent = agentRepository.findById(policyAccountDTO.getAgentId())
-	                .orElseThrow(() -> new UserException("Agent not found"));
-	        if (customer.getAddress().getState().getStateId().equals(agent.getAddress().getState().getStateId())) {
-	            policyAccount.setAgent(agent);
-	        } else {
-	            policyAccount.setAgent(null);
-	        }
-	    }
-	    
-	    return dtoService.convertPolicyAccountToPolicyAccountDTO(savedPolicyAccount);
-	    
-	}
+        Double claimAmount = policyAccountDTO.getInvestmentAmount() * (1 + policy.getProfitRatio() / 100);
+        policyAccount.setClaimAmount(claimAmount);
+        policyAccount.setPolicy(policy);
+        policyAccount.setCustomer(customer);
+        Agent agent = null;
+        if (policyAccountDTO.getAgentId() != null) {
+            agent = agentRepository.findById(policyAccountDTO.getAgentId())
+                    .orElseThrow(() -> new UserException("Agent not found"));
+
+            if (customer.getAddress().getState().getStateId().equals(agent.getAddress().getState().getStateId())) {
+                policyAccount.setAgent(agent);
 
 
-	@Override
-	public Double paymentToPay(Long id, LocalDate paymentToBeMade) {
-		
-		CustomUserDetails userDetails = accessConService.checkUserAccess();
-	    Customer customer = customerRepository.findById(userDetails.getId())
-	            .orElseThrow(() -> new UserException("Customer not found"));
+                Double commission = ((policy.getCommissionNewRegistration() / 100) * policyAccountDTO.getInvestmentAmount());
 
-	    PolicyAccount policyAccount = policyAccountRepository.findById(id)
-	            .orElseThrow(() -> new UserException("Policy account not found"));
+                policyAccount.setAgentCommissionForRegistration(commission);
+            } else {
+                policyAccount.setAgent(null);
+            }
+        }
 
-	    if (!policyAccount.getCustomer().equals(customer)) {
-	        throw new UserException("Unauthorized access to this policy account");
-	    }
-	    
-	    LocalDate currentDate = LocalDate.now();
-	    LocalDate gracePeriod = paymentToBeMade.plusDays(15);
-	    
-	    Settings taxChargesSetting = settingsRepository.findBySettingKey(GlobalSettings.TAX_CHARGES)
-	            .orElseThrow(() -> new UserException("Tax charges setting not found"));
-	    Settings penaltyChargesSetting = settingsRepository.findBySettingKey(GlobalSettings.PENALTY_CHARGES)
-	            .orElseThrow(() -> new UserException("Penalty charges setting not found"));
+        createFutureTransactions(policyAccount, policyAccountDTO.getPaymentTimeInMonths(), balancePerPayment);
 
-	    boolean isLate = currentDate.isAfter(gracePeriod);
-	    Double penalty = 0.0;
-	    
-	    if (isLate) {
-	        penalty = policyAccount.getTimelyBalance() * (penaltyChargesSetting.getSettingValue() / 100);
-	    }
-	    
-	    Double totalAmountToPay = policyAccount.getTimelyBalance() + penalty;
-	    Double taxCharges = totalAmountToPay * (taxChargesSetting.getSettingValue() / 100);
-	    totalAmountToPay += taxCharges;
-	    
-	    return totalAmountToPay;
-	}
-	
+        PolicyAccount savedPolicyAccount = policyAccountRepository.save(policyAccount);
+
+        if (policy.getPolicyAccounts() != null) policy.getPolicyAccounts().add(savedPolicyAccount);
+        else policy.setPolicyAccounts(addFirstPolicyAccount(savedPolicyAccount));
+
+        if (customer.getPolicyAccounts() != null) customer.getPolicyAccounts().add(savedPolicyAccount);
+        else customer.setPolicyAccounts(addFirstPolicyAccount(savedPolicyAccount));
+
+        customerRepository.save(customer);
+        policyRepository.save(policy);
+        assert agent != null;
+        if (agent.getPolicyAccounts() != null) agent.getPolicyAccounts().add(savedPolicyAccount);
+        else agent.setPolicyAccounts(addFirstPolicyAccount(savedPolicyAccount));
+
+        agentRepository.save(agent);
+
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setEmailId(customer.getCredentials().getEmail());
+        emailDTO.setTitle("Policy account Created Successfully");
+        emailDTO.setBody("Congrats!! your Policy account has been created.\n" +
+                " Now, you can do transactions as per your accommodation" +
+                " please complete your transactions as per allocated time by you to avoid penalties");
+        emailService.sendAccountCreationEmail(emailDTO);
+
+        return dtoService.convertPolicyAccountToPolicyAccountDTO(savedPolicyAccount);
+    }
+
+    private List<PolicyAccount> addFirstPolicyAccount(PolicyAccount savedPolicyAccount) {
+        List<PolicyAccount> policyAccounts = new ArrayList<>();
+        policyAccounts.add(savedPolicyAccount);
+        return policyAccounts;
+    }
+
+    private void checkEligibility(Customer customer, Policy policy, PolicyAccountDTO policyAccountDTO) {
+        if (!policy.getIsActive()) {
+            throw new UserException("The policy is not active");
+        }
+
+        // Validate the policy term and investment amount
+        if (policyAccountDTO.getPolicyTerm() < policy.getMinPolicyTerm() ||
+                policyAccountDTO.getPolicyTerm() > policy.getMaxPolicyTerm()) {
+            throw new UserException("Policy term is not within the allowed range");
+        }
+
+        if (policyAccountDTO.getInvestmentAmount() < policy.getMinInvestmentAmount() ||
+                policyAccountDTO.getInvestmentAmount() > policy.getMaxInvestmentAmount()) {
+            throw new UserException("Investment amount is not within the allowed range");
+        }
+
+        // Validate the customer's age
+        int age = LocalDate.now().getYear() - customer.getDateOfBirth().getYear();
+        if (age < policy.getMinAge() || age > policy.getMaxAge()) {
+            throw new UserException("Customer's age is not within the allowed range for this policy");
+        }
+
+        // Validate the customer's gender
+        if (!policy.getEligibleGender().equalsIgnoreCase("BOTH") &&
+                !policy.getEligibleGender().equalsIgnoreCase(customer.getGender().toString())) {
+            throw new UserException("Customer's gender is not eligible for this policy");
+        }
+        List<DocumentNeeded> requiredDocuments = policy.getDocumentsNeeded();
+        List<DocumentUploaded> customerDocuments = customer.getDocuments();
+
+        for (DocumentNeeded requiredDocument : requiredDocuments) {
+            boolean documentApproved = customerDocuments.stream()
+                    .filter(doc -> doc.getDocumentId().equals(requiredDocument.getDocumentId()))
+                    .anyMatch(DocumentUploaded::getIsApproved);
+
+            if (!documentApproved) {
+                throw new UserException("Customer does not have all required approved documents for the policy");
+            }
+        }
+    }
+
+    private void createFutureTransactions(PolicyAccount policyAccount, int paymentTimeInMonths, Double balancePerPayment) {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate nextPaymentDate = currentDate.plusMonths(paymentTimeInMonths);
+
+        // Create the initial payment
+        Transactions initialPayment = new Transactions();
+        initialPayment.setAmount(balancePerPayment);
+        initialPayment.setTransactionDate(currentDate);
+        initialPayment.setStatus("pending");
+        initialPayment.setPosition(1L);
+        Long position = 2L;
+        initialPayment.setPolicyAccount(policyAccount);
+        transactionsRepository.save(initialPayment);
+
+        // Create future scheduled payments
+        while (nextPaymentDate.isBefore(policyAccount.getMaturedDate()) || nextPaymentDate.isEqual(policyAccount.getMaturedDate())) {
+            Transactions transaction = new Transactions();
+            transaction.setAmount(balancePerPayment);
+            transaction.setTransactionDate(nextPaymentDate);
+            transaction.setStatus("pending");
+            transaction.setPosition(position);
+            position += 1L;
+            transaction.setPolicyAccount(policyAccount);
+            transactionsRepository.save(transaction);
+
+            // Move to the next payment date
+            nextPaymentDate = nextPaymentDate.plusMonths(paymentTimeInMonths);
+        }
+    }
+
+    @Override
+    public Double paymentToPay(Long id, LocalDate paymentToBeMade) {
+        String role = accessConService.getUserRole();
+        if (!role.equals("CUSTOMER")) throw new UserException("only customer can create account");
+
+        CustomUserDetails userDetails = accessConService.checkUserAccess();
+        Customer customer = findCustomerById(userDetails.getId());
+
+        PolicyAccount policyAccount = policyAccountRepository.findById(id)
+                .orElseThrow(() -> new UserException("Policy account not found"));
+
+        if (!policyAccount.getCustomer().equals(customer)) {
+            throw new UserException("Unauthorized access to this policy account");
+        }
+        LocalDate currentDate = LocalDate.now();
+        LocalDate gracePeriod = paymentToBeMade.plusDays(15);
+
+        Settings taxChargesSetting = settingsRepository.findBySettingKey(GlobalSettings.TAX_CHARGES)
+                .orElseThrow(() -> new UserException("Tax charges setting not found"));
+        Settings penaltyChargesSetting = settingsRepository.findBySettingKey(GlobalSettings.PENALTY_CHARGES)
+                .orElseThrow(() -> new UserException("Penalty charges setting not found"));
+
+        boolean isLate = currentDate.isAfter(gracePeriod);
+        Double penalty = 0.0;
+
+        if (isLate) {
+            penalty = policyAccount.getTimelyBalance() * (penaltyChargesSetting.getSettingValue() / 100);
+        }
+
+        Double totalAmountToPay = policyAccount.getTimelyBalance() + penalty;
+        Double taxCharges = totalAmountToPay * (taxChargesSetting.getSettingValue() / 100);
+        totalAmountToPay += taxCharges;
+
+        return totalAmountToPay;
+    }
+
+
+    @Override
+    public PagedResponse<WithdrawalRequestsDTO> getAllPolicyClaimsRequest(int pageNo, int size, String sort,
+                                                                          String sortBy, String sortDirection, Long customerId) {
+        Sort sorting = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, size, sorting);
+        String role = accessConService.getUserRole();
+        CustomUserDetails customUserDetails = accessConService.checkUserAccess();
+        Page<WithdrawalRequests> withdrawalRequestsPage;
+        if (role.equals("CUSTOMER")) {
+            Customer customer = findCustomerById(customUserDetails.getId());
+            withdrawalRequestsPage = withdrawalRequestsRepository.findAllByCustomer(customer, pageable);
+        } else if (role.equals("AGENT")) {
+            Agent agent = findAgentById(customUserDetails.getId());
+            List<PolicyAccount> policyAccounts=policyAccountRepository.findAllByAgent(agent);
+            withdrawalRequestsPage = withdrawalRequestsRepository.findAllByPolicyAccountIn(policyAccounts, pageable);
+        } else withdrawalRequestsPage = withdrawalRequestsRepository.findAll(pageable);
+
+        List<WithdrawalRequests> withdrawalRequests = withdrawalRequestsPage.getContent();
+        List<WithdrawalRequestsDTO> withdrawalRequestsDTOS = dtoService.convertWithdrawalsToDto(withdrawalRequests);
+        return new PagedResponse<>(withdrawalRequestsDTOS, withdrawalRequestsPage.getNumber(),
+                withdrawalRequestsPage.getSize(), withdrawalRequestsPage.getTotalElements(), withdrawalRequestsPage.getTotalPages(),
+                withdrawalRequestsPage.isLast());
+    }
+
+    @Override
+    public PagedResponse<WithdrawalRequestsDTO> getAllPolicyClaimsApproved(int pageNo, int size, String sort,
+                                                                           String sortBy, String sortDirection) {
+        Sort sorting = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, size, sorting);
+        String role = accessConService.getUserRole();
+        CustomUserDetails customUserDetails = accessConService.checkUserAccess();
+        Page<WithdrawalRequests> withdrawalRequestsPage;
+        if (role.equals("CUSTOMER")) {
+            Customer customer = findCustomerById(customUserDetails.getId());
+            withdrawalRequestsPage = withdrawalRequestsRepository.findAllByIsApprovedTrueAndCustomer(customer, pageable);
+        } else if (role.equals("AGENT")) {
+            Agent agent = findAgentById(customUserDetails.getId());
+            withdrawalRequestsPage = withdrawalRequestsRepository.findAllByIsApprovedTrueAndAgent(agent, pageable);
+        } else withdrawalRequestsPage = withdrawalRequestsRepository.findAllByIsApprovedTrue(pageable);
+
+        List<WithdrawalRequests> withdrawalRequests = withdrawalRequestsPage.getContent();
+        List<WithdrawalRequestsDTO> withdrawalRequestsDTOS = dtoService.convertWithdrawalsToDto(withdrawalRequests);
+        return new PagedResponse<>(withdrawalRequestsDTOS, withdrawalRequestsPage.getNumber(),
+                withdrawalRequestsPage.getSize(), withdrawalRequestsPage.getTotalElements(), withdrawalRequestsPage.getTotalPages(),
+                withdrawalRequestsPage.isLast());
+    }
+
+
+    @Override
+    public Boolean deleteCustomer(Long customerId) {
+        accessConService.checkEmployeeAccess();
+        Customer customer = findCustomerById(customerId);
+        if (!customer.getIsActive()) throw new UserException("customer is already deleted");
+        customer.setIsActive(false);
+        customerRepository.save(customer);
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setEmailId(customer.getCredentials().getEmail());
+        emailDTO.setTitle("Account deleted");
+        emailDTO.setBody("Oops!! your account has been deleted.\n" +
+                "if this is a mistake please contact your agent");
+        emailService.sendAccountCreationEmail(emailDTO);
+        return true;
+    }
+
+
+    private Customer findCustomerById(Long customerId) {
+        return customerRepository.findById(customerId).orElseThrow(() -> new UserException("customer not found"));
+    }
+
+
+    @Override
+    public Boolean activateCustomer(Long customerId) {
+        accessConService.checkEmployeeAccess();
+        Customer customer = findCustomerById(customerId);
+        if (customer.getIsActive()) throw new UserException("customer is already activated");
+        customer.setIsActive(true);
+        customerRepository.save(customer);
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setEmailId(customer.getCredentials().getEmail());
+        emailDTO.setTitle("Account activated");
+        emailDTO.setBody("Congrats!! your account has been activated as per your request.\n" +
+                " Now, you can do login to your account");
+        emailService.sendAccountCreationEmail(emailDTO);
+        return true;
+    }
+
+    // agent can't access this service
+    @Override
+    public PagedResponse<CustomerDTO> getAllCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection) {
+        accessConService.checkEmployeeAccess();
+        Sort sorting = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, size, sorting);
+        Page<Customer> customerPage = customerRepository.findAllByIsActiveTrue(pageable);
+        List<Customer> customers = customerPage.getContent();
+        List<CustomerDTO> customerDTOS = dtoService.convertCustomersToDto(customers);
+        return new PagedResponse<>(customerDTOS, customerPage.getNumber(),
+                customerPage.getSize(), customerPage.getTotalElements(), customerPage.getTotalPages(),
+                customerPage.isLast());
+    }
+
+    @Override
+    public PagedResponse<CustomerDTO> getAllInActiveCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection) {
+        accessConService.checkEmployeeAccess();
+        Sort sorting = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, size, sorting);
+        Page<Customer> customerPage = customerRepository.findAllByIsActiveFalse(pageable);
+        List<Customer> customers = customerPage.getContent();
+        List<CustomerDTO> customerDTOS = dtoService.convertCustomersToDto(customers);
+        return new PagedResponse<>(customerDTOS, customerPage.getNumber(),
+                customerPage.getSize(), customerPage.getTotalElements(), customerPage.getTotalPages(),
+                customerPage.isLast());
+    }
+
+
 }

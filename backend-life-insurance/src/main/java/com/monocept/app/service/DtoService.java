@@ -8,40 +8,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.List;
 
-import com.monocept.app.dto.AddressDTO;
-import com.monocept.app.dto.AdminDTO;
-import com.monocept.app.dto.CityDTO;
-import com.monocept.app.dto.CredentialsDTO;
-import com.monocept.app.dto.CredentialsResponseDTO;
-import com.monocept.app.dto.CustomerDTO;
-import com.monocept.app.dto.DocumentNeededDTO;
-import com.monocept.app.dto.DocumentUploadedDTO;
-import com.monocept.app.dto.EmployeeDTO;
-import com.monocept.app.dto.FeedbackDTO;
-import com.monocept.app.dto.InsuranceTypeDTO;
-import com.monocept.app.dto.PolicyAccountDTO;
-import com.monocept.app.dto.PolicyDTO;
-import com.monocept.app.dto.QueryDTO;
-import com.monocept.app.dto.SettingsDTO;
-import com.monocept.app.dto.StateDTO;
-import com.monocept.app.dto.TransactionsDTO;
-import com.monocept.app.entity.Address;
-import com.monocept.app.entity.Admin;
-import com.monocept.app.entity.City;
-import com.monocept.app.entity.Credentials;
-import com.monocept.app.entity.Customer;
-import com.monocept.app.entity.DocumentNeeded;
-import com.monocept.app.entity.DocumentUploaded;
-import com.monocept.app.entity.Employee;
-import com.monocept.app.entity.Feedback;
-import com.monocept.app.entity.InsuranceType;
-import com.monocept.app.entity.Policy;
-import com.monocept.app.entity.PolicyAccount;
-import com.monocept.app.entity.Query;
-import com.monocept.app.entity.Settings;
-import com.monocept.app.entity.State;
-import com.monocept.app.entity.Transactions;
-
 public interface DtoService {
 	
     AdminDTO converAdminToAdminResponseDTO(Admin admin);
@@ -115,11 +81,12 @@ public interface DtoService {
 
 	Employee convertEmployeeDtoToEmployee(EmployeeDTO employeeDTO);
 
-	Customer convertCustomerDtoToCustomer(RegistrationDTO registrationDTO);
+	Customer convertCustomerDtoToCustomer(CustomerDTO registrationDTO);
 
     Agent convertAgentDtoToAgent(AgentDTO agentDTO);
 
     AgentDTO convertAgentToAgentDto(Agent agent);
+    
     AddressDTO convertAddressToDto(Address address);
 
     Address convertDtoToAddress(AddressDTO addressDTO);
@@ -148,8 +115,16 @@ public interface DtoService {
 	PolicyAccountDTO convertPolicyAccountToPolicyAccountDTO(PolicyAccount policyAccount);
 	
 
-
     List<AgentDTO> convertAgentsToDto(List<Agent> agents);
 
+
     List<DocumentNeededDTO> convertDocumentNeededToDto(List<DocumentNeeded> documentNeededs);
+
+	List<SettingsDTO> convertSettingsListEntityToDTO(List<Settings> allSettings);
+
+	WithdrawalRequestsDTO convertWithdrawalRequestToDTO(WithdrawalRequests withdrawalRequest);
+
+	List<WithdrawalRequestsDTO> convertWithdrawalRequestsListEntityToDTO(
+			List<WithdrawalRequests> allWithdrawalRequests);
+
 }

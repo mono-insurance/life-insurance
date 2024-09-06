@@ -4,6 +4,7 @@ import com.monocept.app.entity.Agent;
 import com.monocept.app.entity.Customer;
 import com.monocept.app.entity.PolicyAccount;
 import com.monocept.app.exception.RoleAccessException;
+import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.AgentRepository;
 import com.monocept.app.repository.CustomerRepository;
 import org.springframework.security.core.Authentication;
@@ -65,6 +66,12 @@ public class AccessConServiceImp implements AccessConService{
 
     @Override
     public void checkSameUserOrRole(Long agentId) {
+        CustomUserDetails customUserDetails=checkUserAccess();
+        String role=getUserRole();
+        if(!((Objects.equals(role, "AGENT") && customUserDetails.getId().equals(agentId))||
+                Objects.equals(role, "EMPLOYEE")|| (Objects.equals(role, "ADMIN")))){
+                    throw new RoleAccessException("you don't have access");
+        }
 
     }
 
@@ -108,6 +115,44 @@ public class AccessConServiceImp implements AccessConService{
         String role=getUserRole();
         if(!(Objects.equals(role, "ADMIN")|| Objects.equals(role, "EMPLOYEE") || customerDocumentAccess(documentId))){
             throw new RoleAccessException("you don't have access to this document");
+        }
+    }
+
+    @Override
+    public void checkEmployeeAccess() {
+        String role=getUserRole();
+        if(!(Objects.equals(role, "EMPLOYEE") || Objects.equals(role, "ADMIN"))){
+            throw new RoleAccessException("you don't have access to this document");
+        }
+    }
+
+    @Override
+    public void checkCustomerAccess(Long customerId) {
+        String role=getUserRole();
+        CustomUserDetails customUserDetails=checkUserAccess();
+        if(!((role.equals("CUSTOMER") && customUserDetails.getId().equals(customerId)) ||
+                role.equals("EMPLOYEE")|| role.equals("ADMIN"))){
+            throw new RoleAccessException("you don't have access to this document");
+        }
+    }
+
+    @Override
+    public void checkPolicyAccountAccess(Long id) {
+        CustomUserDetails customUserDetails=checkUserAccess();
+        String role=getUserRole();
+        if(role.equals("AGENT")){
+            Agent agent=agentRepository.findById(customUserDetails.getId()).
+                    orElseThrow(()->new UserException("agent not found"));
+            boolean isSuccess=agent.getPolicyAccounts().stream().
+                    anyMatch(account -> account.getPolicyAccountId().equals(id));
+            if(!isSuccess) throw new RoleAccessException("you don't have access to see these transactions");
+        }
+        if(role.equals("CUSTOMER")){
+            Customer customer=customerRepository.findById(customUserDetails.getId()).
+                    orElseThrow(()->new UserException("agent not found"));
+            boolean isSuccess=customer.getPolicyAccounts().stream().
+                    anyMatch(account -> account.getPolicyAccountId().equals(id));
+            if(!isSuccess) throw new RoleAccessException("you don't have access to see these transactions");
         }
     }
 

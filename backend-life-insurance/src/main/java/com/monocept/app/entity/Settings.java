@@ -30,7 +30,7 @@ public class Settings {
     @Column(name = "setting_id")
     private Long settingId;
 
-    @NotBlank
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "setting_key")
     private GlobalSettings settingKey;

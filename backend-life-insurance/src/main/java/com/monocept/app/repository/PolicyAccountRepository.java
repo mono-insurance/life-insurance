@@ -1,5 +1,6 @@
 package com.monocept.app.repository;
 
+import com.monocept.app.entity.Agent;
 import com.monocept.app.entity.Customer;
 import com.monocept.app.entity.PolicyAccount;
 
@@ -18,4 +19,10 @@ public interface PolicyAccountRepository extends JpaRepository<PolicyAccount,Lon
 	Page<PolicyAccount> findByCustomer(Customer customer, Pageable pageable);
 
 	Page<PolicyAccount> findByCustomerAndPolicyAccountId(Customer customer, Long id, Pageable pageable);
+
+    Page<PolicyAccount> findByAgent(Agent agent, Pageable pageable);
+
+	Page<PolicyAccount> findByPolicyAccountId(Long id, Pageable pageable);
+
+    List<PolicyAccount> findAllByAgent(Agent agent);
 }

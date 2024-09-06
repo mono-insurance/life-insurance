@@ -38,6 +38,11 @@ public class Transactions {
     @Positive
     @Column(name = "amount")
     private Double amount;
+
+    @NotNull
+    @Positive
+    @Column(name="position")
+    private Long position;
     
 
 	@Column(name = "transaction_date")

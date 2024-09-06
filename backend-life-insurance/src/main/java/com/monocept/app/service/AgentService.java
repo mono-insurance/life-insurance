@@ -22,4 +22,11 @@ public interface AgentService {
     PagedResponse<CustomerDTO> getAllCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection);
 
     Boolean withdrawalRequest(Double agentCommission);
+	PagedResponse<AgentDTO> getAllAgents(int pageNo, int size, String sort, String sortBy, String sortDirection);
+
+	Boolean deleteAgent(Long agentId);
+
+	Boolean activateAgent(Long agentId);
+
+	Boolean approveAgent(Long agentId, Boolean isApproved);
 }

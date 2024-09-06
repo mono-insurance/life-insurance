@@ -1,6 +1,10 @@
 package com.monocept.app.controller;
 
 import com.monocept.app.dto.*;
+import com.monocept.app.dto.JWTAuthResponse;
+import com.monocept.app.dto.LoginDTO;
+import com.monocept.app.dto.LoginResponseDTO;
+import com.monocept.app.dto.RegistrationDTO;
 import com.monocept.app.service.AgentService;
 import com.monocept.app.service.AuthService;
 import com.monocept.app.service.CustomerService;
@@ -20,18 +24,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/public/api/auth")
 public class AuthController {
 	
     @Autowired
     private AuthService authService;
-    private CustomerService customerService;
     private final AgentService agentService;
     
 
-    public AuthController(AuthService authService, CustomerService customerService, AgentService agentService) {
+    public AuthController(AuthService authService, AgentService agentService) {
         this.authService = authService;
-        this.customerService = customerService;
         this.agentService = agentService;
     }
     
@@ -56,11 +58,7 @@ public class AuthController {
     }
     
 
-    @PostMapping("/customer-register")
-    ResponseEntity<Long> customerRegisterRequest(@RequestBody @Valid RegistrationDTO registrationDTO) {
-        Long id = customerService.customerRegistrationRequest(registrationDTO);
-        return new ResponseEntity<>(id, HttpStatus.OK);
-    }
+
     
     
     @PostMapping("/agent-register")
@@ -127,5 +125,12 @@ public class AuthController {
         System.out.println(customerOrNot);
 
         return ResponseEntity.ok(customerOrNot);
+    }
+    
+    
+    @PostMapping("/update-password")
+    ResponseEntity<LoginResponseDTO> updatePassword(@RequestBody String password) {
+        LoginResponseDTO loginResponseDTO = authService.updatePassword(password);
+        return new ResponseEntity<>(loginResponseDTO, HttpStatus.OK);
     }
 }

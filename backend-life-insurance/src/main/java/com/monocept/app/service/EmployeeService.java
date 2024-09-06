@@ -4,6 +4,8 @@ import com.monocept.app.dto.*;
 import com.monocept.app.utils.PagedResponse;
 import jakarta.validation.Valid;
 
+import jakarta.validation.Valid;
+
 import java.time.LocalDate;
 
 public interface EmployeeService {
@@ -11,20 +13,16 @@ public interface EmployeeService {
 
     EmployeeDTO updateEmployeeProfile(EmployeeDTO employeeDTO);
 
-    Boolean deleteCustomer(Long customerId);
+	EmployeeDTO createEmployee(EmployeeCreationDTO employeeDTO);
 
-    PagedResponse<AgentDTO> getAllAgents(int pageNo, int size, String sort, String sortBy, String sortDirection);
+	EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO);
 
-    Boolean deleteAgent(Long agentId);
+	void deleteEmployee(Long id);
 
-    Boolean activateAgent(Long agentId);
+	PagedResponse<EmployeeDTO> getAllEmployees(int page, int size, String sortBy, String direction);
 
-    Boolean activateCustomer(Long customerId);
+	PagedResponse<EmployeeDTO> getAllActiveEmployees(int page, int size, String sortBy, String direction);
 
-    PagedResponse<CustomerDTO> getAllCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection);
-
-    PagedResponse<CustomerDTO> getAllInActiveCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection);
-    QueryDTO updateQuery(Long id, QueryDTO queryDTO);
     PagedResponse<QueryDTO> getAllQueries(int page, int size, String sortBy, String direction);
     StateDTO updateState(Long id, StateDTO stateDTO);
     CityDTO updateCity(Long id, CityDTO cityDTO);
@@ -56,12 +54,8 @@ public interface EmployeeService {
 
     PagedResponse<FeedbackDTO> getAllFeedbacksByCustomer(int page, int size, String sortBy, String direction, Long id);
 
-
-    PagedResponse<WithdrawalRequestsDTO> getAllPolicyClaimsRequest(int pageNo, int size, String sort, String sortBy, String sortDirection);
-
-    PagedResponse<WithdrawalRequestsDTO> getAllPolicyClaimsApproved(int pageNo, int size, String sort, String sortBy, String sortDirection);
-
     Boolean approveCustomerProfile(Long customerId, Boolean isApproved);
 
     Boolean approveDocument(Long documentId, Boolean isApproved);
+	PagedResponse<EmployeeDTO> getAllInactiveEmployees(int page, int size, String sortBy, String direction);
 }

@@ -3,6 +3,7 @@ package com.monocept.app.service;
 import com.monocept.app.dto.CustomUserDetails;
 
 public interface AccessConService {
+	
     CustomUserDetails checkUserAccess();
 
     String getUserRole();
@@ -18,4 +19,10 @@ public interface AccessConService {
     void checkDocumentAccess(Long documentId);
 
     void checkDocumentDeleteAccess(Long documentId);
+
+    void checkEmployeeAccess();
+
+    void checkCustomerAccess(Long customerId);
+
+    void checkPolicyAccountAccess(Long id);
 }

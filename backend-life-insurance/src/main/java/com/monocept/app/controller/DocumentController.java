@@ -5,6 +5,7 @@ import com.monocept.app.service.StorageService;
 import jakarta.validation.Valid;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,7 +31,7 @@ public class DocumentController {
                 .header("Content-disposition", "attachment; filename=\"" + "testfile" + "\"")
                 .body(resource);
     }
-    @PostMapping("/upload")
+    @PostMapping(value="/upload",consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     ResponseEntity<Boolean> addUserDocument(
             @RequestBody @Valid DocumentUploadedDTO documentUploadedDTO,
             @RequestParam("file") MultipartFile file) {

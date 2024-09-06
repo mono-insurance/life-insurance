@@ -2,30 +2,13 @@ package com.monocept.app.service;
 
 import com.monocept.app.dto.*;
 import com.monocept.app.entity.*;
+import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.CityRepository;
 import com.monocept.app.repository.StateRepository;
+import com.monocept.app.utils.DocumentType;
 import com.monocept.app.utils.GenderType;
 import com.monocept.app.utils.NomineeRelation;
 import com.monocept.app.utils.PageResult;
-
-import com.monocept.app.dto.AddressDTO;
-import com.monocept.app.dto.AdminDTO;
-import com.monocept.app.dto.AgentDTO;
-import com.monocept.app.dto.CityDTO;
-import com.monocept.app.dto.CredentialsDTO;
-import com.monocept.app.dto.CredentialsResponseDTO;
-import com.monocept.app.dto.CustomerDTO;
-import com.monocept.app.dto.DocumentNeededDTO;
-import com.monocept.app.dto.DocumentUploadedDTO;
-import com.monocept.app.dto.EmployeeDTO;
-import com.monocept.app.dto.FeedbackDTO;
-import com.monocept.app.dto.InsuranceTypeDTO;
-import com.monocept.app.dto.PolicyAccountDTO;
-import com.monocept.app.dto.PolicyDTO;
-import com.monocept.app.dto.QueryDTO;
-import com.monocept.app.dto.SettingsDTO;
-import com.monocept.app.dto.StateDTO;
-import com.monocept.app.dto.TransactionsDTO;
 import com.monocept.app.repository.RoleRepository;
 import com.monocept.app.utils.GlobalSettings;
 
@@ -61,15 +44,15 @@ public class DtoServiceImp implements DtoService {
 
 
     @Override
-    public Customer convertCustomerDtoToCustomer(RegistrationDTO customerDTO) {
+    public Customer convertCustomerDtoToCustomer(CustomerDTO customerDTO) {
         Customer customer = new Customer();
         customer.setFirstName(customerDTO.getFirstName());
         customer.setLastName(customerDTO.getLastName());
         customer.setIsApproved(false);
-        customer.setGender(GenderType.valueOf(customerDTO.getGender()));
+        customer.setGender(customerDTO.getGender());
         customer.setDateOfBirth(customerDTO.getDateOfBirth());
         customer.setNomineeName(customerDTO.getNomineeName());
-        customer.setNomineeRelation(NomineeRelation.valueOf(customerDTO.getNomineeRelation()));
+        customer.setNomineeRelation(customerDTO.getNomineeRelation());
         customer.setIsActive(false);
         return customer;
     }
@@ -119,7 +102,7 @@ public class DtoServiceImp implements DtoService {
     public void updateCityAndState(Address agentAddress, AddressDTO address) {
         if (!agentAddress.getState().getStateName().equals(address.getState())) {
             Optional<State> statecheck = stateRepository.findByStateName(address.getState());
-            if (statecheck.isEmpty()) throw new NoSuchElementException("state not found");
+            if (statecheck.isEmpty()) throw new UserException("state not found");
             State state = statecheck.get();
             agentAddress.setState(state);
         }
@@ -128,7 +111,7 @@ public class DtoServiceImp implements DtoService {
                 .findFirst()
                 .orElse(null);
         if (cityInState == null) {
-            throw new NoSuchElementException("city not found");
+            throw new UserException("city not found");
         }
         agentAddress.setCity(cityInState);
     }
@@ -244,7 +227,35 @@ public class DtoServiceImp implements DtoService {
 
     @Override
     public PageResult convertCustomersToPage(List<Customer> customerList, int pageNo, String sort, String sortBy, String sortDirection, int size) {
-        return null;
+        Comparator<Customer> comparator;
+
+        switch (sortBy.toLowerCase()) {
+            case "dateOfBirth":
+                comparator = Comparator.comparing(Customer::getDateOfBirth); // Assuming account number is a String
+                break;
+            case "firstName":
+                comparator = Comparator.comparing(Customer::getFirstName); // Assuming balance is a BigDecimal
+                break;
+            case "isActive":
+                comparator = Comparator.comparing(Customer::getIsActive); // Assuming created date is a LocalDateTime
+                break;
+            default:
+                comparator = Comparator.comparing(Customer::getCustomerId); // Default sort by ID or any default field
+                break;
+        }
+
+        // If descending order is required, reverse the comparator
+        if (sortDirection.equalsIgnoreCase("desc")) {
+            comparator = comparator.reversed();
+        }
+
+        customerList.sort(comparator);
+
+        // Step 3: Implement pagination using subList method
+        int start = pageNo * size;
+        int end = Math.min((start + size), customerList.size());
+        List<Customer> result = customerList.subList(start, end);
+        return new PageResult(result, end);
     }
 
     @Override
@@ -274,8 +285,8 @@ public class DtoServiceImp implements DtoService {
 
     @Override
     public List<DocumentNeededDTO> convertDocumentNeededToDto(List<DocumentNeeded> documentNeededs) {
-        List<DocumentNeededDTO> documentNeededDTOS=new ArrayList<>();
-        for(DocumentNeeded documentNeeded:documentNeededs){
+        List<DocumentNeededDTO> documentNeededDTOS = new ArrayList<>();
+        for (DocumentNeeded documentNeeded : documentNeededs) {
             documentNeededDTOS.add(convertDocumentNeededToDTO(documentNeeded));
         }
         return documentNeededDTOS;
@@ -442,15 +453,12 @@ public class DtoServiceImp implements DtoService {
 
     @Override
     public Agent convertAgentDtoToAgent(AgentDTO agentDTO) {
-        return new Agent(0L, agentDTO.getFirstName(), agentDTO.getLastName(), agentDTO.getDateOfBirth(), agentDTO.getQualification(),
-                agentDTO.getIsActive(), agentDTO.getIsApproved(), null, null, null, null, null);
+        return new Agent(0L, agentDTO.getFirstName(), agentDTO.getLastName(), agentDTO.getDateOfBirth(),
+                agentDTO.getQualification(), agentDTO.getIsActive(), agentDTO.getIsApproved(), agentDTO.getBalance(),
+                agentDTO.getWithdrawalAmount(), null, null, null, null, null);
     }
 
 
-    private Customer convertCustomerDtoToCustomer(CustomerDTO customerDTO) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     @Override
     public Employee convertEmployeeDtoToEntity(EmployeeDTO employeeDTO) {
@@ -496,8 +504,6 @@ public class DtoServiceImp implements DtoService {
         city.setCityId(cityDTO.getCityId());
         city.setCityName(cityDTO.getCityName());
         city.setIsActive(cityDTO.getIsActive());
-
-
         return city;
     }
 
@@ -619,10 +625,6 @@ public class DtoServiceImp implements DtoService {
         policyDTO.setProfitRatio(policy.getProfitRatio());
         policyDTO.setCreatedDate(policy.getCreatedDate());
 
-//        if (policy.getDocumentUploaded() != null) {
-//            policyDTO.setDocumentUploaded(convertDocumentUploadedToDTO(policy.getDocumentUploaded()));
-//        }
-
         if (policy.getDocumentsNeeded() != null) {
             policyDTO.setDocumentsNeeded(
                     policy.getDocumentsNeeded().stream()
@@ -630,33 +632,53 @@ public class DtoServiceImp implements DtoService {
                             .collect(Collectors.toList())
             );
         }
-
-        policyDTO.setInsuranceTypeId(policy.getInsuranceType().getTypeId());
+        if (policy.getInsuranceType() != null) {
+            policyDTO.setInsuranceTypeId(policy.getInsuranceType().getTypeId());
+        }
 
         return policyDTO;
     }
 
-
-    // Convert DocumentNeededDTO to DocumentNeeded entity
     public DocumentNeeded convertDocumentNeededDtoToEntity(DocumentNeededDTO documentNeededDTO) {
         DocumentNeeded documentNeeded = new DocumentNeeded();
         documentNeeded.setDocumentId(documentNeededDTO.getDocumentId());
-        documentNeeded.setDocumentName(documentNeededDTO.getDocumentName());
+
+        // Ensure that documentNeededDTO.getDocumentType() is a String
+        if (documentNeededDTO.getDocumentType() != null) {
+            try {
+                documentNeeded.setDocumentType(DocumentType.valueOf(documentNeededDTO.getDocumentType()));
+            } catch (IllegalArgumentException e) {
+                // Handle invalid enum value
+                throw new IllegalArgumentException("Invalid document type: " + documentNeededDTO.getDocumentType(), e);
+            }
+        }
+
         return documentNeeded;
     }
+
 
     // Convert DocumentNeeded entity to DocumentNeededDTO
     public DocumentNeededDTO convertDocumentNeededToDTO(DocumentNeeded documentNeeded) {
         DocumentNeededDTO documentNeededDTO = new DocumentNeededDTO();
         documentNeededDTO.setDocumentId(documentNeeded.getDocumentId());
-        documentNeededDTO.setDocumentName(documentNeeded.getDocumentName());
+
+        // Handle enum conversion
+        if (documentNeeded.getDocumentType() != null) {
+            documentNeededDTO.setDocumentType(documentNeeded.getDocumentType().name());
+        }
+
         return documentNeededDTO;
     }
 
     public DocumentUploaded convertDocumentUploadedDtoToEntity(DocumentUploadedDTO documentUploadedDTO) {
         DocumentUploaded documentUploaded = new DocumentUploaded();
         documentUploaded.setDocumentId(documentUploadedDTO.getDocumentId());
-        documentUploaded.setName(documentUploadedDTO.getName());
+
+        // Handle enum conversion
+        if (documentUploadedDTO.getDocumentType() != null) {
+            documentUploaded.setDocumentType(DocumentType.valueOf(documentUploadedDTO.getDocumentType()));
+        }
+
         documentUploaded.setIsApproved(documentUploadedDTO.getIsApproved());
 
         return documentUploaded;
@@ -666,7 +688,12 @@ public class DtoServiceImp implements DtoService {
     public DocumentUploadedDTO convertDocumentUploadedToDTO(DocumentUploaded documentUploaded) {
         DocumentUploadedDTO documentUploadedDTO = new DocumentUploadedDTO();
         documentUploadedDTO.setDocumentId(documentUploaded.getDocumentId());
-        documentUploadedDTO.setName(documentUploaded.getName());
+
+        // Handle enum conversion
+        if (documentUploaded.getDocumentType() != null) {
+            documentUploadedDTO.setDocumentType(documentUploaded.getDocumentType().name());
+        }
+
         documentUploadedDTO.setIsApproved(documentUploaded.getIsApproved());
 
         if (documentUploaded.getCustomer() != null) {
@@ -676,11 +703,6 @@ public class DtoServiceImp implements DtoService {
         if (documentUploaded.getAgent() != null) {
             documentUploadedDTO.setAgentId(documentUploaded.getAgent().getAgentId());
         }
-
-//        if (documentUploaded.getPolicy() != null) {
-//            documentUploadedDTO.setPolicyId(documentUploaded.getPolicy().getPolicyId());
-//        }
-
         return documentUploadedDTO;
     }
 
@@ -772,6 +794,15 @@ public class DtoServiceImp implements DtoService {
         return transactionsDTO;
     }
 
+    public Transactions convertTransactionDtoToEntity(TransactionsDTO transactionsDTO) {
+        Transactions transaction = new Transactions();
+        transaction.setTransactionId(transactionsDTO.getTransactionId());
+        transaction.setAmount(transactionsDTO.getAmount());
+        transaction.setTransactionDate(transactionsDTO.getTransactionDate());
+        transaction.setStatus(transactionsDTO.getStatus());
+
+        return transaction;
+    }
     @Override
     public CustomerDTO convertCustomerToCustomerResponseDTO(Customer customer) {
         CustomerDTO customerDTO = new CustomerDTO();
@@ -906,5 +937,34 @@ public class DtoServiceImp implements DtoService {
         policyAccount.setClaimAmount(policyAccountDTO.getClaimAmount());
 
         return policyAccount;
+    }
+
+    @Override
+    public List<SettingsDTO> convertSettingsListEntityToDTO(List<Settings> allSettings) {
+        return allSettings.stream()
+                .map(this::convertSettingsToSettingsDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public WithdrawalRequestsDTO convertWithdrawalRequestToDTO(WithdrawalRequests withdrawalRequest) {
+        WithdrawalRequestsDTO dto = new WithdrawalRequestsDTO();
+        dto.setWithdrawalRequestsId(withdrawalRequest.getWithdrawalRequestsId());
+        dto.setRequestType(withdrawalRequest.getRequestType());
+        dto.setAmount(withdrawalRequest.getAmount());
+        dto.setIsWithdraw(withdrawalRequest.getIsWithdraw());
+        dto.setIsApproved(withdrawalRequest.getIsApproved());
+        dto.setPolicyAccountId(withdrawalRequest.getPolicyAccount().getPolicyAccountId());
+        dto.setAgentId(withdrawalRequest.getAgent() != null ? withdrawalRequest.getAgent().getAgentId() : null);
+        dto.setCustomerId(withdrawalRequest.getCustomer() != null ? withdrawalRequest.getCustomer().getCustomerId() : null);
+
+        return dto;
+    }
+
+    @Override
+    public List<WithdrawalRequestsDTO> convertWithdrawalRequestsListEntityToDTO(List<WithdrawalRequests> allWithdrawalRequests) {
+        return allWithdrawalRequests.stream()
+                .map(this::convertWithdrawalRequestToDTO)
+                .collect(Collectors.toList());
     }
 }

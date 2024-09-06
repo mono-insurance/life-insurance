@@ -5,13 +5,18 @@ import java.util.List;
 import com.monocept.app.dto.*;
 import com.monocept.app.utils.PagedResponse;
 
+import com.monocept.app.dto.AdminCreationDTO;
+import com.monocept.app.dto.AdminDTO;
+
+
 public interface AdminService {
 
     AdminDTO getAdminProfile();
 
-    AdminDTO makeAnotherAdmin(CredentialsDTO credentials);
+    AdminDTO makeAnotherAdmin(AdminCreationDTO adminCreationDTO);
 
     AdminDTO updateAdminProfile(AdminDTO adminDTO);
+
 
     EmployeeDTO createEmployee(CredentialsDTO credentials);
 
@@ -33,7 +38,6 @@ public interface AdminService {
 
     void deleteInsuranceType(Long id);
 
-    PolicyDTO addPolicy(PolicyDTO policyDTO);
 
     PolicyDTO updatePolicy(Long id, PolicyDTO policyDTO);
 
@@ -54,8 +58,6 @@ public interface AdminService {
 
     void deleteQuery(Long id);
 
-
-    Boolean approveAgent(Long agentId);
 
     List<InsuranceTypeDTO> getInsuranceTypes();
 }

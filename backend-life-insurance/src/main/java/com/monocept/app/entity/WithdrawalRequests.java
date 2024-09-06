@@ -50,4 +50,12 @@ public class WithdrawalRequests {
     @JoinColumn(name = "agent_id", nullable = false)
     @JsonBackReference
     private Agent agent;
+    
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", nullable = false)
+    @JsonBackReference
+    private Customer customer;
+    
+    private Long transactionId;
 }

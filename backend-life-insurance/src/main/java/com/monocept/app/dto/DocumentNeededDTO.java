@@ -14,6 +14,6 @@ public class DocumentNeededDTO {
 	private Long documentId;
 
     @NotBlank(message = "Document name is mandatory")
-    private String documentName;
+    private String documentType;
 
 }

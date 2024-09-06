@@ -29,5 +29,17 @@ public class TransactionsDTO {
 
     @NotNull(message = "Policy account ID is mandatory")
     private Long policyAccountId;
+    
+
+    private String cardType;
+
+
+    private String cardAccountNumber;
+
+
+    private String cvv;
+
+    
+    private LocalDate expiryDate;
 	
 }

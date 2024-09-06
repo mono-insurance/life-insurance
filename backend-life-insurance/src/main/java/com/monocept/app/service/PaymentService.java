@@ -2,11 +2,12 @@ package com.monocept.app.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import com.monocept.app.entity.PolicyAccount;
+import com.monocept.app.dto.EmailDTO;
 import com.monocept.app.entity.Transactions;
 import com.monocept.app.repository.AgentRepository;
 import com.monocept.app.repository.TransactionsRepository;
@@ -33,10 +34,13 @@ public class PaymentService {
     private String SUCCESS_URL = "status-success";
     private final TransactionsRepository transactionsRepository;
     private final AgentRepository agentRepository;
+    private final EmailService emailService;
 
-    public PaymentService(TransactionsRepository transactionsRepository, AgentRepository agentRepository) {
+    public PaymentService(TransactionsRepository transactionsRepository, AgentRepository agentRepository,
+                          EmailService emailService) {
         this.transactionsRepository = transactionsRepository;
         this.agentRepository = agentRepository;
+        this.emailService = emailService;
     }
 
     public Payment createPayment(Long transactionId, PaymentOrder order) throws PayPalRESTException {
@@ -80,8 +84,16 @@ public class PaymentService {
         transactions=transactionsRepository.save(transactions);
         Long agentId=transactions.getPolicyAccount().getAgent().getAgentId();
         if(agentId!=null){
-            agentRepository.updateAgentCommission(agentId,transactions.getAgentCommission());
+            Double commission=transactions.getAgentCommission();
+            if(transactions.getPosition()==1) commission+=transactions.getPolicyAccount().getAgentCommissionForRegistration();
+            agentRepository.updateAgentCommission(agentId,commission);
         }
+        EmailDTO emailDTO=new EmailDTO();
+        emailDTO.setEmailId(transactions.getPolicyAccount().getCustomer().getCredentials().getEmail());
+        emailDTO.setTitle("Congrats!, Transaction Success");
+        emailDTO.setBody("Congrats!! your transaction of Policy account number "+transactions.getPolicyAccount().getPolicyAccountId() +" has been completed successfully.\n" +
+                "here are some details:\n transaction amount: "+transactions.getAmount()+"\ndate"+ LocalDate.now());
+        emailService.sendAccountCreationEmail(emailDTO);
         return payment;
     }
 

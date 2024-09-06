@@ -13,4 +13,6 @@ public interface StorageService {
     Boolean deleteDocument(Long documentId);
 
     Boolean deletePolicyImage(Long imageId);
+
+    byte[] downloadPolicyImage(Long pid);
 }

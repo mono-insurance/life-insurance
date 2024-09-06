@@ -14,7 +14,7 @@ import com.paypal.api.payments.Payment;
 import com.paypal.base.rest.PayPalRESTException;
 
 @RestController
-@RequestMapping("/api/transaction/payment")
+@RequestMapping("/suraksha/payment")
 public class PaypalController {
 
     @Autowired
