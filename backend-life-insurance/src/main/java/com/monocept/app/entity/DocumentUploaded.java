@@ -1,9 +1,12 @@
 package com.monocept.app.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.monocept.app.utils.DocumentType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,9 +34,10 @@ public class DocumentUploaded {
     private Long documentId;
 
 
-    @NotBlank
-    @Column(name = "name")
-    private String name;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "document_type")
+    private DocumentType documentType;
 
     @NotNull
     @Column(name = "is_approved")

@@ -53,6 +53,19 @@ public class Transactions {
 	private Double agentCommission;
 	
 	
+	@Column(name = "card_type")
+    private String cardType;
+
+    @Column(name = "card_account_number")
+    private String cardAccountNumber;
+
+    @Column(name = "cvv")
+    private String cvv;
+
+    @Column(name = "expiry_date")
+    private LocalDate expiryDate;
+	
+	
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "policy_account_id", nullable = false)
     @JsonBackReference

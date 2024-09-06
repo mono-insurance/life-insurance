@@ -28,55 +28,22 @@ public class AdminServiceImp implements AdminService{
 	private AccessConService accessConService;
     private AdminRepository adminRepository;
     private DtoService dtoService;
-	private EmployeeRepository employeeRepository;
 	private PasswordEncoder passwordEncoder;
 	private RoleRepository roleRepository;
-	private AuthRepository authRepository;
-	private final AgentRepository agentRepository;
 	
 	@Autowired
-    private StateRepository stateRepository;
-
-    @Autowired
-    private CityRepository cityRepository;
-    
-    @Autowired
-    private InsuranceTypeRepository insuranceTypeRepository;
-    
-    @Autowired
-    private PolicyRepository policyRepository;
-    
-    @Autowired
-    private SettingsRepository settingsRepository;
-    
-    @Autowired
-    private QueryRepository queryRepository;
-    
-    @Autowired
-    private CustomerRepository customerRepository;
-    
-    @Autowired
-    private TransactionsRepository transactionsRepository;
-    
-    @Autowired
-    private PolicyAccountRepository policyAccountRepository;
-    
-    @Autowired
-    private FeedbackRepository feedbackRepository;
+	private AuthRepository credentialsRepository;
     
     
 	@Autowired
     public AdminServiceImp(AccessConService accessConService, AdminRepository adminRepository,
-						   DtoService dtoService, EmployeeRepository employeeRepository, RoleRepository roleRepository,
-						   AuthRepository authRepository, PasswordEncoder passwordEncoder, AgentRepository agentRepository) {
-		this.employeeRepository = employeeRepository;
+						   DtoService dtoService, RoleRepository roleRepository,
+						   PasswordEncoder passwordEncoder) {
 		this.accessConService = accessConService;
         this.adminRepository = adminRepository;
         this.dtoService = dtoService;
         this.roleRepository = roleRepository;
-        this.authRepository = authRepository;
         this.passwordEncoder = passwordEncoder;
-		this.agentRepository = agentRepository;
 	}
 
 	@Override
@@ -111,368 +78,38 @@ public class AdminServiceImp implements AdminService{
 	
 
 	@Override
-	public AdminDTO makeAnotherAdmin(CredentialsDTO credentialsDTO) {
-		credentialsDTO.setId(0L);
-		Credentials credentials = dtoService.convertCredentialsDtoToCredentials(credentialsDTO);
-	    Credentials newCredentials = authRepository.save(credentials);
+	public AdminDTO makeAnotherAdmin(AdminCreationDTO adminCreationDTO) {
+		adminCreationDTO.setAdminId(0L);
+		
+		Admin admin = new Admin();
+		admin.setFirstName(adminCreationDTO.getFirstName());
+		admin.setLastName(adminCreationDTO.getLastName());
+		Credentials credentials = new Credentials();
+		
+	    credentials.setUsername(adminCreationDTO.getUsername());
+	    credentials.setEmail(adminCreationDTO.getEmail());
+	    credentials.setPassword(passwordEncoder.encode(adminCreationDTO.getPassword()));
+	    credentials.setMobileNumber(adminCreationDTO.getMobileNumber());
 	    
-	    AdminDTO adminDTO = dtoService.converAdminToAdminResponseDTO(newCredentials.getAdmin());
+	    Role role = roleRepository.findByName("ROLE_ADMIN")
+                .orElseThrow(() -> new RuntimeException("Role admin not found"));
+    	credentials.setRole(role);
+    	
+    	admin.setCredentials(credentials);
+    	credentials.setAdmin(admin);
+    	credentials = credentialsRepository.save(credentials);
+	    
+	    AdminDTO adminDTO = dtoService.converAdminToAdminResponseDTO(credentials.getAdmin());
 	    
 	    return adminDTO;
 		
 	}
 
-	@Override
-	public EmployeeDTO createEmployee(CredentialsDTO credentialsDTO) {
-		credentialsDTO.setId(0L);
-		Credentials credentials = dtoService.convertCredentialsDtoToCredentials(credentialsDTO);
-		credentials.getEmployee().setIsActive(true);
-		Credentials newCredentials = authRepository.save(credentials);
-		
-		EmployeeDTO employeeDTO = dtoService.converEmployeeToEmployeeResponseDTO(newCredentials.getEmployee());
-		
-		return employeeDTO;
-	}
-
-//
-//	@Override
-//	public EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO) {
-//		Employee existingEmployee = employeeRepository.findById(id)
-//	            .orElseThrow(() -> new UserException("Employee not found"));
-//
-//		existingEmployee.setFirstName(employeeDTO.getFirstName());
-//	    existingEmployee.setLastName(employeeDTO.getLastName());
-//	    existingEmployee.setDateOfBirth(employeeDTO.getDateOfBirth());
-//	    existingEmployee.setQualification(employeeDTO.getQualification());
-//	    existingEmployee.setIsActive(employeeDTO.getIsActive());
-//	    existingEmployee.getCredentials().setUsername(employeeDTO.getCredentials().getUsername());
-//	    existingEmployee.getCredentials().setEmail(employeeDTO.getCredentials().getEmail());
-//	    existingEmployee.getCredentials().setMobileNumber(employeeDTO.getCredentials().getMobileNumber());
-//
-//		Employee updatedEmployee = employeeRepository.save(existingEmployee);
-//
-//
-//		return dtoService.converEmployeeToEmployeeResponseDTO(updatedEmployee);
-//	}
-
-
-	@Override
-	public void deleteEmployee(Long id) {
-		Employee existingEmployee = employeeRepository.findById(id)
-	            .orElseThrow(() -> new UserException("Employee not found"));
-		
-		if(!existingEmployee.getIsActive()) {
-			throw new UserException("This Employee is already deleted");
-		}
-		
-		existingEmployee.setIsActive(false);
-		
-		employeeRepository.save(existingEmployee);
-	}
-
-	@Override
-	public StateDTO addState(StateDTO stateDTO) {
-		stateDTO.setStateId(0L);
-		State state = dtoService.convertStateDtoToEntity(stateDTO);
-		state.setIsActive(true);
-		State savedState = stateRepository.save(state);
-	    return dtoService.convertStateToStateDTO(savedState);
-	}
-
-
-
-	@Override
-	public void deleteState(Long id) {
-		State existingState = stateRepository.findById(id)
-	            .orElseThrow(() -> new UserException("State not found"));
-		
-		if(!existingState.getIsActive()) {
-			throw new UserException("This State is already deleted");
-		}
-
-		existingState.setIsActive(false);
-		stateRepository.save(existingState);
-	}
-
-	@Override
-	public CityDTO addCity(CityDTO cityDTO) {
-		State state = stateRepository.findById(cityDTO.getStateId()).orElseThrow(() -> new UserException("State not found"));
-		
-		if (!state.getIsActive()) {
-	        throw new UserException("Cannot add city to an inactive state");
-	    }
-		
-		cityDTO.setCityId(0L);
-		City city = dtoService.convertCityDtoToEntity(cityDTO);
-		city.setIsActive(true);
-		city.setState(state);
-		City savedCity = cityRepository.save(city);
-		state.getCities().add(savedCity);
-	    return dtoService.convertCityToDTO(savedCity);
-	}
-
-
-	@Override
-	public void deleteCity(Long id) {
-		City existingCity = cityRepository.findById(id)
-	            .orElseThrow(() -> new UserException("City not found"));
-
-	    if (!existingCity.getIsActive()) {
-	        throw new UserException("This City is already deleted");
-	    }
-
-	    existingCity.setIsActive(false);
-
-	    cityRepository.save(existingCity);
-		
-	}
-
-	@Override
-	public InsuranceTypeDTO addInsuranceType(InsuranceTypeDTO insuranceTypeDTO) {
-
-	    insuranceTypeDTO.setTypeId(0L);
-	    InsuranceType insuranceType = dtoService.convertInsuranceTypeDtoToEntity(insuranceTypeDTO);
-	    insuranceType.setIsActive(true);
-	    
-	    InsuranceType savedInsuranceType = insuranceTypeRepository.save(insuranceType);
-	    return dtoService.convertInsuranceTypeToDTO(savedInsuranceType);
-	}
-
-	@Override
-	public InsuranceTypeDTO updateInsuranceType(Long id, InsuranceTypeDTO insuranceTypeDTO) {
-	    InsuranceType existingInsuranceType = insuranceTypeRepository.findById(id)
-	            .orElseThrow(() -> new UserException("Insurance type not found"));
-
-	    if (!existingInsuranceType.getIsActive()) {
-	        throw new UserException("Cannot update an inactive insurance type");
-	    }
-
-	    existingInsuranceType.setInsuranceCategory(insuranceTypeDTO.getInsuranceCategory());
-	    existingInsuranceType.setIsActive(insuranceTypeDTO.getIsActive());
-
-	    InsuranceType updatedInsuranceType = insuranceTypeRepository.save(existingInsuranceType);
-	    return dtoService.convertInsuranceTypeToDTO(updatedInsuranceType);
-	}
-
-	@Override
-	public void deleteInsuranceType(Long id) {
-	    InsuranceType existingInsuranceType = insuranceTypeRepository.findById(id)
-	            .orElseThrow(() -> new UserException("Insurance type not found"));
-
-	    if (!existingInsuranceType.getIsActive()) {
-	        throw new UserException("This insurance type is already deleted");
-	    }
-
-	    existingInsuranceType.setIsActive(false);
-	    insuranceTypeRepository.save(existingInsuranceType);
-	}
-
-	@Override
-	public PolicyDTO addPolicy(PolicyDTO policyDTO) {
-		InsuranceType insuranceType = insuranceTypeRepository.findById(policyDTO.getInsuranceTypeId())
-	            .orElseThrow(() -> new UserException("InsuranceType not found with id " + policyDTO.getInsuranceTypeId()));
-		
-		policyDTO.setPolicyId(0L);
-		Policy policy = dtoService.convertPolicyDtoToEntity(policyDTO);
-		policy.setIsActive(true);
-		policy.setInsuranceType(insuranceType);
-		insuranceType.getPolicies().add(policy);
-		Policy savedPolicy = policyRepository.save(policy);
-		
-		insuranceType.getPolicies().add(savedPolicy);
-	    return dtoService.convertPolicyToDTO(savedPolicy);
-		
-	}
-
-
-	@Override
-	public PolicyDTO updatePolicy(Long id, PolicyDTO policyDTO) {
-		Policy existingPolicy = policyRepository.findById(id)
-	            .orElseThrow(() -> new UserException("Policy not found with id " + id));
-		
-		InsuranceType insuranceType = insuranceTypeRepository.findById(policyDTO.getInsuranceTypeId())
-	            .orElseThrow(() -> new UserException("InsuranceType not found with id " + policyDTO.getInsuranceTypeId()));
-		
-		if (!insuranceType.getIsActive()) {
-	        throw new UserException("Cannot update policy in an inactive insurance category");
-	    }
-		
-		if (!existingPolicy.getIsActive()) {
-	        throw new UserException("Cannot update an inactive policy");
-	    }
-		
-		existingPolicy.setPolicyName(policyDTO.getPolicyName());
-	    existingPolicy.setCommissionNewRegistration(policyDTO.getCommissionNewRegistration());
-	    existingPolicy.setCommissionInstallment(policyDTO.getCommissionInstallment());
-	    existingPolicy.setIsActive(policyDTO.getIsActive());
-	    existingPolicy.setDescription(policyDTO.getDescription());
-	    existingPolicy.setMinPolicyTerm(policyDTO.getMinPolicyTerm());
-	    existingPolicy.setMaxPolicyTerm(policyDTO.getMaxPolicyTerm());
-	    existingPolicy.setMinAge(policyDTO.getMinAge());
-	    existingPolicy.setMaxAge(policyDTO.getMaxAge());
-	    existingPolicy.setEligibleGender(policyDTO.getEligibleGender());
-	    existingPolicy.setMinInvestmentAmount(policyDTO.getMinInvestmentAmount());
-	    existingPolicy.setMaxInvestmentAmount(policyDTO.getMaxInvestmentAmount());
-	    existingPolicy.setProfitRatio(policyDTO.getProfitRatio());
-	    existingPolicy.setCreatedDate(policyDTO.getCreatedDate());
-	    
-	    
-//	    if (policyDTO.getDocumentUploaded() != null) {
-//	    	existingPolicy.setDocumentUploaded(dtoService.convertDocumentUploadedDtoToEntity(policyDTO.getDocumentUploaded()));
-//        }
-
-	    if (policyDTO.getDocumentsNeeded() != null) {
-	        
-	        existingPolicy.setDocumentsNeeded(policyDTO.getDocumentsNeeded().stream()
-		            .map(dtoService::convertDocumentNeededDtoToEntity)
-		            .collect(Collectors.toList()
-		          ));
-	    }
-	    
-		if (!existingPolicy.getInsuranceType().equals(insuranceType)) {
-			    	
-			existingPolicy.getInsuranceType().getPolicies().remove(existingPolicy);
-	        
-			existingPolicy.setInsuranceType(insuranceType);
-			insuranceType.getPolicies().add(existingPolicy);
-	    }
-	    
-	    Policy updatedPolicy = policyRepository.save(existingPolicy);
-
-	    return dtoService.convertPolicyToDTO(updatedPolicy);
-	}
-
-	@Override
-	public void deletePolicy(Long id) {
-		Policy existingPolicy = policyRepository.findById(id)
-	            .orElseThrow(() -> new UserException("Policy not found with id " + id));
-		
-		
-		if (!existingPolicy.getIsActive()) {
-	        throw new UserException("Cannot update an inactive policy");
-	    }
-		
-		
-		existingPolicy.setIsActive(false);
-		
-		policyRepository.save(existingPolicy);
-		
-	}
-
-
-
-
-	@Override
-	public PagedResponse<PolicyDTO> getAllPolicies(int page, int size, String sortBy, String direction) {
-		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-		
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
-		
-		Page<Policy> pages = policyRepository.findAll(pageable);
-		List<Policy> allPolicies = pages.getContent();
-		List<PolicyDTO> allPoliciesDTO = dtoService.convertPolicyListEntityToDTO(allPolicies);
-		
-		return new PagedResponse<PolicyDTO>(allPoliciesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
-	}
-
-	@Override
-	public SettingsDTO addOrUpdateSetting(SettingsDTO settingDTO) {
-		Settings settings = dtoService.convertSettingsDtoToSettings(settingDTO);
-	    
-		Optional<Settings> existingSettingOpt = settingsRepository.findBySettingKey(settings.getSettingKey());
-		
-		if (existingSettingOpt.isPresent()) {
-			
-            Settings existingSetting = existingSettingOpt.get();
-            existingSetting.setSettingValue(settings.getSettingValue());
-            settings = settingsRepository.save(existingSetting);
-        } else {
-        	settings = settingsRepository.save(settings);
-        }
-		
-		return dtoService.convertSettingsToSettingsDTO(settings);
-	}
-
-	@Override
-	public SettingsDTO getSetting(String settingKey) {
-		
-		GlobalSettings settingKeyExists = GlobalSettings.valueOf(settingKey);
-	    Optional<Settings> settingOpt = settingsRepository.findBySettingKey(settingKeyExists);
-
-	    Settings setting = settingOpt.orElseThrow(() -> new RuntimeException("Setting not found: " + settingKey));
-
-	    return dtoService.convertSettingsToSettingsDTO(setting);
-	}
-
-	@Override
-	public PagedResponse<EmployeeDTO> getAllEmployees(int page, int size, String sortBy, String direction) {
-		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-		
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
-		
-		Page<Employee> pages = employeeRepository.findAll(pageable);
-		List<Employee> allEmployees = pages.getContent();
-		List<EmployeeDTO> allEmployeesDTO = dtoService.convertEmployeeListEntityToDTO(allEmployees);
-		
-		return new PagedResponse<EmployeeDTO>(allEmployeesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
-	}
-	
-	
-	@Override
-	public PagedResponse<EmployeeDTO> getAllActiveEmployees(int page, int size, String sortBy, String direction) {
-		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-		
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
-		
-		Page<Employee> pages = employeeRepository.findByIsActiveTrue(pageable);
-		List<Employee> allEmployees = pages.getContent();
-		List<EmployeeDTO> allEmployeesDTO = dtoService.convertEmployeeListEntityToDTO(allEmployees);
-		
-		return new PagedResponse<EmployeeDTO>(allEmployeesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
-	}
-	
-	
-	@Override
-	public PagedResponse<EmployeeDTO> getAllInactiveEmployees(int page, int size, String sortBy, String direction) {
-		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-		
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
-		
-		Page<Employee> pages = employeeRepository.findByIsActiveFalse(pageable);
-		List<Employee> allEmployees = pages.getContent();
-		List<EmployeeDTO> allEmployeesDTO = dtoService.convertEmployeeListEntityToDTO(allEmployees);
-		
-		return new PagedResponse<EmployeeDTO>(allEmployeesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
-	}
-
-
-	
 
 
 
 
 
-	@Override
-	public void deleteQuery(Long id) {
-		Query existingQuery = queryRepository.findById(id)
-	            .orElseThrow(() -> new UserException("Query not found"));
-		
-		queryRepository.delete(existingQuery);
-		
-	}
-
-	@Override
-	public Boolean approveAgent(Long agentId) {
-		Agent agent=findAgentById(agentId);
-		agent.setIsApproved(true);
-		agentRepository.save(agent);
-//		send email to agent
-		return true;
-	}
-
-	private Agent findAgentById(Long agentId) {
-		return agentRepository.findById(agentId).orElseThrow(()->new NoSuchElementException("agent not found"));
-	}
 
 
 }

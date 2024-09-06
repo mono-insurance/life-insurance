@@ -19,4 +19,12 @@ public interface AgentService {
     PagedResponse<WithdrawalRequestsDTO> getAllPolicyClaims(int pageNo, int size, String sort, String sortBy, String sortDirection);
 
     PagedResponse<CustomerDTO> getAllCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection);
+
+	PagedResponse<AgentDTO> getAllAgents(int pageNo, int size, String sort, String sortBy, String sortDirection);
+
+	Boolean deleteAgent(Long agentId);
+
+	Boolean activateAgent(Long agentId);
+
+	Boolean approveAgent(Long agentId);
 }

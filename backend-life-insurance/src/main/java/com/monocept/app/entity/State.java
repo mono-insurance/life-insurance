@@ -36,7 +36,7 @@ public class State {
 	
 	
 	@NotBlank
-	@Column(name ="state_name")
+	@Column(name ="state_name", unique = true)
 	private String stateName;
 	
 	@NotNull

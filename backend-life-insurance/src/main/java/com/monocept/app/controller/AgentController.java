@@ -4,6 +4,8 @@ import com.monocept.app.dto.*;
 import com.monocept.app.service.AgentService;
 import com.monocept.app.service.EmailService;
 import com.monocept.app.utils.PagedResponse;
+
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,14 @@ public class AgentController {
         this.agentService = agentService;
         this.emailService = emailService;
     }
+    
+    
+    
+    // no testing done here
+    
+    
+    
+    
     @GetMapping("/profile/{aid}")
     ResponseEntity<AgentDTO> viewProfile(@PathVariable("aid")Long agentId) {
         AgentDTO agentDTO1 = agentService.viewProfile(agentId);
@@ -36,6 +46,7 @@ public class AgentController {
         Boolean isSuccess = emailService.sendEmails(emailDTO);
         return new ResponseEntity<>(isSuccess, HttpStatus.OK);
     }
+    
     @GetMapping("/policy-accounts")
     ResponseEntity<PagedResponse<PolicyAccountDTO>> getAllCustomerAccounts(
             @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
@@ -97,6 +108,39 @@ public class AgentController {
                 getAllPolicyClaims(pageNo,size,sort,sortBy,sortDirection);
         return new ResponseEntity<>(withdrawalRequestsDTOPagedResponse, HttpStatus.OK);
     }
+    
+    
+	  @Operation(summary = "By Admin,emp: Get agents")
+	  @GetMapping("/agents")
+	  ResponseEntity<PagedResponse<AgentDTO>> getAllAgents(@RequestParam(name = "pageNo", defaultValue = "0") int pageNo, @RequestParam(name = "size", defaultValue = "10") int size, @RequestParam(name = "sort", defaultValue = "ASC") String sort, @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy, @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
+	      PagedResponse<AgentDTO> allAgents = agentService.getAllAgents(pageNo, size, sort, sortBy, sortDirection);
+	      return new ResponseEntity<>(allAgents, HttpStatus.OK);
+	  }
 	
+	
+	
+	  @Operation(summary = "By Admin,emp: delete agents")
+	  @DeleteMapping("/agent/{aid}")
+	  ResponseEntity<Boolean> deleteAgent(@PathVariable("aid") Long agentId) {
+	      Boolean isSuccess = agentService.deleteAgent(agentId);
+	      return new ResponseEntity<>(isSuccess, HttpStatus.OK);
+	  }
+	
+	  @Operation(summary = "By Admin,emp: activate agents")
+	  @PostMapping("/activate-agent/{aid}")
+	  ResponseEntity<Boolean> activateAgent(@PathVariable("aid") Long agentId) {
+	      Boolean isSuccess = agentService.activateAgent(agentId);
+	      return new ResponseEntity<>(isSuccess, HttpStatus.OK);
+	  }
+	
+
+		
+	  
+	@PostMapping("/approve-agent/{aid}")
+	ResponseEntity<Boolean> approveAgent(@PathVariable("aid")Long agentId) {
+	    Boolean isSuccess = agentService.approveAgent(agentId);
+	    return new ResponseEntity<>(isSuccess, HttpStatus.OK);
+	}
+
 	
 }

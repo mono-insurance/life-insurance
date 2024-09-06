@@ -12,15 +12,9 @@ public interface CustomerService {
 
 	CustomerDTO updateCustomerProfile(CustomerDTO customerDTO);
 
-	Long customerRegistrationRequest(@Valid RegistrationDTO registrationDTO);
-
-	AddressDTO updateCustomerAddress(AddressDTO addressDTO);
-
-	QueryDTO addQuery(QueryDTO queryDTO);
+	Long customerRegistration(RegistrationDTO registrationDTO);
 
 	PagedResponse<QueryDTO> getAllResolvedQueries(int page, int size, String sortBy, String direction);
-
-	FeedbackDTO addFeedback(FeedbackDTO feedbackDTO);
 
 	PagedResponse<TransactionsDTO> getAllTransactionsByPolicyAccount(int page, int size, String sortBy,
 			String direction, Long id);
@@ -33,5 +27,20 @@ public interface CustomerService {
 	PolicyAccountDTO createPolicyAccount(PolicyAccountDTO policyAccountDTO);
 
 	Double paymentToPay(Long id, LocalDate paymentToBeMade);
+
+	PagedResponse<WithdrawalRequestsDTO> getAllPolicyClaimsRequest(int pageNo, int size, String sort, String sortBy,
+			String sortDirection);
+
+	PagedResponse<WithdrawalRequestsDTO> getAllPolicyClaimsApproved(int pageNo, int size, String sort, String sortBy,
+			String sortDirection);
+
+	Boolean deleteCustomer(Long customerId);
+
+	Boolean activateCustomer(Long customerId);
+
+	PagedResponse<CustomerDTO> getAllCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection);
+
+	PagedResponse<CustomerDTO> getAllInActiveCustomers(int pageNo, int size, String sort, String sortBy,
+			String sortDirection);
 
 }

@@ -46,10 +46,10 @@ public class StorageServiceImp implements StorageService{
         String fileName=uploadDocToS3(fileObj,file.getOriginalFilename());
         Image image=new Image();
         Policy policy=policyRepository.findById(insuranceId).orElseThrow(()->new NoSuchElementException("policy not found"));
-        image.setPolicy(policy);
+        image.getPolicies().add(policy);
         image.setCloudImageName(fileName);
         image=imageRepository.save(image);
-        policy.getImages().add(image);
+        policy.getImage();
         policyRepository.save(policy);
         return true;
     }

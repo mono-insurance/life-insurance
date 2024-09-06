@@ -19,7 +19,7 @@ public class DocumentUploadedDTO {
     private String blobId;
 
     @NotBlank(message = "Document name is mandatory")
-    private String name;
+    private String documentType;
 
     @NotNull(message = "Approved Status is mandatory")
     private Boolean isApproved;

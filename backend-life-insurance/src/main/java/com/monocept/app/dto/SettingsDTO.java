@@ -16,7 +16,7 @@ public class SettingsDTO {
 	
 	private Long settingId;
 
-    @NotBlank(message = "Setting key is mandatory")
+    @NotNull(message = "Setting key is mandatory")
     private String settingKey;
 
     @NotNull(message = "Setting value is mandatory")
