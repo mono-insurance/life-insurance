@@ -22,7 +22,7 @@ import jakarta.validation.Valid;
 
 
 @RestController
-@RequestMapping("/suraksha")
+@RequestMapping("/suraksha/state")
 public class StateController {
 	
 	@Autowired

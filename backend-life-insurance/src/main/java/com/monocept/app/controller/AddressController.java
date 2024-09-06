@@ -17,7 +17,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/suraksha")
+@RequestMapping("/suraksha/address")
 public class AddressController {
 	
 	@Autowired

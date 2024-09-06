@@ -21,7 +21,7 @@ import jakarta.validation.Valid;
 
 
 @RestController
-@RequestMapping("/suraksha")
+@RequestMapping("/suraksha/withdrawalrequest")
 public class WithdrawalRequestsController {
 	
 	@Autowired

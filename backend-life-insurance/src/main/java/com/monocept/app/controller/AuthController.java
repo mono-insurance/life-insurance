@@ -1,5 +1,6 @@
 package com.monocept.app.controller;
 
+import com.monocept.app.dto.*;
 import com.monocept.app.dto.JWTAuthResponse;
 import com.monocept.app.dto.LoginDTO;
 import com.monocept.app.dto.LoginResponseDTO;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/public/api/auth")
 public class AuthController {
 	
     @Autowired
@@ -61,8 +62,8 @@ public class AuthController {
     
     
     @PostMapping("/agent-register")
-    ResponseEntity<Long> agentRegisterRequest(@RequestBody @Valid RegistrationDTO registrationDTO) {
-        Long id = agentService.agentRegisterRequest(registrationDTO);
+    ResponseEntity<Long> agentRegisterRequest(@RequestBody @Valid CredentialsDTO credentialsDTO) {
+        Long id = agentService.agentRegisterRequest(credentialsDTO);
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
     

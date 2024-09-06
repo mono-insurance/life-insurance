@@ -36,6 +36,7 @@ public class QueryServiceImp implements QueryService{
 	
 	@Override
 	public void deleteQuery(Long id) {
+		accessConService.checkEmployeeAccess();
 		Query existingQuery = queryRepository.findById(id)
 	            .orElseThrow(() -> new UserException("Query not found"));
 		
@@ -46,6 +47,7 @@ public class QueryServiceImp implements QueryService{
 	
     @Override
     public QueryDTO updateQuery(Long id, QueryDTO queryDTO) {
+		accessConService.checkEmployeeAccess();
         Query existingQuery = queryRepository.findById(id)
                 .orElseThrow(() -> new UserException("Query not found"));
 

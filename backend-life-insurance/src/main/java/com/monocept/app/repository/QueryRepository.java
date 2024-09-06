@@ -16,4 +16,6 @@ public interface QueryRepository extends JpaRepository<Query,Long> {
 	Page<Query> findByIsResolvedFalse(Pageable pageable);
 
 	Page<Query> findByCustomer(Customer customer, Pageable pageable);
+
+    Page<Query> findByIsResolvedTrueAndCustomer(Pageable pageable, Customer customer);
 }

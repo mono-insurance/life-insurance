@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
-@RequestMapping("/suraksha")
+@RequestMapping("/suraksha/download")
 public class DownloadController {
 	
 	@Autowired

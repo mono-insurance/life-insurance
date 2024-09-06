@@ -21,4 +21,6 @@ public interface TransactionsRepository extends JpaRepository<Transactions,Long>
 	Page<Transactions> findByTransactionDateBetween(LocalDate startDate, LocalDate endDate, Pageable pageable);
 
 	List<Transactions> findByPolicyAccount(PolicyAccount policyAccount);
+
+	Page<Transactions> findAllByPolicyAccount(PolicyAccount policyAccount, Pageable pageable);
 }

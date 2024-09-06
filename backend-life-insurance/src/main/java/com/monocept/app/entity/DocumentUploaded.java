@@ -34,10 +34,18 @@ public class DocumentUploaded {
     private Long documentId;
 
 
+    @NotBlank
+    @Column(name = "name")
+    private String name;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "document_type")
     private DocumentType documentType;
+
+    @NotBlank
+    @Column(name = "cloud_file_name")
+    private String cloudFileName;
 
     @NotNull
     @Column(name = "is_approved")
@@ -51,6 +59,4 @@ public class DocumentUploaded {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     private Agent agent;
-
-
 }

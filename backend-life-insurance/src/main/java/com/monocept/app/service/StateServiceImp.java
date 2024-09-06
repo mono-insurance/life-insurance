@@ -23,10 +23,13 @@ public class StateServiceImp implements StateService{
 	
 	@Autowired
     private StateRepository stateRepository;
+    @Autowired
+    private AccessConService accessConService;
 
 	
 	@Override
 	public StateDTO addState(StateDTO stateDTO) {
+        accessConService.checkAdminAccess();
 		stateDTO.setStateId(0L);
 		State state = dtoService.convertStateDtoToEntity(stateDTO);
 		state.setIsActive(true);
@@ -37,6 +40,7 @@ public class StateServiceImp implements StateService{
 	
 	@Override
 	public void deleteState(Long id) {
+        accessConService.checkAdminAccess();
 		State existingState = stateRepository.findById(id)
 	            .orElseThrow(() -> new UserException("State not found"));
 		
@@ -66,6 +70,7 @@ public class StateServiceImp implements StateService{
     
     @Override
     public StateDTO updateState(Long id, StateDTO stateDTO) {
+        accessConService.checkEmployeeAccess();
         State existingState = stateRepository.findById(id)
                 .orElseThrow(() -> new UserException("State not found"));
         
@@ -113,6 +118,7 @@ public class StateServiceImp implements StateService{
 
 	@Override
 	public StateDTO activateState(Long id) {
+        accessConService.checkEmployeeAccess();
 		State existingState = stateRepository.findById(id)
                 .orElseThrow(() -> new UserException("State not found"));
 		

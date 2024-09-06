@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/agent")
+@RequestMapping("/suraksha/agent")
 public class AgentController {
     private final AgentService agentService;
     private final EmailService emailService;
@@ -40,6 +40,11 @@ public class AgentController {
         AgentDTO updatedAgent = agentService.updateAgent(agentDTO);
         return new ResponseEntity<>(updatedAgent, HttpStatus.OK);
     }
+    @PostMapping("/commission-withdrawal-request")
+    ResponseEntity<Boolean> withdrawalRequest(@RequestParam("agentCommission")Double agentCommission) {
+        Boolean isSuccess = agentService.withdrawalRequest(agentCommission);
+        return new ResponseEntity<>(isSuccess, HttpStatus.OK);
+    }
 
     @PostMapping("/send-email")
     ResponseEntity<Boolean> sendEmails(@RequestBody @Valid EmailDTO emailDTO) {
@@ -55,7 +60,8 @@ public class AgentController {
             @RequestParam(name = "sortBy", defaultValue = "createdDate") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection
     ) {
-        PagedResponse<PolicyAccountDTO> policyAccountDTOPagedResponse = agentService.getAllCustomerAccounts(pageNo,size,sort,sortBy,sortDirection);
+        PagedResponse<PolicyAccountDTO> policyAccountDTOPagedResponse = agentService.
+                getAllCustomerAccounts(pageNo,size,sort,sortBy,sortDirection);
         return new ResponseEntity<>(policyAccountDTOPagedResponse, HttpStatus.OK);
     }
     @GetMapping("/customers")
@@ -66,7 +72,8 @@ public class AgentController {
             @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection
     ) {
-        PagedResponse<CustomerDTO> customerDTOPagedResponse = agentService.getAllCustomers(pageNo,size,sort,sortBy,sortDirection);
+        PagedResponse<CustomerDTO> customerDTOPagedResponse = agentService.
+                getAllCustomers(pageNo,size,sort,sortBy,sortDirection);
         return new ResponseEntity<>(customerDTOPagedResponse, HttpStatus.OK);
     }
 
@@ -132,15 +139,6 @@ public class AgentController {
 	      Boolean isSuccess = agentService.activateAgent(agentId);
 	      return new ResponseEntity<>(isSuccess, HttpStatus.OK);
 	  }
-	
-
-		
-	  
-	@PostMapping("/approve-agent/{aid}")
-	ResponseEntity<Boolean> approveAgent(@PathVariable("aid")Long agentId) {
-	    Boolean isSuccess = agentService.approveAgent(agentId);
-	    return new ResponseEntity<>(isSuccess, HttpStatus.OK);
-	}
 
 	
 }

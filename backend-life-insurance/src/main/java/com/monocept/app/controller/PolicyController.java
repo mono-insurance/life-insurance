@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/suraksha")
+@RequestMapping("/suraksha/policy")
 public class PolicyController {
 	
 	@Autowired
@@ -40,58 +40,18 @@ public class PolicyController {
         this.storageService = storageService;
     }
 
-    @GetMapping("/download/{fileName}")
-    public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable String fileName) {
-        byte[] data = storageService.downloadFile(fileName);
-        ByteArrayResource resource = new ByteArrayResource(data);
-        return ResponseEntity
-                .ok()
-                .contentLength(data.length)
-                .header("Content-type", "application/octet-stream")
-                .header("Content-disposition", "attachment; filename=\"" + fileName + "\"")
-                .body(resource);
-    }
-    
-    
-    
-    
-	@Operation(summary = "By Admin: Add Policy")
-	@PostMapping(value = "/policy", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-	public ResponseEntity<PolicyDTO> addPolicy(
-	        @ModelAttribute @Valid PolicyDTO policyDTO,
-	        @RequestParam("image") MultipartFile image) {
+	@GetMapping("/download/policy-image/{pid}")
+	public ResponseEntity<ByteArrayResource> downloadPolicyImage(@PathVariable("pid") Long pid) {
+		byte[] data = storageService.downloadPolicyImage(pid);
+		ByteArrayResource resource = new ByteArrayResource(data);
+		return ResponseEntity
+				.ok()
+				.contentLength(data.length)
+				.header("Content-type", "application/octet-stream")
+				.header("Content-disposition", "attachment; filename=\"" + "test" + "\"")
+				.body(resource);
+	}
 
-	    System.out.println("Policy DTO: " + policyDTO);
-	    System.out.println("Image: " + image.getOriginalFilename());
-	    PolicyDTO savedPolicy = policyService.addPolicy(policyDTO, image);
-
-	    return new ResponseEntity<>(savedPolicy, HttpStatus.OK);
-	}
-	
-	@Operation(summary = "By Admin: update Policy")
-	@PutMapping("/policy/{id}")
-	public ResponseEntity<PolicyDTO> updatePolicy(@PathVariable(name = "id") Long id, @RequestBody @Valid PolicyDTO policyDTO) {
-	
-	    PolicyDTO policy = policyService.updatePolicy(id, policyDTO);
-	
-	    return new ResponseEntity<PolicyDTO>(policy, HttpStatus.OK);
-	
-	}
-	
-	
-	@Operation(summary = "By Admin: Delete Policy")
-	@DeleteMapping("/policy/{id}")
-	public ResponseEntity<String> deletePolicy(@PathVariable(name = "id") Long id) {
-	
-		policyService.deletePolicy(id);
-	
-	return new ResponseEntity<String>("Deleted Successfully", HttpStatus.OK);
-	
-	}
-	
-	
-	
-	
 	@Operation(summary = "By Admin: Get All Policies")
 	@GetMapping("/policy")
 	public ResponseEntity<PagedResponse<PolicyDTO>> getAllPolicies(
@@ -103,8 +63,15 @@ public class PolicyController {
 	    PagedResponse<PolicyDTO> policies = policyService.getAllPolicies(page, size, sortBy, direction);
 	
 	    return new ResponseEntity<PagedResponse<PolicyDTO>>(policies, HttpStatus.OK);
-	
 	}
-	
-    
+
+	@Operation(summary = "By Admin: Get  policy by id")
+	@GetMapping("/policy/{pid}")
+	public ResponseEntity<PolicyDTO> getPolicyById(@PathVariable("pid")Long policyId) {
+
+		PolicyDTO policies = policyService.getPolicyById(policyId);
+
+		return new ResponseEntity<>(policies, HttpStatus.OK);
+	}
+
 }

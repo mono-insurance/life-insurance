@@ -4,16 +4,17 @@ import com.monocept.app.dto.*;
 import com.monocept.app.entity.*;
 import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.*;
-import com.monocept.app.utils.GenderType;
-import com.monocept.app.utils.NomineeRelation;
 import com.monocept.app.utils.PageResult;
 import com.monocept.app.utils.PagedResponse;
-
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class AgentServiceImp implements AgentService {
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     private final DtoService dtoService;
     private final AccessConService accessConService;
     private final AgentRepository agentRepository;
@@ -30,13 +33,15 @@ public class AgentServiceImp implements AgentService {
     private final AuthRepository authRepository;
     private final AddressRepository addressRepository;
     private final RoleRepository roleRepository;
-    
-    @Autowired
-	private PasswordEncoder passwordEncoder;
+
+    private final EmailService emailService;
+    private final WithdrawalRequestsRepository withdrawalRequestsRepository;
+
 
     public AgentServiceImp(DtoService dtoService, AccessConService accessConService, AgentRepository agentRepository,
                            CityRepository cityRepository, StateRepository stateRepository, AuthRepository authRepository,
-                           AddressRepository addressRepository, RoleRepository roleRepository) {
+                           AddressRepository addressRepository, RoleRepository roleRepository, EmailService emailService,
+                           WithdrawalRequestsRepository withdrawalRequestsRepository) {
         this.dtoService = dtoService;
         this.accessConService = accessConService;
         this.agentRepository = agentRepository;
@@ -45,59 +50,26 @@ public class AgentServiceImp implements AgentService {
         this.authRepository = authRepository;
         this.addressRepository = addressRepository;
         this.roleRepository = roleRepository;
+        this.emailService = emailService;
+        this.withdrawalRequestsRepository = withdrawalRequestsRepository;
     }
 
+    @Override
+    public Long agentRegisterRequest(@Valid CredentialsDTO credentialsDTO) {
+        Credentials credentials = dtoService.convertCredentialsDtoToCredentials(credentialsDTO);
+        credentials.getAgent().setIsActive(false);
 
-    
-    
-	@Override
-	public Long agentRegisterRequest(RegistrationDTO registrationDTO) {
-		Agent agent = new Agent();
-		agent.setFirstName(registrationDTO.getFirstName());
-		agent.setLastName(registrationDTO.getLastName());
-		agent.setDateOfBirth(registrationDTO.getDateOfBirth());
-		agent.setIsActive(true);
-		agent.setIsApproved(false);
-        
-        Address address = new Address();
-        address.setFirstStreet(registrationDTO.getFirstStreet());
-        address.setLastStreet(registrationDTO.getLastStreet());
-        address.setPincode(registrationDTO.getPincode());
-        
-        State state = stateRepository.findById(registrationDTO.getStateId())
-            .orElseThrow(() -> new UserException("State not found"));
-        if (!state.getIsActive()) {
-            throw new UserException("Selected state is inactive");
-        }
-
-        City city = cityRepository.findById(registrationDTO.getCityId())
-            .orElseThrow(() -> new UserException("City not found"));
-        if (!city.getIsActive()) {
-            throw new UserException("Selected city is inactive");
-        }
-        
-        address.setState(state);
-        address.setCity(city);
-        
-        address = addressRepository.save(address);
-        agent.setAddress(address);
-        
-        Credentials credentials = new Credentials();
-        credentials.setUsername(registrationDTO.getUsername());
-        credentials.setEmail(registrationDTO.getEmail());
-        credentials.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
-        credentials.setMobileNumber(registrationDTO.getMobileNumber());
-        credentials.setAgent(agent);
-        
-        Role role = roleRepository.findByName("ROLE_AGENT")
-                .orElseThrow(() -> new RuntimeException("Role admin not found"));
-    	credentials.setRole(role);
-        
-    	agent.setCredentials(credentials);
-        credentials = authRepository.save(credentials);
-        
-        return credentials.getCustomer().getCustomerId();
-	}
+        Long id= authRepository.save(credentials).getId();
+        EmailDTO emailDTO=new EmailDTO();
+        emailDTO.setEmailId(credentialsDTO.getEmail());
+        emailDTO.setTitle("Registration Success");
+        emailDTO.setBody("Congrats!! you have registered with our company as an agent.\n" +
+                " Now, your details will be verified by our company employees" +
+                " and your account will be activated\n We will inform you once details verified" +
+                "your username is "+credentialsDTO.getUsername());
+        emailService.sendAccountCreationEmail(emailDTO);
+        return id;
+    }
 
     @Override
     public AgentDTO updateAgent(AgentDTO agentDTO) {
@@ -105,12 +77,17 @@ public class AgentServiceImp implements AgentService {
         Agent agent = findAgent(agentDTO.getAgentId());
         agent = updatethisAgent(agent, agentDTO);
         agent = agentRepository.save(agent);
+        EmailDTO emailDTO=new EmailDTO();
+        emailDTO.setEmailId(agent.getCredentials().getEmail());
+        emailDTO.setTitle("Profile update");
+        emailDTO.setBody("You have updated your profile, now your account is under review" +
+                "your username is "+agent.getCredentials().getUsername());
         return dtoService.convertAgentToAgentDto(agent);
     }
 
     private Agent findAgent(Long agentId) {
         return agentRepository.findById(agentId).
-                orElseThrow(() -> new NoSuchElementException("agent not found"));
+                orElseThrow(() -> new UserException("agent not found"));
     }
 
     private Agent updatethisAgent(Agent agent, AgentDTO agentDTO) {
@@ -139,6 +116,7 @@ public class AgentServiceImp implements AgentService {
 
     @Override
     public AgentDTO viewProfile(Long agentId) {
+        accessConService.checkSameUserOrRole(agentId);
         Agent agent = findAgent(agentId);
         return dtoService.convertAgentToAgentDto(agent);
     }
@@ -245,10 +223,28 @@ public class AgentServiceImp implements AgentService {
                 end == customerList.size()
         );
     }
-    
-    
+    @Override
+    public Boolean withdrawalRequest(Double agentCommission) {
+        CustomUserDetails customUserDetails=accessConService.checkUserAccess();
+        Long agentId=customUserDetails.getId();
+        Agent agent=findAgent(agentId);
+        if(agent.getBalance()<agentCommission){
+            throw new UserException("your balance is less than requested");
+        }
+        WithdrawalRequests withdrawalRequests=new WithdrawalRequests();
+        withdrawalRequests.setAgent(agent);
+        withdrawalRequests.setIsWithdraw(false);
+        withdrawalRequests.setRequestType("Commission");
+        withdrawalRequests.setIsApproved(false);
+        withdrawalRequests.setAmount(agentCommission);
+        withdrawalRequests=withdrawalRequestsRepository.save(withdrawalRequests);
+        agent.getWithdrawalRequests().add(withdrawalRequests);
+        agentRepository.save(agent);
+        return true;
+    }
     @Override
     public PagedResponse<AgentDTO> getAllAgents(int pageNo, int size, String sort, String sortBy, String sortDirection) {
+        accessConService.checkEmployeeAccess();
         Sort sorting = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name())
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
@@ -263,24 +259,40 @@ public class AgentServiceImp implements AgentService {
 
     @Override
     public Boolean deleteAgent(Long agentId) {
+        accessConService.checkEmployeeAccess();
         Agent agent=findAgentById(agentId);
         if(!agent.getIsActive()){
-            throw new NoSuchElementException("agent is already deleted");
+            throw new UserException("agent is already deleted");
         }
         agent.setIsActive(false);
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setEmailId(agent.getCredentials().getEmail());
+        emailDTO.setTitle("Account Deleted");
+        emailDTO.setBody("Oops!! your account has been deleted by us.\n" +
+                "if this is a mistake, please contact to our employees");
+        emailService.sendAccountCreationEmail(emailDTO);
         agentRepository.save(agent);
         return true;
     }
 
     private Agent findAgentById(Long agentId) {
-        return agentRepository.findById(agentId).orElseThrow(()->new NoSuchElementException("agent not found"));
+        return agentRepository.findById(agentId).orElseThrow(()->new UserException("agent not found"));
     }
 
     @Override
     public Boolean activateAgent(Long agentId) {
+        accessConService.checkEmployeeAccess();
         Agent agent=findAgentById(agentId);
-        if(agent.getIsActive()) throw new NoSuchElementException("agent is already activated");
+        if(agent.getIsActive()) throw new UserException("agent is already activated");
         agent.setIsActive(true);
+
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setEmailId(agent.getCredentials().getEmail());
+        emailDTO.setTitle("Account activated");
+        emailDTO.setBody("Congrats!! your account has been activated by admin.\n" +
+                "your username is " + agent.getCredentials().getUsername() +
+                "\nPlease Start working to get new customers to us.");
+        emailService.sendAccountCreationEmail(emailDTO);
         agentRepository.save(agent);
         return true;
     }
@@ -288,44 +300,28 @@ public class AgentServiceImp implements AgentService {
     
     
 	@Override
-	public Boolean approveAgent(Long agentId) {
+	public Boolean approveAgent(Long agentId, Boolean isApproved) {
+        accessConService.checkAdminAccess();
 		Agent agent=findAgentById(agentId);
-		agent.setIsApproved(true);
-		agentRepository.save(agent);
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setEmailId(agent.getCredentials().getEmail());
+        if(isApproved){
+            agent.setIsApproved(true);
+            agentRepository.save(agent);
+
+            emailDTO.setTitle("Agent Approved");
+            emailDTO.setBody("Congrats!! your account has been activated by admin.\n" +
+                    " Now, you are an agent of our company\n" +
+                    "your username is " + agent.getCredentials().getUsername() +
+                    "\nPlease Start working to get new customers to us.");
+        }
+        else{
+            emailDTO.setTitle("Agent Not Approved");
+            emailDTO.setBody("Oops!! your registration request has been rejected by admin.\n");
+        }
+
+        emailService.sendAccountCreationEmail(emailDTO);
 //		send email to agent
 		return true;
 	}
-	
-	
-	
-	
-	
-	
-//    @Override
-//    public Long agentRegisterRequest(RegistrationDTO registrationDTO) {
-////        first set credentials
-//        CredentialsResponseDTO credentialsResponseDTO = registrationDTO.getCredentials();
-//        Credentials credentials = new Credentials();
-//        Role role = roleRepository.findByName("ROLE_AGENT").get();
-//        credentials.setRole(role);
-//        credentials.setMobileNumber(credentialsResponseDTO.getMobileNumber());
-//        credentials.setEmail(credentialsResponseDTO.getEmail());
-//        credentials.setUsername(credentialsResponseDTO.getUsername());
-//        credentials = authRepository.save(credentials);
-//        role.getCredentials().add(credentials);
-//        roleRepository.save(role);
-//
-//        Agent agent = new Agent();
-//        agent.setCredentials(credentials);
-//        AddressDTO addressDTO = registrationDTO.getAddress();
-//        Address address = dtoService.convertDtoToAddress(addressDTO);
-//        agent.setAddress(address);
-//        agent.setIsActive(false);
-//        agent.setIsApproved(false);
-//        agent.setFirstName(registrationDTO.getFirstName());
-//        agent.setLastName(registrationDTO.getLastName());
-//        agent = agentRepository.save(agent);
-//        return agent.getAgentId();
-//    }
-
 }

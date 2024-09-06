@@ -63,10 +63,7 @@ public class DownloadServiceImp implements DownloadService{
 	              String.valueOf(transaction.getTransactionId()),
 	              String.valueOf(transaction.getAmount()),  
 	              String.valueOf(transaction.getAgentCommission()),
-	              String.valueOf(transaction.getTransactionDate()),
-	              transaction.getCardType(),
-	              transaction.getCardAccountNumber(),
-	              String.valueOf(transaction.getExpiryDate())
+	              String.valueOf(transaction.getTransactionDate())
 	            );
 
 	        csvPrinter.printRecord(data);

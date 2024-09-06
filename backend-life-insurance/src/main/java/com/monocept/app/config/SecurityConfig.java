@@ -45,20 +45,63 @@ public class SecurityConfig {
         http.csrf((csrf) -> csrf.disable())
                 .authorizeHttpRequests((authorize) ->
                         authorize
-//                                .requestMatchers(HttpMethod.POST, "/private/api/admin/**").hasRole("ADMIN")
-//                                .requestMatchers(HttpMethod.GET, "/private/api/admin/**").hasRole("ADMIN")
-//                                .requestMatchers(HttpMethod.DELETE, "/private/api/admin/**").hasRole("ADMIN")
-//                                .requestMatchers(HttpMethod.PUT, "/private/api/admin/**").hasRole("ADMIN")
-//                                .requestMatchers(HttpMethod.PATCH, "/private/api/admin/**").hasRole("ADMIN")
-//
-//                                .requestMatchers(HttpMethod.POST, "/private/api/customer/**").hasRole("CUSTOMER")
-//                                .requestMatchers(HttpMethod.GET, "/private/api/customer/**").hasRole("CUSTOMER")
-//                                .requestMatchers(HttpMethod.DELETE, "/private/api/customer/**").hasRole("ADMIN")
-//                                .requestMatchers(HttpMethod.PUT, "/private/api/customer/**").hasRole("CUSTOMER")
-//                                .requestMatchers(HttpMethod.PATCH, "/private/api/customer/**").hasRole("CUSTOMER")
+                                .requestMatchers(HttpMethod.POST, "/suraksha/admin/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/suraksha/admin/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/suraksha/admin/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/suraksha/admin/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PATCH, "/suraksha/admin/**").hasRole("ADMIN")
+
+                                .requestMatchers(HttpMethod.POST, "/suraksha/settings/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/suraksha/settings/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/suraksha/settings/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/suraksha/settings/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PATCH, "/suraksha/settings/**").hasRole("ADMIN")
+
+                                .requestMatchers(HttpMethod.POST, "/suraksha/payment/**").hasRole("CUSTOMER")
+                                .requestMatchers(HttpMethod.GET, "/suraksha/payment/**").hasRole("CUSTOMER")
+                                .requestMatchers(HttpMethod.DELETE, "/suraksha/payment/**").hasRole("CUSTOMER")
+                                .requestMatchers(HttpMethod.PUT, "/suraksha/payment/**").hasRole("CUSTOMER")
+                                .requestMatchers(HttpMethod.PATCH, "/suraksha/payment/**").hasRole("CUSTOMER")
+
+                                .requestMatchers(HttpMethod.POST, "/suraksha/customer/**").
+                                hasAnyRole("CUSTOMER","AGENT","EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/suraksha/customer/**").
+                                hasAnyRole("CUSTOMER","AGENT","EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/suraksha/customer/**").
+                                hasAnyRole("CUSTOMER","AGENT","EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/suraksha/customer/**").
+                                hasAnyRole("CUSTOMER","AGENT","EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.PATCH, "/suraksha/customer/**").
+                                hasAnyRole("CUSTOMER","AGENT","EMPLOYEE","ADMIN")
+
+                                .requestMatchers(HttpMethod.POST, "/suraksha/agent/**").
+                                hasAnyRole("AGENT","EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/suraksha/agent/**").
+                                hasAnyRole("AGENT","EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/suraksha/agent/**").
+                                hasAnyRole("AGENT","EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/suraksha/agent/**").
+                                hasAnyRole("AGENT","EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.PATCH, "/suraksha/agent/**").
+                                hasAnyRole("AGENT","EMPLOYEE","ADMIN")
+
+                                .requestMatchers(HttpMethod.POST, "/suraksha/employee/**").
+                                hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/suraksha/employee/**").
+                                hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/suraksha/employee/**").
+                                hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/suraksha/employee/**").
+                                hasAnyRole("CUSTOMER","AGENT","EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.PATCH, "/suraksha/employee/**").
+                                hasAnyRole("EMPLOYEE","ADMIN")
+
                                 .requestMatchers("/public/api/auth/**").permitAll()
                                 .requestMatchers("/swagger-ui/**","/v3/api-docs").permitAll()
-                                .anyRequest().permitAll()
+
+                                .requestMatchers(HttpMethod.GET, "/suraksha/policy/**").permitAll()
+
+                                .anyRequest().authenticated()
 
                 ).exceptionHandling( exception -> exception
                         .authenticationEntryPoint(authenticationEntryPoint)

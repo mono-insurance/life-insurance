@@ -64,10 +64,6 @@ public class TransactionPdfExporter {
             table.addCell(String.valueOf(transaction.getTransactionDate()));
             table.addCell(transaction.getStatus());
             table.addCell(String.valueOf(transaction.getAgentCommission()));
-            table.addCell(transaction.getCardType() != null ? transaction.getCardType() : "N/A");
-            table.addCell(transaction.getCardAccountNumber() != null ? transaction.getCardAccountNumber() : "N/A");
-            table.addCell(transaction.getExpiryDate() != null ? String.valueOf(transaction.getExpiryDate()) : "N/A");
-            table.addCell(String.valueOf(transaction.getPolicyAccount().getPolicyAccountId()));
         }
     }
 

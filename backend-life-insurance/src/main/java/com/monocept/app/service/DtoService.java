@@ -81,7 +81,7 @@ public interface DtoService {
 
 	Employee convertEmployeeDtoToEmployee(EmployeeDTO employeeDTO);
 
-	Customer convertCustomerDtoToCustomer(RegistrationDTO registrationDTO);
+	Customer convertCustomerDtoToCustomer(CustomerDTO registrationDTO);
 
     Agent convertAgentDtoToAgent(AgentDTO agentDTO);
 
@@ -117,10 +117,14 @@ public interface DtoService {
 
     List<AgentDTO> convertAgentsToDto(List<Agent> agents);
 
+
+    List<DocumentNeededDTO> convertDocumentNeededToDto(List<DocumentNeeded> documentNeededs);
+
 	List<SettingsDTO> convertSettingsListEntityToDTO(List<Settings> allSettings);
 
 	WithdrawalRequestsDTO convertWithdrawalRequestToDTO(WithdrawalRequests withdrawalRequest);
 
 	List<WithdrawalRequestsDTO> convertWithdrawalRequestsListEntityToDTO(
 			List<WithdrawalRequests> allWithdrawalRequests);
+
 }

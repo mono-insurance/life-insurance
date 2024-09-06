@@ -1,7 +1,6 @@
 package com.monocept.app.service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.monocept.app.dto.PolicyDTO;
 import com.monocept.app.entity.DocumentNeeded;
-import com.monocept.app.entity.Image;
 import com.monocept.app.entity.InsuranceType;
 import com.monocept.app.entity.Policy;
-import com.monocept.app.entity.Settings;
 import com.monocept.app.exception.UserException;
-import com.monocept.app.repository.CustomerRepository;
 import com.monocept.app.repository.DocumentNeededRepository;
 import com.monocept.app.repository.InsuranceTypeRepository;
 import com.monocept.app.repository.PolicyRepository;
@@ -46,7 +42,7 @@ public class PolicyServiceImp implements PolicyService{
 	
 	
 	@Override
-	public PolicyDTO addPolicy(PolicyDTO policyDTO, MultipartFile image) {
+	public PolicyDTO addPolicy(PolicyDTO policyDTO, MultipartFile file) {
 	    InsuranceType insuranceType = insuranceTypeRepository.findById(policyDTO.getInsuranceTypeId())
 	            .orElseThrow(() -> new UserException("InsuranceType not found with id " + policyDTO.getInsuranceTypeId()));
 	    
@@ -54,10 +50,6 @@ public class PolicyServiceImp implements PolicyService{
 	    Policy policy = dtoService.convertPolicyDtoToEntity(policyDTO);
 	    policy.setIsActive(true);
 	    policy.setInsuranceType(insuranceType);
-	    
-	    Image savedImage = imageService.saveImage(image);
-	    policy.setImage(savedImage);
-	    
 	    if (policyDTO.getDocumentsNeeded() != null && !policyDTO.getDocumentsNeeded().isEmpty()) {
 	        List<DocumentNeeded> documentNeededEntities = policyDTO.getDocumentsNeeded()
 	            .stream()
@@ -73,7 +65,6 @@ public class PolicyServiceImp implements PolicyService{
 	                                newDocument.setDocumentType(documentType);
 	                                return documentNeededRepository.save(newDocument);
 	                            });
-
 	                    return documentNeeded;
 
 	                } catch (IllegalArgumentException e) {
@@ -89,6 +80,7 @@ public class PolicyServiceImp implements PolicyService{
 	    
 	    insuranceType.getPolicies().add(policy);
 	    Policy savedPolicy = policyRepository.save(policy);
+		imageService.saveImage(file,savedPolicy);
 	    
 	    return dtoService.convertPolicyToDTO(savedPolicy);
 	}
@@ -183,6 +175,12 @@ public class PolicyServiceImp implements PolicyService{
 		List<PolicyDTO> allPoliciesDTO = dtoService.convertPolicyListEntityToDTO(allPolicies);
 		
 		return new PagedResponse<PolicyDTO>(allPoliciesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+	@Override
+	public PolicyDTO getPolicyById(Long policyId) {
+		Policy policy=policyRepository.findById(policyId).orElseThrow(()->new UserException("policy not found"));
+		return dtoService.convertPolicyToDTO(policy);
 	}
 
 

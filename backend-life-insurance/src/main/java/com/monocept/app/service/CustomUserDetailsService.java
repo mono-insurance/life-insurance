@@ -30,6 +30,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 new UsernameNotFoundException("User not found with username or email: "+ usernameOrEmail));
         
         String roleName=credentials.getRole().getName();
+        System.out.println("ROLE is "+roleName);
         Set<GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(roleName));
         
         

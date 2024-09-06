@@ -15,9 +15,6 @@ public class DocumentUploadedDTO {
 	
 	private Long documentId;
 
-	@NotBlank(message = "Blob Id is mandatory")
-    private String blobId;
-
     @NotBlank(message = "Document name is mandatory")
     private String documentType;
 

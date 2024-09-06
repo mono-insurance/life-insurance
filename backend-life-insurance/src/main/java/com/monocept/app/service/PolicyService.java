@@ -7,7 +7,7 @@ import com.monocept.app.utils.PagedResponse;
 
 public interface PolicyService {
 
-	PolicyDTO addPolicy(PolicyDTO policyDTO, MultipartFile image);
+	PolicyDTO addPolicy(PolicyDTO policyDTO, MultipartFile file);
 
 	PolicyDTO updatePolicy(Long id, PolicyDTO policyDTO);
 
@@ -15,4 +15,5 @@ public interface PolicyService {
 
 	PagedResponse<PolicyDTO> getAllPolicies(int page, int size, String sortBy, String direction);
 
+    PolicyDTO getPolicyById(Long policyId);
 }

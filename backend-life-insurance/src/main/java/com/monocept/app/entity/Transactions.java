@@ -38,6 +38,11 @@ public class Transactions {
     @Positive
     @Column(name = "amount")
     private Double amount;
+
+    @NotNull
+    @Positive
+    @Column(name="position")
+    private Long position;
     
 
 	@Column(name = "transaction_date")
@@ -51,19 +56,6 @@ public class Transactions {
 	
 	@Column(name = "agent_commission")
 	private Double agentCommission;
-	
-	
-	@Column(name = "card_type")
-    private String cardType;
-
-    @Column(name = "card_account_number")
-    private String cardAccountNumber;
-
-    @Column(name = "cvv")
-    private String cvv;
-
-    @Column(name = "expiry_date")
-    private LocalDate expiryDate;
 	
 	
 	@ManyToOne(fetch = FetchType.LAZY)
