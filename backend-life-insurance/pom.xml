@@ -49,6 +49,15 @@
 	</dependencyManagement>
 	<dependencies>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>com.paypal.sdk</groupId>
 			<artifactId>payouts-sdk</artifactId>
 			<version>1.1.1</version>
