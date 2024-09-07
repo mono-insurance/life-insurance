@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,10 +41,13 @@ public class PolicyServiceImp implements PolicyService{
 	
 	@Autowired
     private DocumentNeededRepository documentNeededRepository;
+	@Autowired
+	private AccessConService accessConService;
 	
 	
 	@Override
 	public PolicyDTO addPolicy(PolicyDTO policyDTO, MultipartFile file) {
+		accessConService.checkAdminAccess();
 	    InsuranceType insuranceType = insuranceTypeRepository.findById(policyDTO.getInsuranceTypeId())
 	            .orElseThrow(() -> new UserException("InsuranceType not found with id " + policyDTO.getInsuranceTypeId()));
 	    
@@ -88,7 +93,9 @@ public class PolicyServiceImp implements PolicyService{
 
 
 	@Override
+	@CacheEvict(value = "policy", key = "#id")
 	public PolicyDTO updatePolicy(Long id, PolicyDTO policyDTO) {
+		accessConService.checkEmployeeAccess();
 		Policy existingPolicy = policyRepository.findById(id)
 	            .orElseThrow(() -> new UserException("Policy not found with id " + id));
 		
@@ -117,12 +124,6 @@ public class PolicyServiceImp implements PolicyService{
 	    existingPolicy.setMaxInvestmentAmount(policyDTO.getMaxInvestmentAmount());
 	    existingPolicy.setProfitRatio(policyDTO.getProfitRatio());
 	    existingPolicy.setCreatedDate(policyDTO.getCreatedDate());
-	    
-	    
-//	    if (policyDTO.getDocumentUploaded() != null) {
-//	    	existingPolicy.setDocumentUploaded(dtoService.convertDocumentUploadedDtoToEntity(policyDTO.getDocumentUploaded()));
-//        }
-
 	    if (policyDTO.getDocumentsNeeded() != null) {
 	        
 	        existingPolicy.setDocumentsNeeded(policyDTO.getDocumentsNeeded().stream()
@@ -145,7 +146,9 @@ public class PolicyServiceImp implements PolicyService{
 	}
 
 	@Override
+	@CacheEvict(value = "policy", key = "#id")
 	public void deletePolicy(Long id) {
+		accessConService.checkAdminAccess();
 		Policy existingPolicy = policyRepository.findById(id)
 	            .orElseThrow(() -> new UserException("Policy not found with id " + id));
 		
@@ -165,6 +168,7 @@ public class PolicyServiceImp implements PolicyService{
 
 
 	@Override
+	@Cacheable(value = "policies", key = "#page + '-' + #size + '-' + #sortBy + '-' + #direction")
 	public PagedResponse<PolicyDTO> getAllPolicies(int page, int size, String sortBy, String direction) {
 		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
 		
@@ -178,6 +182,7 @@ public class PolicyServiceImp implements PolicyService{
 	}
 
 	@Override
+	@Cacheable(value = "policy", key = "#policyId")
 	public PolicyDTO getPolicyById(Long policyId) {
 		Policy policy=policyRepository.findById(policyId).orElseThrow(()->new UserException("policy not found"));
 		return dtoService.convertPolicyToDTO(policy);
