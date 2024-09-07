@@ -96,6 +96,13 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.PATCH, "/suraksha/employee/**").
                                 hasAnyRole("EMPLOYEE","ADMIN")
 
+                                .requestMatchers(HttpMethod.PUT, "/suraksha/state/**").
+                                hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/suraksha/city/**").
+                                hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/suraksha/download/**").
+                                hasRole("ADMIN")
+
                                 .requestMatchers("/public/api/auth/**").permitAll()
                                 .requestMatchers("/swagger-ui/**","/v3/api-docs").permitAll()
 

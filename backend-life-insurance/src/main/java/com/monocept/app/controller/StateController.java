@@ -27,30 +27,10 @@ public class StateController {
 	
 	@Autowired
 	private StateService stateService;
-	
-    @Operation(summary = "By Admin: Add State")
-    @PostMapping("/state")
-    public ResponseEntity<StateDTO> addState(@RequestBody @Valid StateDTO stateDTO) {
 
-        StateDTO state = stateService.addState(stateDTO);
-
-        return new ResponseEntity<StateDTO>(state, HttpStatus.OK);
-
-    }
-    
-    
-    @Operation(summary = "By Admin and Employee: Delete State")
-    @DeleteMapping("/state/{id}")
-    public ResponseEntity<String> deleteState(@PathVariable(name = "id") Long id) {
-
-    	stateService.deleteState(id);
-
-        return new ResponseEntity<String>("Deleted Successfully", HttpStatus.OK);
-
-    }
     
     @Operation(summary = "By Admin and Employee: update State")
-    @PutMapping("/state/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<StateDTO> updateState(@PathVariable(name = "id") Long id, @RequestBody @Valid StateDTO stateDTO) {
 
         StateDTO state = stateService.updateState(id, stateDTO);
@@ -59,7 +39,7 @@ public class StateController {
     }
     
     @Operation(summary = "By Admin and Employee: Activate State")
-    @PutMapping("/state/activate/{id}")
+    @PutMapping("/activate/{id}")
     public ResponseEntity<StateDTO> activateState(@PathVariable(name = "id") Long id) {
 
         StateDTO state = stateService.activateState(id);
@@ -69,8 +49,12 @@ public class StateController {
     
     
     @Operation(summary = "By Admin and Employee: Get All States")
-    @GetMapping("/state")
-    public ResponseEntity<PagedResponse<StateDTO>> getAllStates(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "stateId") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction) {
+    @GetMapping("")
+    public ResponseEntity<PagedResponse<StateDTO>> getAllStates(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size,
+            @RequestParam(name = "sortBy", defaultValue = "stateId") String sortBy,
+            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
         PagedResponse<StateDTO> states = stateService.getAllStates(page, size, sortBy, direction);
 
@@ -80,8 +64,12 @@ public class StateController {
     
     
     @Operation(summary = "By All: Get All Activated States")
-    @GetMapping("/state/activated")
-    public ResponseEntity<PagedResponse<StateDTO>> getAllActivatedStates(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "stateId") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction) {
+    @GetMapping("/activated")
+    public ResponseEntity<PagedResponse<StateDTO>> getAllActivatedStates(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size,
+            @RequestParam(name = "sortBy", defaultValue = "stateId") String sortBy,
+            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
         PagedResponse<StateDTO> states = stateService.getAllActivatedStates(page, size, sortBy, direction);
 
@@ -91,7 +79,7 @@ public class StateController {
     
     
     @Operation(summary = "By Admin and Employee: Get All Inactivated States")
-    @GetMapping("/state/inactivated")
+    @GetMapping("/inactivated")
     public ResponseEntity<PagedResponse<StateDTO>> getAllInactivatedStates(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "stateId") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
         PagedResponse<StateDTO> states = stateService.getAllInactivatedStates(page, size, sortBy, direction);

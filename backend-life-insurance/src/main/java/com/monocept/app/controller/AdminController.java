@@ -3,19 +3,13 @@ package com.monocept.app.controller;
 import java.util.List;
 
 
-import com.monocept.app.dto.PolicyDTO;
-import com.monocept.app.service.AgentService;
-import com.monocept.app.service.PolicyService;
+import com.monocept.app.dto.*;
+import com.monocept.app.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import com.monocept.app.dto.AdminCreationDTO;
-import com.monocept.app.dto.AdminDTO;
-import com.monocept.app.dto.InsuranceTypeDTO;
-import com.monocept.app.service.AdminService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -31,6 +25,14 @@ public class AdminController {
     private final AgentService agentService;
     @Autowired
     private PolicyService policyService;
+    @Autowired
+    private StateService stateService;
+
+    @Autowired
+    private InsuranceTypeService insuranceTypeService;
+
+    @Autowired
+    private CityService cityService;
 
     public AdminController(AdminService adminService, AgentService agentService) {
         this.adminService = adminService;
@@ -106,9 +108,73 @@ public class AdminController {
         return new ResponseEntity<AdminDTO>(admin, HttpStatus.OK);
 
     }
-    
-    
-    
-    
+
+
+    @Operation(summary = "By Admin: Add State")
+    @PostMapping("/state")
+    public ResponseEntity<StateDTO> addState(@RequestBody @Valid StateDTO stateDTO) {
+
+        StateDTO state = stateService.addState(stateDTO);
+
+        return new ResponseEntity<StateDTO>(state, HttpStatus.OK);
+
+    }
+
+
+    @Operation(summary = "By Admin and Employee: Delete State")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteState(@PathVariable(name = "id") Long id) {
+
+        stateService.deleteState(id);
+
+        return new ResponseEntity<String>("Deleted Successfully", HttpStatus.OK);
+
+    }
+
+
+    @Operation(summary = "By Admin: Add City")
+    @PostMapping("/city")
+    public ResponseEntity<CityDTO> addCity(@RequestBody @Valid CityDTO cityDTO) {
+
+        CityDTO city = cityService.addCity(cityDTO);
+
+        return new ResponseEntity<CityDTO>(city, HttpStatus.OK);
+
+    }
+
+
+    @Operation(summary = "By Admin and Employee: Delete City")
+    @DeleteMapping("/city/{id}")
+    public ResponseEntity<String> deleteCity(@PathVariable(name = "id") Long id) {
+
+        cityService.deleteCity(id);
+
+        return new ResponseEntity<String>("Deleted Successfully", HttpStatus.OK);
+
+    }
+    @Operation(summary = "By Admin: Add Insurance type")
+    @PostMapping("/insurance/type")
+    public ResponseEntity<InsuranceTypeDTO> addInsuranceType(@RequestBody @Valid InsuranceTypeDTO insuranceTypeDTO) {
+
+        InsuranceTypeDTO insuranceType = insuranceTypeService.addInsuranceType(insuranceTypeDTO);
+
+        return new ResponseEntity<InsuranceTypeDTO>(insuranceType, HttpStatus.OK);
+
+    }
+
+    @Operation(summary = "By Admin: Delete Insurance type")
+    @DeleteMapping("/insurance/type/{id}")
+    public ResponseEntity<String> deleteInsuranceType(@PathVariable(name = "id") Long id) {
+
+        insuranceTypeService.deleteInsuranceType(id);
+
+        return new ResponseEntity<String>("Deleted Successfully", HttpStatus.OK);
+
+    }
+
+
+
+
+
 
 }

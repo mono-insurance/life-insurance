@@ -1,7 +1,9 @@
 package com.monocept.app.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.monocept.app.dto.EmailDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +34,8 @@ public class QueryServiceImp implements QueryService{
 	
 	@Autowired
     private AccessConService accessConService;
+	@Autowired
+	private EmailService emailService;
 	
 	
 	@Override
@@ -39,7 +43,6 @@ public class QueryServiceImp implements QueryService{
 		accessConService.checkEmployeeAccess();
 		Query existingQuery = queryRepository.findById(id)
 	            .orElseThrow(() -> new UserException("Query not found"));
-		
 		queryRepository.delete(existingQuery);
 		
 	}
@@ -56,8 +59,11 @@ public class QueryServiceImp implements QueryService{
         existingQuery.setIsResolved(true);
 
         Query updatedQuery = queryRepository.save(existingQuery);
-
-//		send email to customer about its query
+		EmailDTO emailDTO = new EmailDTO();
+		emailDTO.setEmailId(existingQuery.getCustomer().getCredentials().getEmail());
+		emailDTO.setTitle("Query resolved");
+		emailDTO.setBody("your query has been resolved by us.\n Please login to suraksha to see response from our side.");
+		emailService.sendAccountCreationEmail(emailDTO);
 
         return dtoService.convertQueryToQueryDTO(updatedQuery);
     }
@@ -131,7 +137,12 @@ public class QueryServiceImp implements QueryService{
 	    newQuery.setCustomer(customer);
 	    
 	    Query savedQuery = queryRepository.save(newQuery);
-	    customer.getQueries().add(savedQuery);
+		if(customer.getQueries()==null){
+			List<Query> queries=new ArrayList<>();
+			queries.add(savedQuery);
+			customer.setQueries(queries);
+		}
+	    else customer.getQueries().add(savedQuery);
 	    
 	    return dtoService.convertQueryToQueryDTO(savedQuery);
 	    
@@ -180,7 +191,7 @@ public class QueryServiceImp implements QueryService{
 	    }
 
 	    if (existingQuery.getIsResolved()) {
-	        throw new UserException("Query is already resolved and cannot be updated.");
+	        throw new UserException("Query is already resolved and cannot be deleted.");
 	    }
 	    
 	    queryRepository.delete(existingQuery);

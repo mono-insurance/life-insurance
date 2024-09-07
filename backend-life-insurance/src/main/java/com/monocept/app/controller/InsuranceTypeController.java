@@ -28,15 +28,7 @@ public class InsuranceTypeController {
 	@Autowired
 	private InsuranceTypeService insuranceTypeService;
 
-    @Operation(summary = "By Admin: Add Insurance type")
-    @PostMapping("/insurance/type")
-    public ResponseEntity<InsuranceTypeDTO> addInsuranceType(@RequestBody @Valid InsuranceTypeDTO insuranceTypeDTO) {
 
-        InsuranceTypeDTO insuranceType = insuranceTypeService.addInsuranceType(insuranceTypeDTO);
-
-        return new ResponseEntity<InsuranceTypeDTO>(insuranceType, HttpStatus.OK);
-
-    }
 
     @Operation(summary = "By Admin: update Insurance type")
     @PutMapping("/insurance/type/{id}")
@@ -49,15 +41,6 @@ public class InsuranceTypeController {
     }
 
 
-    @Operation(summary = "By Admin: Delete Insurance type")
-    @DeleteMapping("/insurance/type/{id}")
-    public ResponseEntity<String> deleteInsuranceType(@PathVariable(name = "id") Long id) {
-
-    	insuranceTypeService.deleteInsuranceType(id);
-
-        return new ResponseEntity<String>("Deleted Successfully", HttpStatus.OK);
-
-    }
     
     @Operation(summary = "By Admin: Get All Insurance types")
     @GetMapping("/insurance/type")

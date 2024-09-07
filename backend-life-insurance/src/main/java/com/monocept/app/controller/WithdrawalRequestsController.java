@@ -21,14 +21,14 @@ import jakarta.validation.Valid;
 
 
 @RestController
-@RequestMapping("/suraksha/withdrawalrequest")
+@RequestMapping("/suraksha/withdrawal-request")
 public class WithdrawalRequestsController {
 	
 	@Autowired
 	private WithdrawalRequestsService withdrawalRequestsService;
 	
 	@Operation(summary = "By Customer: Create a withdrawal request")
-    @PostMapping("/withdrawal-request/customer")
+    @PostMapping("/customer")
     public ResponseEntity<WithdrawalRequestsDTO> createWithdrawalRequestForCustomer(@RequestBody @Valid WithdrawalRequestsDTO withdrawalRequestDTO) {
 		 
         WithdrawalRequestsDTO createdRequest = withdrawalRequestsService.createWithdrawalRequestForCustomer(withdrawalRequestDTO);
@@ -36,7 +36,7 @@ public class WithdrawalRequestsController {
     }
 	
 	@Operation(summary = "By Agent: Create a withdrawal request")
-    @PostMapping("/withdrawal-request/agent")
+    @PostMapping("/agent")
     public ResponseEntity<WithdrawalRequestsDTO> createWithdrawalRequestForAgent(@RequestBody @Valid WithdrawalRequestsDTO withdrawalRequestDTO) {
 		 
         WithdrawalRequestsDTO createdRequest = withdrawalRequestsService.createWithdrawalRequestForAgent(withdrawalRequestDTO);
@@ -44,7 +44,7 @@ public class WithdrawalRequestsController {
     }
   
 	@Operation(summary = "By Admin: Approve or reject request")
-    @PostMapping("/withdrawal-request/admin/{id}")
+    @PostMapping("/admin/{id}")
     public ResponseEntity<Boolean> approveOrRejectRequest(@PathVariable(name="id") Long withDrawalRequestId, @RequestBody Boolean isApproved) {
 		 
        Boolean decision = withdrawalRequestsService.approveOrRejectRequest(withDrawalRequestId, isApproved);
@@ -53,7 +53,7 @@ public class WithdrawalRequestsController {
 	
 	
 	@Operation(summary = "By Admin: Get All Withdrawal Requests")
-    @GetMapping("/withdrawal-requests")
+    @GetMapping
     public ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllWithdrawalRequests(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "5") int size,
@@ -65,7 +65,7 @@ public class WithdrawalRequestsController {
     }
 
     @Operation(summary = "By Customer: Get All Withdrawal Requests by Customer")
-    @GetMapping("/withdrawal-requests/customer/{customerId}")
+    @GetMapping("/customer/{customerId}")
     public ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllWithdrawalRequestsByCustomer(
             @PathVariable(name = "customerId") Long customerId,
             @RequestParam(name = "page", defaultValue = "0") int page,
@@ -78,7 +78,7 @@ public class WithdrawalRequestsController {
     }
 
     @Operation(summary = "By Agent: Get All Withdrawal Requests by Agent")
-    @GetMapping("/withdrawal-requests/agent/{agentId}")
+    @GetMapping("/agent/{agentId}")
     public ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllWithdrawalRequestsByAgent(
             @PathVariable(name = "agentId") Long agentId,
             @RequestParam(name = "page", defaultValue = "0") int page,
@@ -91,7 +91,7 @@ public class WithdrawalRequestsController {
     }
 
     @Operation(summary = "By Admin: Get All Approved Withdrawal Requests by Customer")
-    @GetMapping("/withdrawal-requests/customer/{customerId}/approved")
+    @GetMapping("/customer/{customerId}/approved")
     public ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllApprovedWithdrawalRequestsByCustomer(
             @PathVariable(name = "customerId") Long customerId,
             @RequestParam(name = "page", defaultValue = "0") int page,
@@ -104,7 +104,7 @@ public class WithdrawalRequestsController {
     }
 
     @Operation(summary = "By Admin: Get All Approved Withdrawal Requests by Agent")
-    @GetMapping("/withdrawal-requests/agent/{agentId}/approved")
+    @GetMapping("/agent/{agentId}/approved")
     public ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllApprovedWithdrawalRequestsByAgent(
             @PathVariable(name = "agentId") Long agentId,
             @RequestParam(name = "page", defaultValue = "0") int page,
@@ -117,7 +117,7 @@ public class WithdrawalRequestsController {
     }
 
     @Operation(summary = "By Admin: Get All Withdraw Withdrawal Requests by Agent")
-    @GetMapping("/withdrawal-requests/agent/{agentId}/withdraw")
+    @GetMapping("/agent/{agentId}/withdraw")
     public ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllWithdrawWithdrawalRequestsByAgent(
             @PathVariable(name = "agentId") Long agentId,
             @RequestParam(name = "page", defaultValue = "0") int page,
@@ -130,7 +130,7 @@ public class WithdrawalRequestsController {
     }
 
     @Operation(summary = "By Customer: Get All Withdraw Withdrawal Requests by Customer")
-    @GetMapping("/withdrawal-requests/customer/{customerId}/withdraw")
+    @GetMapping("/customer/{customerId}/withdraw")
     public ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllWithdrawWithdrawalRequestsByCustomer(
             @PathVariable(name = "customerId") Long customerId,
             @RequestParam(name = "page", defaultValue = "0") int page,
@@ -143,7 +143,7 @@ public class WithdrawalRequestsController {
     }
 
     @Operation(summary = "By Admin: Get All Withdraw Withdrawal Requests")
-    @GetMapping("/withdrawal-requests/withdraw")
+    @GetMapping("/withdraw")
     public ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllWithdrawWithdrawalRequests(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "5") int size,
