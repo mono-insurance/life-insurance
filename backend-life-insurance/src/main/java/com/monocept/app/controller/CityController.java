@@ -27,30 +27,9 @@ public class CityController {
 	@Autowired
 	private CityService cityService;
 	
-	
-    @Operation(summary = "By Admin: Add City")
-    @PostMapping("/city")
-    public ResponseEntity<CityDTO> addCity(@RequestBody @Valid CityDTO cityDTO) {
 
-        CityDTO city = cityService.addCity(cityDTO);
-
-        return new ResponseEntity<CityDTO>(city, HttpStatus.OK);
-
-    }
-
-
-    @Operation(summary = "By Admin and Employee: Delete City")
-    @DeleteMapping("/city/{id}")
-    public ResponseEntity<String> deleteCity(@PathVariable(name = "id") Long id) {
-
-    	cityService.deleteCity(id);
-
-        return new ResponseEntity<String>("Deleted Successfully", HttpStatus.OK);
-
-    }
-    
     @Operation(summary = "By Admin and Employee: update City")
-    @PutMapping("/city/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<CityDTO> updateCity(@PathVariable(name = "id") Long id, @RequestBody @Valid CityDTO cityDTO) {
 
         CityDTO city = cityService.updateCity(id, cityDTO);
@@ -60,7 +39,7 @@ public class CityController {
     }
     
     @Operation(summary = "By Admin and Employee: Activate City")
-    @PutMapping("/city/activate/{id}")
+    @PutMapping("/activate/{id}")
     public ResponseEntity<CityDTO> activateCity(@PathVariable(name = "id") Long id) {
 
         CityDTO city = cityService.activateCity(id);
@@ -71,7 +50,7 @@ public class CityController {
 
 
     @Operation(summary = "By Admin and Employee: Get All Cities")
-    @GetMapping("/city")
+    @GetMapping("")
     public ResponseEntity<PagedResponse<CityDTO>> getAllCities(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "cityId") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
         PagedResponse<CityDTO> cities = cityService.getAllCities(page, size, sortBy, direction);
@@ -82,7 +61,7 @@ public class CityController {
     
     
     @Operation(summary = "By All: Get All Activated Cities")
-    @GetMapping("/city/activated")
+    @GetMapping("/activated")
     public ResponseEntity<PagedResponse<CityDTO>> getAllActivatedCities(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "cityId") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
         PagedResponse<CityDTO> cities = cityService.getAllActivatedCities(page, size, sortBy, direction);
@@ -93,7 +72,7 @@ public class CityController {
     
     
     @Operation(summary = "By Admin and Employee: Get All Inactivated Cities")
-    @GetMapping("/city/inactivated")
+    @GetMapping("/inactivated")
     public ResponseEntity<PagedResponse<CityDTO>> getAllInactivatedCities(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "cityId") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
         PagedResponse<CityDTO> cities = cityService.getAllInactivatedCities(page, size, sortBy, direction);
@@ -104,7 +83,7 @@ public class CityController {
     
     
     @Operation(summary = "By Admin and Employee: Get All Activated Cities by State Id")
-    @GetMapping("/city/activated/state/{id}")
+    @GetMapping("/activated/state/{id}")
     public ResponseEntity<PagedResponse<CityDTO>> getAllActivatedCitiesByStateId(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "cityId") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction, @PathVariable(name = "id") Long id) {
 
         PagedResponse<CityDTO> cities = cityService.getAllActivatedCitiesByStateId(page, size, sortBy, direction, id);

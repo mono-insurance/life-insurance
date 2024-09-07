@@ -55,8 +55,11 @@ public class TransactionServiceImp implements TransactionService {
             Agent agent = agentRepository.findById(customUserDetails.getId()).
                     orElseThrow(() -> new UserException("agent not found"));
             pages = withdrawalRequestsRepository.findAllByAgent(agent, pageable);
-        } else {
+        } else if (role.equals("EMPLOYEE") || role.equals("ADMIN") ) {
             pages = withdrawalRequestsRepository.findAll(pageable);
+        }
+        else{
+            throw new RoleAccessException("you don't have access to this resource");
         }
 
         List<WithdrawalRequests> withdrawalRequests = pages.getContent();
