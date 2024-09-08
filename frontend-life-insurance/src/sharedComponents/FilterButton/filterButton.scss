@@ -1,0 +1,65 @@
+/* Button styles */
+.filter-button {
+    display: inline-block;
+    position: relative; /* Positions dropdown relative to this container */
+}
+
+.action-dropdown-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: var(--default-transition);
+}
+
+.action-dropdown-btn:hover {
+    background-color: var(--side-link-hover-color);
+    color: var(--side-text-color);
+}
+
+/* Dropdown menu styles */
+.filter-dropdown-menu {
+    position: absolute;
+    top: 100%; /* Position the dropdown directly below the button */
+    right: 0; /* Align the dropdown to the right edge of the button */
+    transform: none;
+    height: auto;
+    padding-top: 0;
+    min-width: 215px; /* Ensure the dropdown has a reasonable minimum width */
+    box-shadow: rgba(100, 100, 111, 0.1) 0px 1px 4px 0px;
+    background-color: var(--secondary-color);
+    padding: 10px;
+    z-index: 1000;
+    border-radius: 8px;
+    border: 1px solid var(--border-color-inverted);
+    text-align: left;
+    display: block;
+}
+
+.filter-dropdown-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Dropdown item styles */
+.dropdown-menu-item {
+    margin: 8px 0;
+}
+
+.dropdown-menu-link {
+    color: var(--text-color-inverted);
+    font-weight: 500;
+    transition: var(--default-transition);
+
+    &:hover {
+        color: var(--primary-color);
+    }
+}
+
+.dropdown-menu-link:hover {
+    opacity: 0.9;
+}

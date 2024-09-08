@@ -1,0 +1,137 @@
+ /* .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    overflow-x: auto;
+  }
+  
+  .table th, .table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+  }
+  
+  .table th {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .table tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .table-container {
+    max-width: 100%;
+    overflow-x: auto;
+  }  */
+
+  /* .table-container {
+    width: 100%;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+    text-align: left;
+}
+
+.table th, .table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.table th {
+    background-color: #f8f8f8;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    color: #333;
+}
+
+.table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table td {
+    font-size: 14px;
+    color: #555;
+}
+
+.table td a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.table td a:hover {
+    text-decoration: underline;
+}
+
+.table td img {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.button-add {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.button-add:hover {
+    background-color: #0056b3;
+} */
+
+
+.table {
+  min-width: 900px;
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--text-color-inverted);
+
+  td,
+  th {
+    border: none;
+    padding: 14px 12px;
+    @media (max-width: 768px) {
+      font-size: 15px;
+      padding: 12px 10px;
+    }
+  }
+
+  thead {
+    text-align: left;
+    font-size: 17px;
+
+    th{
+      background-color: var(--thead-bg-color);
+    }
+  }
+
+  tbody {
+    td {
+      color: var(--lg-text-color);
+      background-color: var(--secondary-color);
+    }
+  }
+
+}
