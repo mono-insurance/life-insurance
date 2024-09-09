@@ -25,21 +25,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.jwtTokenProvider = jwtTokenProvider;
         this.userDetailsService = userDetailsService;
     }
-    private String parsedToken(String token){
-        if (token!=null && token.startsWith("Bearer ")) {
-            token = token.substring(7); // Remove "Bearer " (7 characters)
-        }
-        return  token;
-    }
+//    private String parsedToken(String token){
+//        if (token!=null && token.startsWith("Bearer ")) {
+//            token = token.substring(7); // Remove "Bearer " (7 characters)
+//        }
+//        return  token;
+//    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        String tokenWithBearer=getTokenFromRequest(request);
-        // get JWT token from http request
-        assert tokenWithBearer != null;
-        String token = parsedToken(tokenWithBearer);
+//        String tokenWithBearer=getTokenFromRequest(request);
+//        // get JWT token from http request
+//        assert tokenWithBearer != null;
+        String token = getTokenFromRequest(request);
 
         // validate token
         if(StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)){

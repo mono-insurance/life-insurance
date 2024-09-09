@@ -23,8 +23,8 @@ public class Role {
 	@NotBlank
 	private String name;
 	
-	@OneToMany(mappedBy = "role",cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-	@JsonManagedReference
-	private Set<Credentials> credentials;
+//	@OneToMany(mappedBy = "role",cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+//	@JsonManagedReference
+//	private Set<Credentials> credentials;
 
 }

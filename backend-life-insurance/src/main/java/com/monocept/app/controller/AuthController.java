@@ -41,6 +41,7 @@ public class AuthController {
     @Operation(summary = "By Anyone: Login the user or admin if have registered and if active")
     @PostMapping(value = {"/login"})
     public ResponseEntity<JWTAuthResponse> login(@RequestBody LoginDTO loginDto){
+    	System.out.println(loginDto);
     	JWTAuthResponse jwtAuthResponse = authService.login(loginDto);
         System.out.println(loginDto);
 

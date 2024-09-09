@@ -54,9 +54,11 @@ public class AuthServiceImp implements AuthService{
     @Override
     public JWTAuthResponse login(LoginDTO loginDto) {
     	try {
+    		System.out.println(loginDto+"765");
 	        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
 	                loginDto.getUsernameOrEmail(), loginDto.getPassword()));
 	
+	        System.out.println(loginDto + "333");
 	        SecurityContextHolder.getContext().setAuthentication(authentication);
 	        
 	        String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -107,11 +109,8 @@ public class AuthServiceImp implements AuthService{
 
 	@Override
 	public boolean isAdmin(String token, int userId) {
-		Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
-		
-		Claims claims = Jwts.parserBuilder()
-	            .setSigningKey(key)
-	            .build()
+		Claims claims = Jwts.parser()
+                .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody();
 		Integer tokenUserId = claims.get("id", Integer.class);
