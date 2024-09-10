@@ -1,16 +1,81 @@
 import axios from 'axios';
 import { AxiosError } from '../utils/errors/APIError';
-import { errorToast } from '../utils/helper/toast';
-
 
 
 export const fetchAdmin = async () => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get('http://localhost:8080/api/admin', {
+        const response = await axios.get('http://localhost:8080/suraksha/admin', {
         headers: {
             'Authorization': `Bearer ${token}`
         }}).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+export const getAllCustomers = async (currentPage, itemsPerPage) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get('http://localhost:8080/suraksha/employee/customers', {
+              params: { page: currentPage - 1, size: itemsPerPage },
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+export const getAllActiveCustomers = async (currentPage, itemsPerPage) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get('http://localhost:8080/suraksha/employee/active-customers', {
+          params: { page: currentPage - 1, size: itemsPerPage },
+          headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+export const getAllInactiveCustomers = async (currentPage, itemsPerPage) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get('http://localhost:8080/suraksha/employee/inactive-customers', {
+            params: { page: currentPage - 1, size: itemsPerPage },
+            headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+export const getCustomerById = async (id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/customer/customer/${id}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
         return response.data;
     } 
@@ -88,38 +153,7 @@ export const adminProfileUpdate = async (formState) => {
 }
 
 
-export const getAllActiveCustomers = async (currentPage, itemsPerPage) => {
-    const token = localStorage.getItem('auth');
-    try {
-        const response = await axios.get('http://localhost:8080/api/admin/users/active', {
-          params: { page: currentPage - 1, size: itemsPerPage },
-          headers: { 'Authorization': `Bearer ${token}` }
-        }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-        return response.data;
-    } 
-    catch (error) {
-        throw error;
-    }
-
-}
-
-
-export const getAllInactiveCustomers = async (currentPage, itemsPerPage) => {
-    const token = localStorage.getItem('auth');
-    try {
-        const response = await axios.get('http://localhost:8080/api/admin/users/inactive', {
-            params: { page: currentPage - 1, size: itemsPerPage },
-            headers: { 'Authorization': `Bearer ${token}` }
-          }).catch((error) => {throw new AxiosError(error.response.data.message)});
-
-        return response.data;
-    } 
-    catch (error) {
-        throw error;
-    }
-
-}
 
 
 
@@ -225,21 +259,7 @@ export const getSystemStats = async () => {
 
 }
 
-export const getAllCustomers = async (currentPage, itemsPerPage) => {
-    const token = localStorage.getItem('auth');
-    try {
-        const response = await axios.get('http://localhost:8080/api/admin/customers', {
-              params: { page: currentPage - 1, size: itemsPerPage },
-              headers: { 'Authorization': `Bearer ${token}` }
-          }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-        return response.data;
-    } 
-    catch (error) {
-        throw error;
-    }
-
-}
 
 
 export const makeAnotherAdmin = async (formState) => {
@@ -375,20 +395,7 @@ export const getAllCustomersByCharacters = async (currentPage, itemsPerPage, fir
 }
 
 
-export const getCustomerById = async (id) => {
-    const token = localStorage.getItem('auth');
-    try {
-        const response = await axios.get(`http://localhost:8080/api/admin/customer/${id}`, {
-              headers: { 'Authorization': `Bearer ${token}` }
-          }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-        return response.data;
-    } 
-    catch (error) {
-        throw error;
-    }
-
-}
 
 
 export const getAllUsersByCharacters = async (currentPage, itemsPerPage, firstName) => {

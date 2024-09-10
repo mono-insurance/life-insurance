@@ -19,8 +19,10 @@ export const Table = ({ data, keysToBeIncluded, includeButton, handleButtonClick
         
 
         if (Array.isArray(sanitizedData) && sanitizedData.length > 0) {
-            tableHeaders = Object.keys(sanitizedData[0]).map((k, index) => (
-                <th key={index}>{camelToTitle(k)}</th>
+            tableHeaders = Object.keys(sanitizedData[0]).map((key, index) => (
+                <th key={index} className={key === 'Action' ? 'center-align' : ''}>
+                    {camelToTitle(key)}
+                </th>
             ));
 
             rows = sanitizedData.map((d, rowIndex) => (

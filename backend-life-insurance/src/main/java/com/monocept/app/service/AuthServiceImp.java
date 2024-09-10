@@ -124,11 +124,8 @@ public class AuthServiceImp implements AuthService{
 
 	@Override
 	public boolean isEmployee(String token, int userId) {
-		Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
-		
-		Claims claims = Jwts.parserBuilder()
-	            .setSigningKey(key)
-	            .build()
+		Claims claims = Jwts.parser()
+                .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody();
 		Integer tokenUserId = claims.get("id", Integer.class);
@@ -142,11 +139,8 @@ public class AuthServiceImp implements AuthService{
 
 	@Override
 	public boolean isAgent(String token, int userId) {
-		Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
-		
-		Claims claims = Jwts.parserBuilder()
-	            .setSigningKey(key)
-	            .build()
+		Claims claims = Jwts.parser()
+                .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody();
 		Integer tokenUserId = claims.get("id", Integer.class);
@@ -160,11 +154,8 @@ public class AuthServiceImp implements AuthService{
 
 	@Override
 	public boolean isCustomer(String token, int userId) {
-		Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
-		
-		Claims claims = Jwts.parserBuilder()
-	            .setSigningKey(key)
-	            .build()
+		Claims claims = Jwts.parser()
+                .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody();
 		Integer tokenUserId = claims.get("id", Integer.class);
