@@ -21,5 +21,7 @@ public interface CityService {
 
 	PagedResponse<CityDTO> getAllActivatedCitiesByStateId(int page, int size, String sortBy, String direction, Long id);
 
+	CityDTO getCityById(Long id);
+
 
 }

@@ -5,17 +5,19 @@ import java.util.List;
 import com.monocept.app.dto.*;
 import com.monocept.app.utils.PagedResponse;
 
+import jakarta.validation.Valid;
+
 import com.monocept.app.dto.AdminCreationDTO;
 import com.monocept.app.dto.AdminDTO;
 
 
 public interface AdminService {
 
-    AdminDTO getAdminProfile();
+	AdminCreationDTO getAdminProfile();
 
     AdminDTO makeAnotherAdmin(AdminCreationDTO adminCreationDTO);
 
-    AdminDTO updateAdminProfile(AdminDTO adminDTO);
+    AdminCreationDTO updateAdminProfile(AdminCreationDTO adminDTO);
 
 
     EmployeeDTO createEmployee(CredentialsDTO credentials);

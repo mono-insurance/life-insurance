@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.monocept.app.dto.SettingsDTO;
@@ -34,7 +35,7 @@ public class SettingsController {
 
     @Operation(summary = "By Admin: Get Settings By Key")
     @GetMapping("/settings/key")
-    public ResponseEntity<SettingsDTO> getSetting(@RequestBody String settingKey) {
+    public ResponseEntity<SettingsDTO> getSetting(@RequestParam String settingKey) {
         SettingsDTO setting = settingsService.getSetting(settingKey);
 
         return new ResponseEntity<SettingsDTO>(setting, HttpStatus.OK);

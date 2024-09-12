@@ -2,6 +2,7 @@ package com.monocept.app.repository;
 
 import com.monocept.app.entity.State;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -18,4 +19,7 @@ public interface StateRepository extends JpaRepository<State,Long> {
 	Page<State> findByIsActiveTrue(Pageable pageable);
 
 	Page<State> findByIsActiveFalse(Pageable pageable);
+
+
+	List<State> findByIsActiveTrue();
 }

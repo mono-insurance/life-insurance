@@ -1,5 +1,7 @@
 package com.monocept.app.service;
 
+import java.util.List;
+
 import com.monocept.app.dto.InsuranceTypeDTO;
 import com.monocept.app.utils.PagedResponse;
 
@@ -23,5 +25,7 @@ public interface InsuranceTypeService {
 			String direction);
 
 	InsuranceTypeDTO activateInsuranceType(Long id);
+
+	List<InsuranceTypeDTO> getListOfAllActiveInsuranceType();
 
 }

@@ -26,4 +26,6 @@ public interface QueryService {
 
 	void deleteUnresolvedQueryByCustomer(Long id);
 
+	QueryDTO getQueryById(Long id);
+
 }

@@ -71,7 +71,7 @@ public class TransactionController {
     ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllCommissions(
             @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
             @RequestParam(name = "size", defaultValue = "10") int size,
-            @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "withdrawalRequestsId") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
         PagedResponse<WithdrawalRequestsDTO> allCommissions = transactionService.getAllCommissions(pageNo, size, sortBy, sortDirection);
         return new ResponseEntity<>(allCommissions, HttpStatus.OK);

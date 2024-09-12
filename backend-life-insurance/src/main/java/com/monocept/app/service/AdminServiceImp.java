@@ -73,32 +73,34 @@ public class AdminServiceImp implements AdminService {
     }
 
     @Override
-    public AdminDTO getAdminProfile() {
+    public AdminCreationDTO getAdminProfile() {
         CustomUserDetails userDetails = accessConService.checkUserAccess();
 
         Admin admin = adminRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new UserException("Admin not found"));
 
-        return dtoService.converAdminToAdminResponseDTO(admin);
+        return dtoService.converAdminToAdminCreationDTO(admin);
     }
 
 
     @Override
-    public AdminDTO updateAdminProfile(AdminDTO adminDTO) {
+    public AdminCreationDTO updateAdminProfile(AdminCreationDTO adminCreationDTO) {
         CustomUserDetails userDetails = accessConService.checkUserAccess();
 
         Admin admin = adminRepository.findById(userDetails.getId())
                 .orElseThrow(() -> new UserException("Admin not found"));
 
-        admin.setFirstName(adminDTO.getFirstName());
-        admin.setLastName(adminDTO.getLastName());
-        admin.getCredentials().setUsername(adminDTO.getCredentials().getUsername());
-        admin.getCredentials().setEmail(adminDTO.getCredentials().getEmail());
-        admin.getCredentials().setMobileNumber(adminDTO.getCredentials().getMobileNumber());
+        admin.setFirstName(adminCreationDTO.getFirstName());
+        admin.setLastName(adminCreationDTO.getLastName());
+
+        admin.getCredentials().setUsername(adminCreationDTO.getUsername());
+        admin.getCredentials().setEmail(adminCreationDTO.getEmail());
+        admin.getCredentials().setPassword(passwordEncoder.encode(adminCreationDTO.getPassword()));
+        admin.getCredentials().setMobileNumber(adminCreationDTO.getMobileNumber());
 
         Admin updatedAdmin = adminRepository.save(admin);
 
-        return dtoService.converAdminToAdminResponseDTO(updatedAdmin);
+        return dtoService.converAdminToAdminCreationDTO(updatedAdmin);
     }
 
 

@@ -10,7 +10,7 @@ export const verifyAdmin = async ({adminId}) => {
     }
 
     try {
-        const response = await axios.get(`http://localhost:8080/api/auth/verify/admin/${adminId}`, {
+        const response = await axios.get(`http://localhost:8080/public/api/auth/verify/admin/${adminId}`, {
         headers: {
             'Authorization': `${token}`
         }});
@@ -45,7 +45,7 @@ export const verifyCustomer = async ({customerId}) => {
 
 export const login = async (usernameOrEmail, password) => {
     try {
-        const response = await axios.post('http://localhost:8080/api/auth/login', {
+        const response = await axios.post('http://localhost:8080/public/api/auth/login', {
                 usernameOrEmail, password
             }).catch((error) => {throw new AxiosError(error.response.data.message)});
 

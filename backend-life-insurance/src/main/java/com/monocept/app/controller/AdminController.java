@@ -60,10 +60,7 @@ public class AdminController {
 
     @Operation(summary = "By Admin: Add Policy")
     @PostMapping(value = "/policy",consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<PolicyDTO> addPolicy(
-            @ModelAttribute @Valid PolicyDTO policyDTO,
-            @RequestParam("file") MultipartFile file
-            ) {
+    public ResponseEntity<PolicyDTO> addPolicy( @ModelAttribute @Valid PolicyDTO policyDTO, @RequestParam("file") MultipartFile file) {
 
         System.out.println("Policy DTO: " + policyDTO);
         PolicyDTO savedPolicy = policyService.addPolicy(policyDTO,file);
@@ -75,10 +72,10 @@ public class AdminController {
 
     @Operation(summary = "By Admin: Get the admin profile")
     @GetMapping
-    public ResponseEntity<AdminDTO> getAdminProfile() {
+    public ResponseEntity<AdminCreationDTO> getAdminProfile() {
 
-        AdminDTO admin = adminService.getAdminProfile();
-        return new ResponseEntity<AdminDTO>(admin, HttpStatus.OK);
+    	AdminCreationDTO admin = adminService.getAdminProfile();
+        return new ResponseEntity<AdminCreationDTO>(admin, HttpStatus.OK);
     }
 
     @Operation(summary = "By Admin: Get all the documentNeeded")
@@ -92,10 +89,10 @@ public class AdminController {
 
     @Operation(summary = "By Admin: Update admin profile")
     @PutMapping
-    public ResponseEntity<AdminDTO> updateAdminProfile(@RequestBody @Valid AdminDTO adminDTO) {
+    public ResponseEntity<AdminCreationDTO> updateAdminProfile(@RequestBody @Valid AdminCreationDTO adminDTO) {
 
-        AdminDTO admin = adminService.updateAdminProfile(adminDTO);
-        return new ResponseEntity<AdminDTO>(admin, HttpStatus.OK);
+    	AdminCreationDTO admin = adminService.updateAdminProfile(adminDTO);
+        return new ResponseEntity<AdminCreationDTO>(admin, HttpStatus.OK);
     }
 
 
@@ -122,7 +119,7 @@ public class AdminController {
 
 
     @Operation(summary = "By Admin and Employee: Delete State")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/state/{id}")
     public ResponseEntity<String> deleteState(@PathVariable(name = "id") Long id) {
 
         stateService.deleteState(id);

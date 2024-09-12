@@ -127,4 +127,6 @@ public interface DtoService {
 	List<WithdrawalRequestsDTO> convertWithdrawalRequestsListEntityToDTO(
 			List<WithdrawalRequests> allWithdrawalRequests);
 
+	AdminCreationDTO converAdminToAdminCreationDTO(Admin updatedAdmin);
+
 }

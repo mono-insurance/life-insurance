@@ -531,7 +531,7 @@ public class DtoServiceImp implements DtoService {
         cityDTO.setCityName(city.getCityName());
         cityDTO.setIsActive(city.getIsActive());
         cityDTO.setStateId(city.getState().getStateId());
-
+        cityDTO.setStateName(city.getState().getStateName());
         return cityDTO;
     }
 
@@ -967,4 +967,18 @@ public class DtoServiceImp implements DtoService {
                 .map(this::convertWithdrawalRequestToDTO)
                 .collect(Collectors.toList());
     }
+
+	@Override
+	public AdminCreationDTO converAdminToAdminCreationDTO(Admin updatedAdmin) {
+		AdminCreationDTO adminCreationDTO = new AdminCreationDTO();
+		
+		adminCreationDTO.setAdminId(updatedAdmin.getAdminId());
+		adminCreationDTO.setFirstName(updatedAdmin.getFirstName());
+		adminCreationDTO.setLastName(updatedAdmin.getLastName());
+		adminCreationDTO.setUsername(updatedAdmin.getCredentials().getUsername());
+		adminCreationDTO.setEmail(updatedAdmin.getCredentials().getEmail());
+		adminCreationDTO.setMobileNumber(updatedAdmin.getCredentials().getMobileNumber());
+		
+		return adminCreationDTO;
+	}
 }
