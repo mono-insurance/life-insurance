@@ -25,4 +25,6 @@ public interface PolicyAccountRepository extends JpaRepository<PolicyAccount,Lon
 	Page<PolicyAccount> findByPolicyAccountId(Long id, Pageable pageable);
 
     List<PolicyAccount> findAllByAgent(Agent agent);
+
+    Long countByIsActiveTrue();
 }

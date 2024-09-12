@@ -127,4 +127,5 @@ public interface DtoService {
 	List<WithdrawalRequestsDTO> convertWithdrawalRequestsListEntityToDTO(
 			List<WithdrawalRequests> allWithdrawalRequests);
 
+    List<DocumentUploadedDTO> convertDocumentsToDTO(List<DocumentUploaded> allDocuments);
 }

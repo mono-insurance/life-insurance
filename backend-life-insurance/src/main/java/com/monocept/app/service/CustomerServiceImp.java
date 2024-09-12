@@ -169,6 +169,7 @@ public class CustomerServiceImp implements CustomerService {
 
     @Override
     public Long customerRegistration(RegistrationDTO registrationDTO) {
+        registrationDTO.setId(0L);
         Customer customer = new Customer();
         customer.setFirstName(registrationDTO.getFirstName());
         customer.setLastName(registrationDTO.getLastName());
@@ -178,6 +179,16 @@ public class CustomerServiceImp implements CustomerService {
         customer.setNomineeName(registrationDTO.getNomineeName());
         customer.setNomineeRelation(NomineeRelation.valueOf(registrationDTO.getNomineeRelation()));
         customer.setIsApproved(false);
+        Credentials credentials = new Credentials();
+        credentials.setUsername(registrationDTO.getUsername());
+        credentials.setEmail(registrationDTO.getEmail());
+        String encriptedPassword = passwordEncoder.encode(registrationDTO.getPassword());
+        credentials.setPassword(encriptedPassword);
+        credentials.setMobileNumber(registrationDTO.getMobileNumber());
+        credentials.setCustomer(customer);
+        Role role = roleRepository.findByName("ROLE_CUSTOMER")
+                .orElseThrow(() -> new RuntimeException("Role admin not found"));
+        credentials.setRole(role);
 
         Address address = new Address();
         address.setFirstStreet(registrationDTO.getFirstStreet());
@@ -201,20 +212,10 @@ public class CustomerServiceImp implements CustomerService {
 
         address = addressRepository.save(address);
         customer.setAddress(address);
-
-        Credentials credentials = new Credentials();
-        credentials.setUsername(registrationDTO.getUsername());
-        credentials.setEmail(registrationDTO.getEmail());
-        credentials.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
-        credentials.setMobileNumber(registrationDTO.getMobileNumber());
-        credentials.setCustomer(customer);
-
-        Role role = roleRepository.findByName("ROLE_CUSTOMER")
-                .orElseThrow(() -> new RuntimeException("Role admin not found"));
-        credentials.setRole(role);
-
         customer.setCredentials(credentials);
         credentials = credentialsRepository.save(credentials);
+
+
         EmailDTO emailDTO = new EmailDTO();
         emailDTO.setEmailId(credentials.getEmail());
         emailDTO.setTitle("Registration Success");
@@ -516,7 +517,7 @@ public class CustomerServiceImp implements CustomerService {
             withdrawalRequestsPage = withdrawalRequestsRepository.findAllByCustomer(customer, pageable);
         } else if (role.equals("AGENT")) {
             Agent agent = findAgentById(customUserDetails.getId());
-            List<PolicyAccount> policyAccounts=policyAccountRepository.findAllByAgent(agent);
+            List<PolicyAccount> policyAccounts = policyAccountRepository.findAllByAgent(agent);
             withdrawalRequestsPage = withdrawalRequestsRepository.findAllByPolicyAccountIn(policyAccounts, pageable);
         } else withdrawalRequestsPage = withdrawalRequestsRepository.findAll(pageable);
 
@@ -599,7 +600,22 @@ public class CustomerServiceImp implements CustomerService {
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNo, size, sorting);
-        Page<Customer> customerPage = customerRepository.findAllByIsActiveTrue(pageable);
+        Page<Customer> customerPage = customerRepository.findAll(pageable);
+        List<Customer> customers = customerPage.getContent();
+        List<CustomerDTO> customerDTOS = dtoService.convertCustomersToDto(customers);
+        return new PagedResponse<>(customerDTOS, customerPage.getNumber(),
+                customerPage.getSize(), customerPage.getTotalElements(), customerPage.getTotalPages(),
+                customerPage.isLast());
+    }
+
+    @Override
+    public PagedResponse<CustomerDTO> getAllActiveCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection) {
+        accessConService.checkEmployeeAccess();
+        Sort sorting = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, size, sorting);
+        Page<Customer> customerPage = customerRepository.findAllByIsActiveTrueAndIsApprovedTrue(pageable);
         List<Customer> customers = customerPage.getContent();
         List<CustomerDTO> customerDTOS = dtoService.convertCustomersToDto(customers);
         return new PagedResponse<>(customerDTOS, customerPage.getNumber(),
@@ -614,7 +630,7 @@ public class CustomerServiceImp implements CustomerService {
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNo, size, sorting);
-        Page<Customer> customerPage = customerRepository.findAllByIsActiveFalse(pageable);
+        Page<Customer> customerPage = customerRepository.findAllByIsActiveFalseAndIsApprovedTrue(pageable);
         List<Customer> customers = customerPage.getContent();
         List<CustomerDTO> customerDTOS = dtoService.convertCustomersToDto(customers);
         return new PagedResponse<>(customerDTOS, customerPage.getNumber(),

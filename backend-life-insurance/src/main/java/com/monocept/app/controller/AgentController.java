@@ -25,14 +25,23 @@ public class AgentController {
     
     
     // no testing done here
-    
-    
-    
+
+
+    @GetMapping("/balance")
+    ResponseEntity<BalanceDTO> getAgentBalance() {
+        BalanceDTO balanceDTO = agentService.getAgentBalance();
+        return new ResponseEntity<>(balanceDTO, HttpStatus.OK);
+    }
     
     @GetMapping("/profile/{aid}")
     ResponseEntity<AgentDTO> viewProfile(@PathVariable("aid")Long agentId) {
-        AgentDTO agentDTO1 = agentService.viewProfile(agentId);
-        return new ResponseEntity<>(agentDTO1, HttpStatus.OK);
+        AgentDTO agentDTO = agentService.viewProfile(agentId);
+        return new ResponseEntity<>(agentDTO, HttpStatus.OK);
+    }
+    @GetMapping("/dashboard")
+    ResponseEntity<DashBoardDTO> agentDashboard() {
+        DashBoardDTO dashBoardDTO = agentService.agentDashboard();
+        return new ResponseEntity<>(dashBoardDTO, HttpStatus.OK);
     }
 
     @PostMapping("/update")
@@ -64,16 +73,43 @@ public class AgentController {
                 getAllCustomerAccounts(pageNo,size,sort,sortBy,sortDirection);
         return new ResponseEntity<>(policyAccountDTOPagedResponse, HttpStatus.OK);
     }
+    @GetMapping("/approved-commissions/{aid}")
+    ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllApprovedCommissions(
+            @PathVariable("aid")Long agentId,
+            @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sort", defaultValue = "ASC") String sort,
+            @RequestParam(name = "sortBy", defaultValue = "amount") String sortBy,
+            @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection
+    ) {
+        PagedResponse<WithdrawalRequestsDTO> withdrawalRequestsDTOPagedResponse = agentService.
+                getAllApprovedCommissions(agentId,pageNo,size,sort,sortBy,sortDirection);
+        return new ResponseEntity<>(withdrawalRequestsDTOPagedResponse, HttpStatus.OK);
+    }
+    @GetMapping("/not-approved-commissions/{aid}")
+    ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllNotApprovedCommissions(
+            @PathVariable("aid")Long agentId,
+            @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sort", defaultValue = "ASC") String sort,
+            @RequestParam(name = "sortBy", defaultValue = "amount") String sortBy,
+            @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection
+    ) {
+        PagedResponse<WithdrawalRequestsDTO> withdrawalRequestsDTOPagedResponse = agentService.
+                getAllNotApprovedCommissions(agentId,pageNo,size,sort,sortBy,sortDirection);
+        return new ResponseEntity<>(withdrawalRequestsDTOPagedResponse, HttpStatus.OK);
+    }
     @GetMapping("/customers")
     ResponseEntity<PagedResponse<CustomerDTO>> getAllCustomers(
             @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sort", defaultValue = "ASC") String sort,
             @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy,
-            @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection
+            @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection,
+            @RequestParam(name="isActive",defaultValue = "true")Boolean isActive
     ) {
         PagedResponse<CustomerDTO> customerDTOPagedResponse = agentService.
-                getAllCustomers(pageNo,size,sort,sortBy,sortDirection);
+                getAllCustomers(pageNo,size,sort,sortBy,sortDirection,isActive);
         return new ResponseEntity<>(customerDTOPagedResponse, HttpStatus.OK);
     }
 

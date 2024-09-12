@@ -126,11 +126,15 @@ public class AuthServiceImp implements AuthService{
 	public boolean isEmployee(String token, int userId) {
 		Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
 		
-		Claims claims = Jwts.parserBuilder()
-	            .setSigningKey(key)
-	            .build()
-                .parseClaimsJws(token)
-                .getBody();
+//		Claims claims = Jwts.parserBuilder()
+//	            .setSigningKey(key)
+//	            .build()
+//                .parseClaimsJws(token)
+//                .getBody();
+		Claims claims = Jwts.parser()
+				.setSigningKey(secretKey)
+				.parseClaimsJws(token)
+				.getBody();
 		Integer tokenUserId = claims.get("id", Integer.class);
 	    if (tokenUserId == null || !tokenUserId.equals(userId)) {
 	        return false;
@@ -144,11 +148,15 @@ public class AuthServiceImp implements AuthService{
 	public boolean isAgent(String token, int userId) {
 		Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
 		
-		Claims claims = Jwts.parserBuilder()
-	            .setSigningKey(key)
-	            .build()
-                .parseClaimsJws(token)
-                .getBody();
+//		Claims claims = Jwts.parserBuilder()
+//	            .setSigningKey(key)
+//	            .build()
+//                .parseClaimsJws(token)
+//                .getBody();
+		Claims claims = Jwts.parser()
+				.setSigningKey(secretKey)
+				.parseClaimsJws(token)
+				.getBody();
 		Integer tokenUserId = claims.get("id", Integer.class);
 	    if (tokenUserId == null || !tokenUserId.equals(userId)) {
 	        return false;

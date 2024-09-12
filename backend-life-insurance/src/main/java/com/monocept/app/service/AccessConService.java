@@ -25,4 +25,6 @@ public interface AccessConService {
     void checkCustomerAccess(Long customerId);
 
     void checkPolicyAccountAccess(Long id);
+
+    void checkAgentAccess(Long agentId);
 }

@@ -39,4 +39,5 @@ public interface CustomerService {
 	PagedResponse<CustomerDTO> getAllInActiveCustomers(int pageNo, int size, String sort, String sortBy,
 			String sortDirection);
 
+	PagedResponse<CustomerDTO> getAllActiveCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection);
 }

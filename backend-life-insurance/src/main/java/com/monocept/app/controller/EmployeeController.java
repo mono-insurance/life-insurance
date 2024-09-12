@@ -37,6 +37,13 @@ public class EmployeeController {
     @Autowired
     private StorageService storageService;
 
+
+    @GetMapping("/dashboard")
+    ResponseEntity<DashBoardDTO> employeeDashboard() {
+        DashBoardDTO dashBoardDTO = employeeService.employeeDashboard();
+        return new ResponseEntity<>(dashBoardDTO, HttpStatus.OK);
+    }
+
     @PostMapping(value = "/policy/{pid}/upload-policy-image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     ResponseEntity<Boolean> addNewInsuranceImages(
             @PathVariable("pid") Long policyId,
@@ -66,7 +73,7 @@ public class EmployeeController {
     }
 
     @Operation(summary = "By Admin and Employee: Update Employee")
-    @PutMapping("/employee/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable(name = "id") Long id, @RequestBody @Valid EmployeeDTO employeeDTO) {
 
         EmployeeDTO employee = employeeService.updateEmployee(id, employeeDTO);
@@ -129,6 +136,19 @@ public class EmployeeController {
         return new ResponseEntity<PagedResponse<EmployeeDTO>>(employees, HttpStatus.OK);
 
     }
+    @Operation(summary = "By Admin: Get All Inactive Employee")
+    @GetMapping("/registered-customers")
+    public ResponseEntity<PagedResponse<CustomerDTO>> getAllRegisteredCustomers(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size,
+            @RequestParam(name = "sortBy", defaultValue = "customerId") String sortBy,
+            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
+
+        PagedResponse<CustomerDTO> customers = employeeService.getAllRegisteredCustomers(page, size, sortBy, direction);
+
+        return new ResponseEntity<>(customers, HttpStatus.OK);
+
+    }
 
 
     @Operation(summary = "By Admin and Employee: Get employee profile")
@@ -161,11 +181,35 @@ public class EmployeeController {
     }
 
     @Operation(summary = "By Admin,emp: approve customer")
-    @PostMapping("/approve-customer/{cid}")
+    @PostMapping("/approve-customer/{cid}/{isApproved}")
     ResponseEntity<Boolean> approveCustomerProfile(@PathVariable("cid") Long customerId
-            , @RequestBody @Valid Boolean isApproved) {
+            , @PathVariable("isApproved") Boolean isApproved) {
         Boolean isSuccess = employeeService.approveCustomerProfile(customerId, isApproved);
         return new ResponseEntity<>(isSuccess, HttpStatus.OK);
+    }
+    @Operation(summary = "By Admin: Get All not approved docs")
+    @GetMapping("/document/not-approved")
+    public ResponseEntity<PagedResponse<DocumentUploadedDTO>> getAllNotApprovedDocuments(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size,
+            @RequestParam(name = "sortBy", defaultValue = "documentId") String sortBy,
+            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
+
+        PagedResponse<DocumentUploadedDTO> customers = employeeService.getAllNotApprovedDocuments(page, size, sortBy, direction);
+
+        return new ResponseEntity<>(customers, HttpStatus.OK);
+    }
+    @Operation(summary = "By Admin: Get All not approved docs")
+    @GetMapping("/document/approved")
+    public ResponseEntity<PagedResponse<DocumentUploadedDTO>> getAllApprovedDocuments(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size,
+            @RequestParam(name = "sortBy", defaultValue = "documentId") String sortBy,
+            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
+
+        PagedResponse<DocumentUploadedDTO> documents = employeeService.getAllApprovedDocuments(page, size, sortBy, direction);
+
+        return new ResponseEntity<>(documents, HttpStatus.OK);
     }
 
     @Operation(summary = "By Admin,emp: approve documents")
@@ -185,12 +229,39 @@ public class EmployeeController {
     }
 
     @Operation(summary = "By Admin,emp: Get All active customers")
-    @GetMapping("/customers")
-    ResponseEntity<PagedResponse<CustomerDTO>> getAllActiveCustomers(@RequestParam(name = "pageNo", defaultValue = "0") int pageNo, @RequestParam(name = "size", defaultValue = "10") int size, @RequestParam(name = "sort", defaultValue = "ASC") String sort, @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy, @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
-        PagedResponse<CustomerDTO> allCustomers = customerService.getAllCustomers(pageNo, size, sort, sortBy, sortDirection);
+    @GetMapping("/active-customers")
+    ResponseEntity<PagedResponse<CustomerDTO>> getAllActiveCustomers(
+            @RequestParam(name = "pageNo", defaultValue = "0")
+            int pageNo, @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sort", defaultValue = "ASC") String sort,
+            @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy,
+            @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
+        PagedResponse<CustomerDTO> allCustomers = customerService.getAllActiveCustomers(pageNo, size, sort, sortBy, sortDirection);
         return new ResponseEntity<>(allCustomers, HttpStatus.OK);
     }
 
+    @Operation(summary = "By Admin,emp: Get All active customers")
+    @GetMapping("/active-agents")
+    ResponseEntity<PagedResponse<AgentDTO>> getAllActiveAgents(
+            @RequestParam(name = "pageNo", defaultValue = "0")
+            int pageNo, @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sort", defaultValue = "ASC") String sort,
+            @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy,
+            @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
+        PagedResponse<AgentDTO> allActiveAgents = agentService.getAllActiveAgents(pageNo, size, sort, sortBy, sortDirection);
+        return new ResponseEntity<>(allActiveAgents, HttpStatus.OK);
+    }
+    @Operation(summary = "By Admin,emp: Get All active customers")
+    @GetMapping("/inactive-agents")
+    ResponseEntity<PagedResponse<AgentDTO>> getAllInActiveAgents(
+            @RequestParam(name = "pageNo", defaultValue = "0")
+            int pageNo, @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sort", defaultValue = "ASC") String sort,
+            @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy,
+            @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
+        PagedResponse<AgentDTO> allActiveAgents = agentService.getAllInActiveAgents(pageNo, size, sort, sortBy, sortDirection);
+        return new ResponseEntity<>(allActiveAgents, HttpStatus.OK);
+    }
     @Operation(summary = "By Admin,emp: Get All inactive customers")
     @GetMapping("/inactive-customers")
     ResponseEntity<PagedResponse<CustomerDTO>> getAllInActiveCustomers(@RequestParam(name = "pageNo", defaultValue = "0") int pageNo, @RequestParam(name = "size", defaultValue = "10") int size, @RequestParam(name = "sort", defaultValue = "ASC") String sort, @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy, @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
@@ -211,13 +282,18 @@ public class EmployeeController {
         Boolean isSuccess = agentService.activateAgent(agentId);
         return new ResponseEntity<>(isSuccess, HttpStatus.OK);
     }
+    @Operation(summary = "By Admin,emp: activate agents")
+    @PostMapping("/inactivate-agent/{aid}")
+    ResponseEntity<Boolean> inActivateAgent(@PathVariable("aid") Long agentId) {
+        Boolean isSuccess = agentService.inActivateAgent(agentId);
+        return new ResponseEntity<>(isSuccess, HttpStatus.OK);
+    }
 
     @Operation(summary = "By Admin,emp: review Commission Withdrawal Request")
-    @GetMapping("/review-commissions/{wid}")
+    @PostMapping("/review-commissions/{wid}/{isApproved}")
     ResponseEntity<Boolean> reviewCommissionWithdrawalRequest(
             @PathVariable("wid") Long withdrawalId,
-            @RequestParam(value = "isApproved", defaultValue = "false")
-            Boolean isApproved) {
+            @PathVariable("isApproved") Boolean isApproved) {
         Boolean isSuccess = transactionService.reviewCommissionWithdrawalRequest(withdrawalId, isApproved);
         return new ResponseEntity<>(isSuccess, HttpStatus.OK);
     }
@@ -288,13 +364,12 @@ public class EmployeeController {
     }
 
     @Operation(summary = "By Admin: Get All Insurance types")
-    @GetMapping("/insurance/type")
+    @GetMapping("/insurance-type")
     public ResponseEntity<PagedResponse<InsuranceTypeDTO>> getAllInsuranceTypes(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "typeId") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
         PagedResponse<InsuranceTypeDTO> insuranceCategories = employeeService.getAllInsuranceTypes(page, size, sortBy, direction);
 
         return new ResponseEntity<PagedResponse<InsuranceTypeDTO>>(insuranceCategories, HttpStatus.OK);
-
     }
 
 
