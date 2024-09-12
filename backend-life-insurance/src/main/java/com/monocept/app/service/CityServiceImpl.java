@@ -77,9 +77,9 @@ public class CityServiceImpl implements CityService{
             throw new UserException("Cannot update city in an inactive state");
         }
 
-        if (!existingCity.getIsActive()) {
-            throw new UserException("Cannot update city as it is inactive");
-        }
+//        if (!existingCity.getIsActive()) {
+//            throw new UserException("Cannot update city as it is inactive");
+//        }
 
 
         existingCity.setCityName(cityDTO.getCityName());
@@ -177,5 +177,14 @@ public class CityServiceImpl implements CityService{
         List<CityDTO> allCitiesDTO = dtoService.convertCityListEntityToDTO(allCities);
 
         return new PagedResponse<CityDTO>(allCitiesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+
+	@Override
+	public CityDTO getCityById(Long id) {
+		City existingCity = cityRepository.findById(id)
+                .orElseThrow(() -> new UserException("City not found"));
+		
+		return dtoService.convertCityToDTO(existingCity);
 	}
 }

@@ -189,4 +189,34 @@ public class PolicyServiceImp implements PolicyService{
 	}
 
 
+
+	@Override
+	public PagedResponse<PolicyDTO> getAllActivePolicies(int page, int size, String sortBy, String direction) {
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+		
+		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+		
+		Page<Policy> pages = policyRepository.findByIsActiveTrue(pageable);
+		List<Policy> allPolicies = pages.getContent();
+		List<PolicyDTO> allPoliciesDTO = dtoService.convertPolicyListEntityToDTO(allPolicies);
+		
+		return new PagedResponse<PolicyDTO>(allPoliciesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+
+
+	@Override
+	public PagedResponse<PolicyDTO> getAllInactivePolicies(int page, int size, String sortBy, String direction) {
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+		
+		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+		
+		Page<Policy> pages = policyRepository.findByIsActiveFalse(pageable);
+		List<Policy> allPolicies = pages.getContent();
+		List<PolicyDTO> allPoliciesDTO = dtoService.convertPolicyListEntityToDTO(allPolicies);
+		
+		return new PagedResponse<PolicyDTO>(allPoliciesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+
 }

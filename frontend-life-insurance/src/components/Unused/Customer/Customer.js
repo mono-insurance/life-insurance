@@ -90,7 +90,7 @@ export const Customer = () => {
           }
           
           setData(response);
-          setKeysToBeIncluded(["id", "firstName", "lastName", "username",  "email", "active", "totalBalance"]);
+          setKeysToBeIncluded(["id", "firstName", "lastName", "username",  "email", "active"]);
 
       } catch (error) {
           setData([]);

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.monocept.app.dto.InsuranceTypeDTO;
 import com.monocept.app.entity.InsuranceType;
+import com.monocept.app.entity.State;
 import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.InsuranceTypeRepository;
 import com.monocept.app.repository.StateRepository;
@@ -42,9 +43,9 @@ public class InsuranceTypeServiceImp implements InsuranceTypeService{
 	    InsuranceType existingInsuranceType = insuranceTypeRepository.findById(id)
 	            .orElseThrow(() -> new UserException("Insurance type not found"));
 
-	    if (!existingInsuranceType.getIsActive()) {
-	        throw new UserException("Cannot update an inactive insurance type");
-	    }
+//	    if (!existingInsuranceType.getIsActive()) {
+//	        throw new UserException("Cannot update an inactive insurance type");
+//	    }
 
 	    existingInsuranceType.setInsuranceCategory(insuranceTypeDTO.getInsuranceCategory());
 	    existingInsuranceType.setIsActive(insuranceTypeDTO.getIsActive());
@@ -139,6 +140,13 @@ public class InsuranceTypeServiceImp implements InsuranceTypeService{
 
 	    InsuranceType updatedInsuranceType = insuranceTypeRepository.save(existingInsuranceType);
 	    return dtoService.convertInsuranceTypeToDTO(updatedInsuranceType);
+	}
+
+	@Override
+	public List<InsuranceTypeDTO> getListOfAllActiveInsuranceType() {
+		List<InsuranceType> insuranceType = insuranceTypeRepository.findByIsActiveTrue();
+		
+		return dtoService.convertInsuranceTypeListEntityToDTO(insuranceType);
 	}
     
 

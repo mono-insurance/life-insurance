@@ -1,5 +1,7 @@
 package com.monocept.app.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.monocept.app.dto.InsuranceTypeDTO;
+import com.monocept.app.dto.StateDTO;
 import com.monocept.app.service.InsuranceTypeService;
 import com.monocept.app.utils.PagedResponse;
 
@@ -106,5 +109,13 @@ public class InsuranceTypeController {
 
     }
     
-    
+    @Operation(summary = "By Admin and Employee: Get List of All Active insurance categories")
+    @GetMapping("/all/active")
+    public ResponseEntity<List<InsuranceTypeDTO>> getListOfAllActiveInsuranceType() {
+
+    	List<InsuranceTypeDTO> insuranceType = insuranceTypeService.getListOfAllActiveInsuranceType();
+
+        return new ResponseEntity<>(insuranceType, HttpStatus.OK);
+
+    }
 }

@@ -128,4 +128,5 @@ public interface DtoService {
 			List<WithdrawalRequests> allWithdrawalRequests);
 
     List<DocumentUploadedDTO> convertDocumentsToDTO(List<DocumentUploaded> allDocuments);
+	AdminCreationDTO converAdminToAdminCreationDTO(Admin updatedAdmin);
 }

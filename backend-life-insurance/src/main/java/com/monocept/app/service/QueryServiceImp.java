@@ -198,4 +198,13 @@ public class QueryServiceImp implements QueryService{
 		
 	}
 
+
+	@Override
+	public QueryDTO getQueryById(Long id) {
+		Query existingQuery = queryRepository.findById(id)
+	            .orElseThrow(() -> new UserException("Query not found"));
+		
+		return dtoService.convertQueryToQueryDTO(existingQuery);
+	}
+
 }

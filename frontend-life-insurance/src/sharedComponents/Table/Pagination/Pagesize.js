@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import './pagination.scss';
 import { PaginationContext } from '../../../context/PaginationContext';
 
-export const Pagesize = ({ noOfElements }) => {
+export const Pagesize = () => {
   const { itemsPerPage, handleItemsPerPageChange } = useContext(PaginationContext);
     
   const pageSizeOptions = [5, 10, 20, 50, 100];

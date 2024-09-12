@@ -74,9 +74,9 @@ public class StateServiceImp implements StateService{
         State existingState = stateRepository.findById(id)
                 .orElseThrow(() -> new UserException("State not found"));
         
-        if(!existingState.getIsActive()) {
-			throw new UserException("Cannot update an inactive states");
-		}
+//        if(!existingState.getIsActive()) {
+//			throw new UserException("Cannot update an inactive states");
+//		}
 
         existingState.setStateName(stateDTO.getStateName());
         existingState.setIsActive(stateDTO.getIsActive());
@@ -130,6 +130,24 @@ public class StateServiceImp implements StateService{
 		State updatedState = stateRepository.save(existingState);
         return dtoService.convertStateToStateDTO(updatedState);
 		
+	}
+
+
+	@Override
+	public List<StateDTO> getListOfAllActiveStates() {
+		List<State> states = stateRepository.findByIsActiveTrue();
+		
+		return dtoService.convertStateListEntityToDTO(states);
+		
+	}
+
+
+	@Override
+	public StateDTO getStateById(Long id) {
+		State existingState = stateRepository.findById(id)
+                .orElseThrow(() -> new UserException("State not found"));
+		
+		 return dtoService.convertStateToStateDTO(existingState);
 	}
 
 }

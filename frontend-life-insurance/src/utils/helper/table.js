@@ -1,7 +1,9 @@
 import React from 'react';
-import { MdOutlineDelete } from 'react-icons/md';
+import { TableAction } from '../../sharedComponents/Table/TableAction/TableAction';
 
 export const sanitizeTableData = (data, keysToBeIncluded, includeButton, handleButtonClick) => {
+
+    const possibleIdFields = ['feedbackId', 'queryId', 'customerId', 'agentId', 'employeeId', 'cityId', 'stateId', 'policyId', 'typeId', 'id'];
 
     const findKeyInObject = (obj, key) => {
         if (!obj || typeof obj !== 'object') return undefined;
@@ -16,6 +18,15 @@ export const sanitizeTableData = (data, keysToBeIncluded, includeButton, handleB
         }
 
         return undefined;
+    };
+
+    const getId = (item) => {
+        for (const idField of possibleIdFields) {
+            if (item[idField]) {
+                return item[idField];
+            }
+        }
+        return null;
     };
 
     return data.map((item) => {
@@ -36,11 +47,8 @@ export const sanitizeTableData = (data, keysToBeIncluded, includeButton, handleB
         });
 
         if (includeButton) {
-            sanitizedItem['Action'] = (
-                <button onClick={() => handleButtonClick(item)} className="edit-button large-icon" style={{ justifyContent: 'center' }}>
-                    <MdOutlineDelete color='var(--primary-color)'/>
-                </button>
-            );
+            const id = getId(item);
+            sanitizedItem['Action'] = <TableAction actions={handleButtonClick(id)} />;
         }
         return sanitizedItem;
     });

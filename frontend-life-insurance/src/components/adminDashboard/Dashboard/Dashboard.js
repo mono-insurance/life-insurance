@@ -70,17 +70,17 @@ export const Dashboard = () => {
           let formattedData =[];
           if(filterType === 'firstName') {
             validateFirstName(firstName);
-            response = await getAllUsersByCharacters(currentPage, itemsPerPage, firstName);
+            // response = await getAllUsersByCharacters(currentPage, itemsPerPage, firstName);
             formattedData = formatRoleForTable(response);
           }
           else if(filterType === 'id') {
             validateUserId(id);
-            const data = await getUserById(id);
+            // const data = await getUserById(id);
             response = covertIdDataIntoTable(data);
             formattedData = formatRoleForTable(response);
           }
           else {
-            response = await getAllUsers(currentPage, itemsPerPage);
+            // response = await getAllUsers(currentPage, itemsPerPage);
             formattedData = formatRoleForTable(response);
           }
           
@@ -137,8 +137,8 @@ export const Dashboard = () => {
     useEffect(() => {
       const fetchSystemCounts = async () => {
         try {
-            const response = await getSystemStats();
-
+            // const response = await getSystemStats();
+            const response = {};
             setCounts(response);
             console.log(response);
 

@@ -2,6 +2,7 @@ package com.monocept.app.repository;
 
 import com.monocept.app.entity.InsuranceType;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -17,4 +18,6 @@ public interface InsuranceTypeRepository extends JpaRepository<InsuranceType,Lon
 	Page<InsuranceType> findByIsActiveFalse(Pageable pageable);
 
 	Optional<InsuranceType> findByTypeIdAndIsActiveTrue(Long id);
+
+	List<InsuranceType> findByIsActiveTrue();
 }

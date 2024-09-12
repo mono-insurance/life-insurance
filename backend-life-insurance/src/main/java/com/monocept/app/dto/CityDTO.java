@@ -20,5 +20,8 @@ public class CityDTO {
     private Boolean isActive;
 
     private Long stateId;
+    
+    
+    private String stateName;
 
 }

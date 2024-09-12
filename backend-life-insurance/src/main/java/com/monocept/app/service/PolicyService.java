@@ -16,4 +16,8 @@ public interface PolicyService {
 	PagedResponse<PolicyDTO> getAllPolicies(int page, int size, String sortBy, String direction);
 
     PolicyDTO getPolicyById(Long policyId);
+
+	PagedResponse<PolicyDTO> getAllActivePolicies(int page, int size, String sortBy, String direction);
+
+	PagedResponse<PolicyDTO> getAllInactivePolicies(int page, int size, String sortBy, String direction);
 }
