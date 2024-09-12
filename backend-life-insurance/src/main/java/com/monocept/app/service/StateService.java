@@ -1,5 +1,7 @@
 package com.monocept.app.service;
 
+import java.util.List;
+
 import com.monocept.app.dto.StateDTO;
 import com.monocept.app.utils.PagedResponse;
 
@@ -19,5 +21,9 @@ public interface StateService {
 	PagedResponse<StateDTO> getAllInactivatedStates(int page, int size, String sortBy, String direction);
 
 	StateDTO activateState(Long id);
+
+	List<StateDTO> getListOfAllActiveStates();
+
+	StateDTO getStateById(Long id);
 
 }

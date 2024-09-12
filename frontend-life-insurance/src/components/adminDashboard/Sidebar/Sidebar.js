@@ -13,6 +13,7 @@ import {
   MdOutlinePerson,
   MdOutlinePerson2,
   MdOutlinePerson4,
+  MdOutlinePerson3,
   MdOutlineLocationCity,
   MdOutlineShareLocation,
   MdOutlineMyLocation,
@@ -125,8 +126,28 @@ export const Sidebar = () => {
                 </span>
                 <span className="menu-link-text">Users</span>
               </button>
-              {(activeMenu === 'users' || activeMenu === 'employees' || activeMenu === 'agents' || activeMenu === 'customers') && (
+              {(activeMenu === 'users' || activeMenu === 'admin' || activeMenu === 'employees' || activeMenu === 'agents' || activeMenu === 'customers' || activeMenu === 'add-admin' || activeMenu === 'add-employees' || activeMenu === 'get-employees' || activeMenu === 'add-agents' || activeMenu === 'get-agents' || activeMenu === 'add-customers' || activeMenu === 'get-customers') && (
                 <ul className="menu-list" >
+                  <li className={`menu-item ${activeMenu === 'admin' ? 'active' : ''}`}>
+                    <button className="menu-link" onClick={() => handleMenuClick('admin')} style={{marginBottom: '6px'}}>
+                      <span className="menu-link-icon">
+                        <MdOutlinePerson3 size={20} />
+                      </span>
+                      <span className="menu-link-text">Admin</span>
+                    </button>
+                    {(activeMenu === 'admin' || activeMenu === 'add-admin') && (
+                      <ul className="menu-list" >
+                        <li className={`menu-item ${activeMenu === 'add-admin' ? 'active' : ''}`} style={{marginBottom: '4px'}}>
+                          <NavLink to={`/admin/add-admin/${routeParams.id}`} className="menu-link" onClick={() => handleMenuClick('add-admin')}>
+                          <span className="menu-link-icon">
+                            <MdOutlinePersonAdd size={20} />
+                          </span>
+                          <span className="menu-link-text">Add Admin</span>
+                          </NavLink>
+                        </li>
+                      </ul>
+                    )}
+                  </li>
                   <li className={`menu-item ${activeMenu === 'employees' ? 'active' : ''}`}>
                     <button className="menu-link" onClick={() => handleMenuClick('employees')} style={{marginBottom: '6px'}}>
                       <span className="menu-link-icon">
@@ -221,7 +242,7 @@ export const Sidebar = () => {
                 </span>
                 <span className="menu-link-text">Locations</span>
               </button>
-              {(activeMenu === 'locations' || activeMenu === 'state' || activeMenu === 'city') && (
+              {(activeMenu === 'locations' || activeMenu === 'state' || activeMenu === 'city' || activeMenu === 'add-state' || activeMenu === 'get-state' || activeMenu === 'add-city' || activeMenu === 'get-city') && (
                 <ul className="menu-list" >
                 <li className={`menu-item ${activeMenu === 'state' ? 'active' : ''}`}>
                   <button className="menu-link" onClick={() => handleMenuClick('state')} style={{marginBottom: '6px'}}>

@@ -64,6 +64,35 @@ public class PolicyController {
 	
 	    return new ResponseEntity<PagedResponse<PolicyDTO>>(policies, HttpStatus.OK);
 	}
+	
+	
+	@Operation(summary = "By Admin: Get All Active Policies")
+	@GetMapping("/policy/active")
+	public ResponseEntity<PagedResponse<PolicyDTO>> getAllActivePolicies(
+	        @RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "5") int size,
+			@RequestParam(name = "sortBy", defaultValue = "policyId") String sortBy,
+			@RequestParam(name = "direction", defaultValue = "asc") String direction) {
+	
+	    PagedResponse<PolicyDTO> policies = policyService.getAllActivePolicies(page, size, sortBy, direction);
+	
+	    return new ResponseEntity<PagedResponse<PolicyDTO>>(policies, HttpStatus.OK);
+	}
+	
+	
+	
+	@Operation(summary = "By Admin: Get All Inactive Policies")
+	@GetMapping("/policy/inactive")
+	public ResponseEntity<PagedResponse<PolicyDTO>> getAllInactivePolicies(
+	        @RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "5") int size,
+			@RequestParam(name = "sortBy", defaultValue = "policyId") String sortBy,
+			@RequestParam(name = "direction", defaultValue = "asc") String direction) {
+	
+	    PagedResponse<PolicyDTO> policies = policyService.getAllInactivePolicies(page, size, sortBy, direction);
+	
+	    return new ResponseEntity<PagedResponse<PolicyDTO>>(policies, HttpStatus.OK);
+	}
 
 	@Operation(summary = "By Admin: Get  policy by id")
 	@GetMapping("/policy/{pid}")
@@ -73,5 +102,8 @@ public class PolicyController {
 
 		return new ResponseEntity<>(policies, HttpStatus.OK);
 	}
+	
+	
+	
 
 }

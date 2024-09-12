@@ -1,5 +1,7 @@
 package com.monocept.app.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,16 @@ public class StateController {
 	
 	@Autowired
 	private StateService stateService;
+	
+	
+	@Operation(summary = "By Admin and Employee: get State by id")
+    @GetMapping("/{id}")
+    public ResponseEntity<StateDTO> getStateById(@PathVariable(name = "id") Long id) {
+
+        StateDTO state = stateService.getStateById(id);
+
+        return new ResponseEntity<>(state, HttpStatus.OK);
+    }
 
     
     @Operation(summary = "By Admin and Employee: update State")
@@ -83,6 +95,17 @@ public class StateController {
     public ResponseEntity<PagedResponse<StateDTO>> getAllInactivatedStates(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "stateId") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
         PagedResponse<StateDTO> states = stateService.getAllInactivatedStates(page, size, sortBy, direction);
+
+        return new ResponseEntity<>(states, HttpStatus.OK);
+
+    }
+    
+    
+    @Operation(summary = "By Admin and Employee: Get List of All Active states")
+    @GetMapping("/all/active")
+    public ResponseEntity<List<StateDTO>> getListOfAllActiveStates() {
+
+    	List<StateDTO> states = stateService.getListOfAllActiveStates();
 
         return new ResponseEntity<>(states, HttpStatus.OK);
 

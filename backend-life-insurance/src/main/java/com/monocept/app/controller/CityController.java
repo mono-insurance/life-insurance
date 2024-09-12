@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.monocept.app.dto.CityDTO;
+import com.monocept.app.dto.StateDTO;
 import com.monocept.app.service.CityService;
 import com.monocept.app.utils.PagedResponse;
 
@@ -26,6 +27,17 @@ public class CityController {
 	
 	@Autowired
 	private CityService cityService;
+	
+	
+	@Operation(summary = "By Admin and Employee: get City by id")
+    @GetMapping("/{id}")
+    public ResponseEntity<CityDTO> getCityById(@PathVariable(name = "id") Long id) {
+
+		CityDTO city = cityService.getCityById(id);
+
+        return new ResponseEntity<>(city, HttpStatus.OK);
+    }
+
 	
 
     @Operation(summary = "By Admin and Employee: update City")

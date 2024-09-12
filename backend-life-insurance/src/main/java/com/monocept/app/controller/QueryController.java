@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.monocept.app.dto.QueryDTO;
+import com.monocept.app.dto.StateDTO;
 import com.monocept.app.service.QueryService;
 import com.monocept.app.utils.PagedResponse;
 
@@ -26,6 +27,16 @@ public class QueryController {
 	
 	@Autowired
 	private QueryService queryService;
+	
+	
+	@Operation(summary = "By Admin and Employee: get Query by id")
+    @GetMapping("/{id}")
+    public ResponseEntity<QueryDTO> getQueryById(@PathVariable(name = "id") Long id) {
+
+		QueryDTO query = queryService.getQueryById(id);
+
+        return new ResponseEntity<>(query, HttpStatus.OK);
+    }
 	
 	
 	@Operation(summary = "By Customer: Add Query")

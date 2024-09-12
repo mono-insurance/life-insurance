@@ -39,6 +39,15 @@ import { Query } from './components/adminDashboard/Query/Query';
 import { TaxSettings } from './components/adminDashboard/TaxSettings/TaxSettings';
 import { InsuranceSettings } from './components/adminDashboard/InsuranceSettings/InsuranceSettings';
 import { Settings } from './components/adminDashboard/Settings/Settings';
+import { UpdateInsurance } from './components/adminDashboard/UpdateInsurance/UpdateInsurance';
+import { DeleteInsurance } from './components/adminDashboard/DeleteInsurance/DeleteInsurance';
+import { UpdateState } from './components/adminDashboard/UpdateState/UpdateState';
+import { DeleteState } from './components/adminDashboard/DeleteState/DeleteState';
+import { UpdateCity } from './components/adminDashboard/UpdateCity/UpdateCity';
+import { DeleteCity } from './components/adminDashboard/DeleteCity/DeleteCity';
+import { AddAdmin } from './components/adminDashboard/AddAdmin/AddAdmin';
+import { UpdateQuery } from './components/adminDashboard/UpdateQuery/UpdateQuery';
+import { DeleteQuery } from './components/adminDashboard/DeleteQuery/DeleteQuery';
 
 function App() {
 
@@ -66,6 +75,7 @@ function App() {
           <Route element={<AdminDashboard />}>
 
             <Route path='/admin/dashboard/:id' element={<Dashboard />}></Route>
+            <Route path='/admin/add-admin/:id' element={<AddAdmin />}></Route>
             <Route path='/admin/add-employees/:id' element={<AddEmployees />}></Route>
             <Route path='/admin/get-employees/:id' element={<GetEmployees />}></Route>
             <Route path='/admin/add-agents/:id' element={<AddAgents />}></Route>
@@ -90,7 +100,15 @@ function App() {
             <Route path='/admin/tax-settings/:id' element={<TaxSettings />}></Route>
             <Route path='/admin/insurance-settings/:id' element={<InsuranceSettings />}></Route>
             <Route path='/admin/settings/:id' element={<Settings />}></Route>
-          
+            <Route path='/admin/insurance-categories/:id/edit/:insuranceId' element={<UpdateInsurance />}></Route>
+            <Route path='/admin/insurance-categories/:id/delete/:insuranceId' element={<DeleteInsurance />}></Route>
+            <Route path='/admin/state/:id/edit/:stateId' element={<UpdateState />}></Route>
+            <Route path='/admin/state/:id/delete/:stateId' element={<DeleteState />}></Route>
+            <Route path='/admin/city/:id/edit/:cityId' element={<UpdateCity />}></Route>
+            <Route path='/admin/city/:id/delete/:cityId' element={<DeleteCity />}></Route>
+            <Route path='/admin/query/:id/edit/:queryId' element={<UpdateQuery />}></Route>
+            <Route path='/admin/query/:id/delete/:queryId' element={<DeleteQuery />}></Route>
+
           </Route>
 
           <Route element={<CustomerDashboard />}>
