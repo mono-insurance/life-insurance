@@ -42,18 +42,18 @@ public class WithdrawalRequests {
 	private Boolean isApproved;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "policy_account_id", nullable = false)
+    @JoinColumn(name = "policy_account_id", nullable = true)
     @JsonBackReference
     private PolicyAccount policyAccount;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "agent_id", nullable = false)
+    @JoinColumn(name = "agent_id", nullable = true)
     @JsonBackReference
     private Agent agent;
-    
-    
+
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", nullable = false)
+    @JoinColumn(name = "customer_id", nullable = true)
     @JsonBackReference
     private Customer customer;
     

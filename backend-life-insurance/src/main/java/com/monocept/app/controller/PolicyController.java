@@ -53,7 +53,7 @@ public class PolicyController {
 	}
 
 	@Operation(summary = "By Admin: Get All Policies")
-	@GetMapping("/policy")
+	@GetMapping
 	public ResponseEntity<PagedResponse<PolicyDTO>> getAllPolicies(
 	        @RequestParam(name = "page", defaultValue = "0") int page,
 			@RequestParam(name = "size", defaultValue = "5") int size,

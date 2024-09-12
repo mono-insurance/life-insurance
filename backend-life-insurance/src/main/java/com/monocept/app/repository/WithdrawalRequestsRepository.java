@@ -56,4 +56,14 @@ public interface WithdrawalRequestsRepository extends JpaRepository<WithdrawalRe
 	@Transactional
 	@Query("UPDATE WithdrawalRequests w set w.isApproved=true where w.withdrawalRequestsId=:withdrawalId")
 	void reviewAgentCommission(@Param("withdrawalId") Long withdrawalId);
+
+    Long countByIsApprovedTrue();
+	@Query("SELECT COUNT(wr) FROM WithdrawalRequests wr WHERE wr.agent IS NOT NULL AND wr.customer IS NULL")
+	long countByAgentMappedAndNotByCustomer();
+	@Query("SELECT COUNT(wr) FROM WithdrawalRequests wr WHERE wr.agent IS NOT NULL AND wr.customer IS NULL and wr.isApproved=true")
+	long countByAgentMappedAndNotByCustomerAndIsApprovedTrue();
+
+	Page<WithdrawalRequests> findByAgentAndIsApprovedTrue(Agent agent, Pageable pageable);
+
+	Page<WithdrawalRequests> findByAgentAndIsApprovedFalse(Agent agent, Pageable pageable);
 }

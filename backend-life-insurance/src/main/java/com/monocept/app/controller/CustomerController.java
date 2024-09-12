@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/suraksha/customer")
+@RequestMapping("/suraksha")
 public class CustomerController {
 
     @Autowired
@@ -37,12 +37,7 @@ public class CustomerController {
     }
 
 
-    @PostMapping("/customer/registration")
-    ResponseEntity<Long> customerRegistration(@RequestBody @Valid RegistrationDTO registrationDTO) {
 
-        Long id = customerService.customerRegistration(registrationDTO);
-        return new ResponseEntity<>(id, HttpStatus.OK);
-    }
 
 
     @Operation(summary = "By Customer: Get the customer profile")

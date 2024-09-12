@@ -80,7 +80,8 @@ public class TransactionServiceImp implements TransactionService {
         emailDTO.setEmailId(withdrawalRequests.getAgent().getCredentials().getEmail());
         if (isApproved) {
             withdrawalRequestsRepository.reviewAgentCommission(withdrawalId);
-
+            Long agentId=withdrawalRequests.getAgent().getAgentId();
+            agentRepository.updateAgentCommission(agentId,withdrawalRequests.getAmount());
             emailDTO.setTitle("Withdrawal request accepted");
             emailDTO.setBody("Congrats!, your commission withdrawal request has been accepted.\n" +
                     " we have transferred requested money to your account\n");

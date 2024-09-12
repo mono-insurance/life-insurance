@@ -156,6 +156,18 @@ public class AccessConServiceImp implements AccessConService{
         }
     }
 
+    @Override
+    public void checkAgentAccess(Long agentId) {
+        CustomUserDetails customUserDetails=checkUserAccess();
+        String role=getUserRole();
+        if(!(role.equals("EMPLOYEE") || role.equals("ADMIN") || (role.equals("AGENT") && customUserDetails.getId().equals(agentId)))){
+            throw new RoleAccessException("you don't have access");
+        }
+        if(role.equals("CUSTOMER")){
+            throw new RoleAccessException("you don't have access");
+        }
+    }
+
     private boolean checkUserAccess(Long documentId) {
         CustomUserDetails customUserDetails= checkUserAccess();
         String role= getUserRole();

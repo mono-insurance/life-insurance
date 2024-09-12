@@ -15,6 +15,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegistrationDTO {
+    private Long id;
 
 
     @NotBlank(message = "First name is mandatory")

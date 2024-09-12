@@ -203,13 +203,19 @@ public class AgentServiceImp implements AgentService {
     }
 
     @Override
-    public PagedResponse<CustomerDTO> getAllCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection) {
+    public PagedResponse<CustomerDTO> getAllCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection, Boolean isActive) {
         Long agentId = accessConService.checkUserAccess().getId();
         Agent agent = findAgent(agentId);
         List<PolicyAccount> policyAccounts=agent.getPolicyAccounts();
         List<Customer> customerList=new ArrayList<>();
         for(PolicyAccount policyAccount:policyAccounts){
-            customerList.add(policyAccount.getCustomer());
+            if(isActive){
+                if(policyAccount.getCustomer().getIsActive()) customerList.add(policyAccount.getCustomer());
+            }
+            else{
+                if(!policyAccount.getCustomer().getIsActive()) customerList.add(policyAccount.getCustomer());
+            }
+
         }
         PageResult pageResult = dtoService.convertCustomersToPage(customerList, pageNo, sort, sortBy, sortDirection, size);
         List<CustomerDTO> customerDto = dtoService.convertCustomersToDto(pageResult.getContent());
@@ -324,4 +330,115 @@ public class AgentServiceImp implements AgentService {
 //		send email to agent
 		return true;
 	}
+
+    @Override
+    public DashBoardDTO agentDashboard() {
+        CustomUserDetails customUserDetails=accessConService.checkUserAccess();
+        Agent agent=findAgent(customUserDetails.getId());
+        Long accounts= (long) agent.getPolicyAccounts().size();
+        Long activeAccountsCount=agent.getPolicyAccounts().
+                stream().
+                filter(account->account.getIsActive()).count();
+        Long inactiveAccounts=accounts-activeAccountsCount;
+
+        Long withdrawals= (long) agent.getWithdrawalRequests().size();
+
+        Long approvedWithdrawals=agent.getWithdrawalRequests().
+                stream().
+                filter(account->account.getIsApproved()).count();
+        Long notApprovedWithdrawals=withdrawals-approvedWithdrawals;
+
+
+        return new DashBoardDTO(accounts,activeAccountsCount,inactiveAccounts,withdrawals,approvedWithdrawals,notApprovedWithdrawals);
+    }
+
+    @Override
+    public Boolean inActivateAgent(Long agentId) {
+        return null;
+    }
+
+    @Override
+    public PagedResponse<AgentDTO> getAllActiveAgents(int pageNo, int size, String sort, String sortBy, String sortDirection) {
+        accessConService.checkEmployeeAccess();
+        Sort sorting = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, size, sorting);
+        Page<Agent> agentPage = agentRepository.findAlByIsActiveTrue(pageable);
+        List<Agent> agents = agentPage.getContent();
+        List<AgentDTO> agentDTOS=dtoService.convertAgentsToDto(agents);
+        return new PagedResponse<>(agentDTOS, agentPage.getNumber(),
+                agentPage.getSize(), agentPage.getTotalElements(), agentPage.getTotalPages(),
+                agentPage.isLast());
+    }
+
+    @Override
+    public PagedResponse<AgentDTO> getAllInActiveAgents(int pageNo, int size, String sort, String sortBy, String sortDirection) {
+        accessConService.checkEmployeeAccess();
+        Sort sorting = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, size, sorting);
+        Page<Agent> agentPage = agentRepository.findAllByIsActiveFalse(pageable);
+        List<Agent> agents = agentPage.getContent();
+        List<AgentDTO> agentDTOS=dtoService.convertAgentsToDto(agents);
+        return new PagedResponse<>(agentDTOS, agentPage.getNumber(),
+                agentPage.getSize(), agentPage.getTotalElements(), agentPage.getTotalPages(),
+                agentPage.isLast());
+    }
+
+    @Override
+    public PagedResponse<WithdrawalRequestsDTO> getAllApprovedCommissions(Long agentId, int pageNo, int size, String sort, String sortBy, String sortDirection) {
+        accessConService.checkAgentAccess(agentId);
+        Sort sorting = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        String role=accessConService.getUserRole();
+        Pageable pageable = PageRequest.of(pageNo, size, sorting);
+        Page<WithdrawalRequests> withdrawalRequestsPage;
+        if(role.equals("AGENT")){
+            CustomUserDetails customUserDetails=accessConService.checkUserAccess();
+            Agent agent=findAgent(customUserDetails.getId());
+            withdrawalRequestsPage = withdrawalRequestsRepository.findByAgentAndIsApprovedTrue(agent,pageable);
+        }
+        else{
+            withdrawalRequestsPage = withdrawalRequestsRepository.findAllByIsApprovedTrue(pageable);
+        }
+        List<WithdrawalRequests> withdrawalRequests = withdrawalRequestsPage.getContent();
+        List<WithdrawalRequestsDTO> withdrawalRequestsDTOS=dtoService.convertWithdrawalsToDto(withdrawalRequests);
+        return new PagedResponse<>(withdrawalRequestsDTOS, withdrawalRequestsPage.getNumber(),
+                withdrawalRequestsPage.getSize(), withdrawalRequestsPage.getTotalElements(), withdrawalRequestsPage.getTotalPages(),
+                withdrawalRequestsPage.isLast());
+    }
+
+    @Override
+    public PagedResponse<WithdrawalRequestsDTO> getAllNotApprovedCommissions(Long agentId, int pageNo, int size, String sort, String sortBy, String sortDirection) {
+        accessConService.checkAgentAccess(agentId);
+        Sort sorting = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        String role=accessConService.getUserRole();
+        Pageable pageable = PageRequest.of(pageNo, size, sorting);
+        Page<WithdrawalRequests> withdrawalRequestsPage;
+        if(role.equals("AGENT")){
+            CustomUserDetails customUserDetails=accessConService.checkUserAccess();
+            Agent agent=findAgent(customUserDetails.getId());
+            withdrawalRequestsPage = withdrawalRequestsRepository.findByAgentAndIsApprovedFalse(agent,pageable);
+        }
+        else{
+            withdrawalRequestsPage = withdrawalRequestsRepository.findAllByIsApprovedFalse(pageable);
+        }
+        List<WithdrawalRequests> withdrawalRequests = withdrawalRequestsPage.getContent();
+        List<WithdrawalRequestsDTO> withdrawalRequestsDTOS=dtoService.convertWithdrawalsToDto(withdrawalRequests);
+        return new PagedResponse<>(withdrawalRequestsDTOS, withdrawalRequestsPage.getNumber(),
+                withdrawalRequestsPage.getSize(), withdrawalRequestsPage.getTotalElements(), withdrawalRequestsPage.getTotalPages(),
+                withdrawalRequestsPage.isLast());
+    }
+
+    @Override
+    public BalanceDTO getAgentBalance() {
+        CustomUserDetails customUserDetails=accessConService.checkUserAccess();
+        Agent agent=findAgent(customUserDetails.getId());
+        return new BalanceDTO(agent.getBalance(),agent.getWithdrawalAmount());
+    }
 }

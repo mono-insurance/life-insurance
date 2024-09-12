@@ -2,9 +2,6 @@ package com.monocept.app.service;
 
 import com.monocept.app.dto.*;
 import com.monocept.app.utils.PagedResponse;
-import jakarta.validation.Valid;
-
-import jakarta.validation.Valid;
 
 import java.time.LocalDate;
 
@@ -58,4 +55,12 @@ public interface EmployeeService {
 
     Boolean approveDocument(Long documentId, Boolean isApproved);
 	PagedResponse<EmployeeDTO> getAllInactiveEmployees(int page, int size, String sortBy, String direction);
+
+    DashBoardDTO employeeDashboard();
+
+    PagedResponse<CustomerDTO> getAllRegisteredCustomers(int page, int size, String sortBy, String direction);
+
+    PagedResponse<DocumentUploadedDTO> getAllNotApprovedDocuments(int page, int size, String sortBy, String direction);
+
+    PagedResponse<DocumentUploadedDTO> getAllApprovedDocuments(int page, int size, String sortBy, String direction);
 }

@@ -222,7 +222,7 @@ public class DtoServiceImp implements DtoService {
         for (WithdrawalRequests withdrawalRequest : withdrawalRequests) {
             withdrawalRequestsDTOS.add(convertWithdrawalToDto(withdrawalRequest));
         }
-        return null;
+        return withdrawalRequestsDTOS;
     }
 
     @Override
@@ -968,6 +968,14 @@ public class DtoServiceImp implements DtoService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<DocumentUploadedDTO> convertDocumentsToDTO(List<DocumentUploaded> allDocuments) {
+        List<DocumentUploadedDTO> documentUploadedDTOS=new ArrayList<>();
+        for(DocumentUploaded documentUploaded:allDocuments){
+            documentUploadedDTOS.add(convertDocumentUploadedToDTO(documentUploaded));
+        }
+        return documentUploadedDTOS;
+    }
 	@Override
 	public AdminCreationDTO converAdminToAdminCreationDTO(Admin updatedAdmin) {
 		AdminCreationDTO adminCreationDTO = new AdminCreationDTO();
