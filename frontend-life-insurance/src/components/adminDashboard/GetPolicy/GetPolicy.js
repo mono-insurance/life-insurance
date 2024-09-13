@@ -25,6 +25,7 @@ export const GetPolicy = () => {
     const [active, setActive] = useState('');
     const [showPagination, setShowPagination] = useState(true);
     const [searchParams, setSearchParams] = useSearchParams();
+    const { id: adminId } = useParams();
     const filterOptions = [
       { label: 'Search by Policy Id', value: 'id' },
       { label: 'Search by Active', value: 'active' },
@@ -64,10 +65,11 @@ export const GetPolicy = () => {
       setSearchParams({});
     };
   
-    const actions = (id) => [
-      { name: "View", url: `/policy/view/${id}` },
-      { name: "Edit", url: `/policy/edit/${id}` },
-      { name: "Delete", url: `/policy/delete/${id}` }
+
+    const actions = (policyId) => [
+      { name: "View", url: `/admin/policy/${adminId}/view/${policyId}` },
+      { name: "Edit", url: `/admin/policy/${adminId}/edit/${policyId}` },
+      { name: "Delete", url: `/admin/policy/${adminId}/delete/${policyId}` }
     ];
     
   

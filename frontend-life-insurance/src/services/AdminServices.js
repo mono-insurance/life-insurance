@@ -962,6 +962,128 @@ export const deleteQuery = async (id) => {
 
 
 
+export const updatePolicy = async (id, formState) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.put(`http://localhost:8080/suraksha/employee/policy/${id}`, formState, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+
+export const getPolicyImage = async (policyId) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/policy/download/policy-image/${policyId}`, {
+              responseType: 'blob',
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+export const uploadNewPolicyImage = async (policyId, file) => {
+    const token = localStorage.getItem('auth');
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+        const response = await axios.put(`http://localhost:8080/suraksha/policy/update/policy-image/${policyId}`, formData, {
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+
+export const deletePolicy = async (id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.delete(`http://localhost:8080/suraksha/admin/policy/${id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+export const fetchEmployeeById = async (id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/employee/employee/${id}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+
+export const updateEmployee = async (id, formState) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.put(`http://localhost:8080/suraksha/employee/employee/${id}`, formState, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+
+export const deleteEmployee = async (id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.delete(`http://localhost:8080/suraksha/employee/employee/${id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+
+
+
 
 
 

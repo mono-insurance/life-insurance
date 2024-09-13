@@ -595,14 +595,6 @@ public class DtoServiceImp implements DtoService {
 //            policy.setDocumentUploaded(convertDocumentUploadedDtoToEntity(policyDTO.getDocumentUploaded()));
 //        }
 
-        if (policyDTO.getDocumentsNeeded() != null) {
-            policy.setDocumentsNeeded(
-                    policyDTO.getDocumentsNeeded().stream()
-                            .map(this::convertDocumentNeededDtoToEntity)
-                            .collect(Collectors.toList())
-            );
-        }
-
         return policy;
     }
 
@@ -628,7 +620,7 @@ public class DtoServiceImp implements DtoService {
         if (policy.getDocumentsNeeded() != null) {
             policyDTO.setDocumentsNeeded(
                     policy.getDocumentsNeeded().stream()
-                            .map(this::convertDocumentNeededToDTO)
+                            .map(doc -> doc.getDocumentType().name())
                             .collect(Collectors.toList())
             );
         }
@@ -980,5 +972,22 @@ public class DtoServiceImp implements DtoService {
 		adminCreationDTO.setMobileNumber(updatedAdmin.getCredentials().getMobileNumber());
 		
 		return adminCreationDTO;
+	}
+
+	@Override
+	public EmployeeCreationDTO convertEmployeeToEmployeeCreationDTO(Employee existingEmployee) {
+		// TODO Auto-generated method stub
+		EmployeeCreationDTO employeeCreationDTO = new EmployeeCreationDTO();
+		employeeCreationDTO.setEmployeeId(existingEmployee.getEmployeeId());
+		employeeCreationDTO.setFirstName(existingEmployee.getFirstName());
+		employeeCreationDTO.setLastName(existingEmployee.getLastName());
+		employeeCreationDTO.setQualification(existingEmployee.getQualification());
+		employeeCreationDTO.setDateOfBirth(existingEmployee.getDateOfBirth());
+		employeeCreationDTO.setEmail(existingEmployee.getCredentials().getEmail());
+		employeeCreationDTO.setUsername(existingEmployee.getCredentials().getUsername());
+		employeeCreationDTO.setMobileNumber(existingEmployee.getCredentials().getMobileNumber());
+		employeeCreationDTO.setIsActive(existingEmployee.getIsActive());
+		
+		return employeeCreationDTO;
 	}
 }

@@ -9,6 +9,8 @@ import com.monocept.app.utils.PagedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
@@ -47,10 +49,38 @@ public class PolicyController {
 		return ResponseEntity
 				.ok()
 				.contentLength(data.length)
-				.header("Content-type", "application/octet-stream")
+				.header("Content-type", "image/jpeg")
 				.header("Content-disposition", "attachment; filename=\"" + "test" + "\"")
 				.body(resource);
 	}
+	
+	
+	@PutMapping(value ="/update/policy-image/{pid}" ,consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+	public ResponseEntity<ByteArrayResource> updatePolicyImage(@PathVariable("pid") Long pid,@RequestParam("file") MultipartFile file) {
+		byte[] data = storageService.updatePolicyImage(pid, file);
+		ByteArrayResource resource = new ByteArrayResource(data);
+		return ResponseEntity
+				.ok()
+				.contentLength(data.length)
+				.header("Content-type", "image/jpeg")
+				.header("Content-disposition", "attachment; filename=\"" + "test" + "\"")
+				.body(resource);
+	}
+	
+	
+	
+//	@Operation(summary = "By Admin: Get the uploaded Files of the Customers")
+//	@GetMapping("/files/user/{userId}/{fileNumber}")
+//	public ResponseEntity<Object> getUploadedFilesOfUsers(@PathVariable(name = "userId") int customerId,@PathVariable(name = "fileNumber") int fileNumber) {
+//		List<byte[]> fileContent = adminService.getFileContent(customerId, fileNumber);
+//		
+//		byte[] content = fileContent.get(fileNumber-1);
+//		System.out.println("image returned");
+//		return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.valueOf("image/png")).body(content);
+//	}
+	
+	
+	
 
 	@Operation(summary = "By Admin: Get All Policies")
 	@GetMapping("/policy")

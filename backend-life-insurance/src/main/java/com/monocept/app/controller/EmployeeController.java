@@ -64,14 +64,24 @@ public class EmployeeController {
 
         return new ResponseEntity<EmployeeDTO>(employee, HttpStatus.OK);
     }
+    
+    
+    @Operation(summary = "By Admin: Get Employee By Id")
+    @GetMapping("/employee/{id}")
+    public ResponseEntity<EmployeeCreationDTO> getEmployeeById(@PathVariable(name = "id") Long id) {
+
+    	EmployeeCreationDTO employee = employeeService.getEmployeeById(id);
+
+        return new ResponseEntity<EmployeeCreationDTO>(employee, HttpStatus.OK);
+    }
 
     @Operation(summary = "By Admin and Employee: Update Employee")
     @PutMapping("/employee/{id}")
-    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable(name = "id") Long id, @RequestBody @Valid EmployeeDTO employeeDTO) {
+    public ResponseEntity<EmployeeCreationDTO> updateEmployee(@PathVariable(name = "id") Long id, @RequestBody @Valid EmployeeCreationDTO employeeDTO) {
 
-        EmployeeDTO employee = employeeService.updateEmployee(id, employeeDTO);
+    	EmployeeCreationDTO employee = employeeService.updateEmployee(id, employeeDTO);
 
-        return new ResponseEntity<EmployeeDTO>(employee, HttpStatus.OK);
+        return new ResponseEntity<EmployeeCreationDTO>(employee, HttpStatus.OK);
 
     }
 

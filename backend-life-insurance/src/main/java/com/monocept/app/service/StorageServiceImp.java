@@ -222,4 +222,40 @@ public class StorageServiceImp implements StorageService {
         }
         return convertedFile;
     }
+
+    @Override
+    public byte[] updatePolicyImage(Long pid, MultipartFile file) {
+    	accessConService.checkEmployeeAccess();
+        Policy policy = policyRepository.findById(pid).orElseThrow(() -> new UserException("Policy not found"));
+
+
+        Image existingImage = policy.getImage();
+        if (existingImage != null && existingImage.getCloudImageName() != null) {
+            // Ensure cloud image name exists before trying to delete
+            deleteFromS3(existingImage.getCloudImageName());
+            
+            // Remove the existing image from the policy and repository
+            policy.setImage(null);
+            imageRepository.delete(existingImage);
+        }
+
+        File fileObj = convertMultiPartFileToFile(file);
+        String newFileName = System.currentTimeMillis() + "_" + pid + "_" + file.getOriginalFilename();
+        uploadDocToS3(fileObj, newFileName);
+
+        Image newImage = new Image();
+        newImage.setCloudImageName(newFileName);
+        List<Policy> policyList = new ArrayList<>();
+        policyList.add(policy);
+        newImage.setPolicies(policyList);
+        newImage = imageRepository.save(newImage);
+
+
+        policy.setImage(newImage);
+        policyRepository.save(policy);
+
+        return downloadFromS3(newFileName);
+    }
+
+    
 }

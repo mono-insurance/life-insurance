@@ -48,6 +48,11 @@ import { DeleteCity } from './components/adminDashboard/DeleteCity/DeleteCity';
 import { AddAdmin } from './components/adminDashboard/AddAdmin/AddAdmin';
 import { UpdateQuery } from './components/adminDashboard/UpdateQuery/UpdateQuery';
 import { DeleteQuery } from './components/adminDashboard/DeleteQuery/DeleteQuery';
+import { ViewPolicy } from './components/adminDashboard/ViewPolicy/ViewPolicy';
+import { UpdatePolicy } from './components/adminDashboard/UpdatePolicy/UpdatePolicy';
+import { DeletePolicy } from './components/adminDashboard/DeletePolicy/DeletePolicy';
+import { UpdateEmployee } from './components/adminDashboard/UpdateEmployee/UpdateEmployee';
+import { DeleteEmployee } from './components/adminDashboard/DeleteEmployee/DeleteEmployee';
 
 function App() {
 
@@ -108,6 +113,11 @@ function App() {
             <Route path='/admin/city/:id/delete/:cityId' element={<DeleteCity />}></Route>
             <Route path='/admin/query/:id/edit/:queryId' element={<UpdateQuery />}></Route>
             <Route path='/admin/query/:id/delete/:queryId' element={<DeleteQuery />}></Route>
+            <Route path='/admin/policy/:id/view/:policyId' element={<ViewPolicy />}></Route>
+            <Route path='/admin/policy/:id/edit/:policyId' element={<UpdatePolicy />}></Route>
+            <Route path='/admin/policy/:id/delete/:policyId' element={<DeletePolicy />}></Route>
+            <Route path='/admin/employee/:id/edit/:employeeId' element={<UpdateEmployee />}></Route>
+            <Route path='/admin/employee/:id/delete/:employeeId' element={<DeleteEmployee />}></Route>
 
           </Route>
 

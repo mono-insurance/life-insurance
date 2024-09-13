@@ -1,18 +1,20 @@
 import React, { useState, useEffect, createRef } from 'react';
 import { AreaTop } from '../../../sharedComponents/Title/Title';
-import './addPolicy.scss';
 import { errorToast, successToast } from '../../../utils/helper/toast';
-import { ToastContainer } from 'react-toastify';
 import { useParams } from 'react-router-dom';
-import { createNewPolicy, fetchListOfActiveInsuranceCategories, fetchListOfAllDocuments } from '../../../services/AdminServices';
+import { ToastContainer } from 'react-toastify';
+import { updatePolicy, getPolicyById, fetchListOfActiveInsuranceCategories, fetchListOfAllDocuments, getPolicyImage, uploadNewPolicyImage } from '../../../services/AdminServices';
 import { validateForm } from '../../../utils/validations/Validations';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
 
-export const AddPolicy = () => {
-  const routeParams = useParams();
-  
+export const UpdatePolicy = () => {
+  const { id, policyId } = useParams(); // Get policyId from the URL parameters
   const [investmentTypes, setInvestmentTypes] = useState([]);
   const [documents, setDocuments] = useState([]);
+  const [imageSrc, setImageSrc] = useState(null);
+  const [newImageUploaded, setNewImageUploaded] = useState(false);
+  const [file, setFile] = useState(null);
+  const fileInputRef = createRef();
   const [formState, setFormState] = useState({
     policyName: '',
     commissionNewRegistration: '',
@@ -27,39 +29,70 @@ export const AddPolicy = () => {
     eligibleGender: 'both',
     insuranceTypeId: '',
     profitRatio: '',
-    file: '',
     isActive: true,
     documentsNeeded: []
   });
 
-  const fileInputRef = createRef();
-
+  // Fetch policy details and associated data (investment types and documents)
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchPolicyAndData = async () => {
       try {
+        const policyResponse = await getPolicyById(policyId);
+
+
+        setFormState({
+          policyName: policyResponse.policyName || '',
+          commissionNewRegistration: policyResponse.commissionNewRegistration || '',
+          commissionInstallment: policyResponse.commissionInstallment || '',
+          description: policyResponse.description || '',
+          minPolicyTerm: policyResponse.minPolicyTerm || '',
+          maxPolicyTerm: policyResponse.maxPolicyTerm || '',
+          minAge: policyResponse.minAge || '',
+          maxAge: policyResponse.maxAge || '',
+          minInvestmentAmount: policyResponse.minInvestmentAmount || '',
+          maxInvestmentAmount: policyResponse.maxInvestmentAmount || '',
+          eligibleGender: policyResponse.eligibleGender || 'both',
+          insuranceTypeId: policyResponse.insuranceTypeId || '',
+          profitRatio: policyResponse.profitRatio || '',
+          isActive: policyResponse.isActive,
+          documentsNeeded: policyResponse.documentsNeeded || []
+        });
+
+        console.log(policyResponse);
+
         const investmentTypesData = await fetchListOfActiveInsuranceCategories();
         const documentsNeededData = await fetchListOfAllDocuments();
+        const image = await getPolicyImage(policyId);
+
         setInvestmentTypes(investmentTypesData);
         setDocuments(documentsNeededData);
+        const imageUrl = URL.createObjectURL(image);
+        setImageSrc(imageUrl);
       } catch (error) {
-        errorToast('Error fetching data');
+        errorToast('Error fetching policy details or related data.');
       }
     };
-    fetchData();
-  }, []);
+
+    fetchPolicyAndData();
+  }, [policyId]);
 
   const handleChange = (event) => {
+    const { name, value } = event.target;
     setFormState({
       ...formState,
-      [event.target.name]: event.target.value,
+      [name]: value,
     });
   };
 
   const handleFileChange = (event) => {
-    setFormState({
-      ...formState,
-      [event.target.name]: event.target.files[0], // Handling file input
-    });
+    console.log("coming here or not for file");
+    const selectedFile = event.target.files[0];
+    setFile(selectedFile);
+  
+    if (selectedFile) {
+      setImageSrc(URL.createObjectURL(selectedFile));
+      setNewImageUploaded(true); // Flag to mark that a new image was uploaded
+    }
   };
 
   const handleDocumentSelect = (documentId) => {
@@ -77,37 +110,30 @@ export const AddPolicy = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      // const formErrors = validateForm(formState);
+    //   const formErrors = validateForm(formState);
 
-      // if (Object.keys(formErrors).length > 0) {
-      //   Object.values(formErrors).forEach((errorMessage) => {
-      //     errorToast(errorMessage);
-      //   });
-      //   return;
-      // }
+    //   if (Object.keys(formErrors).length > 0) {
+    //     Object.values(formErrors).forEach((errorMessage) => {
+    //       errorToast(errorMessage);
+    //     });
+    //     return;
+    //   }
 
-      await createNewPolicy(formState);
-      successToast("Policy created successfully!");
-      
-      setFormState({
-        policyName: '',
-        commissionNewRegistration: '',
-        commissionInstallment: '',
-        description: '',
-        minPolicyTerm: '',
-        maxPolicyTerm: '',
-        minAge: '',
-        maxAge: '',
-        minInvestmentAmount: '',
-        maxInvestmentAmount: '',
-        eligibleGender: 'both',
-        investmentTypeId: '',
-        profitRatio: '',
-        file: '',
-        isActive: true,
-        documentsNeeded: []
-      });
+      // Update the policy with new details
+      await updatePolicy(policyId, formState);
+      successToast("Policy updated successfully!");
 
+      if (newImageUploaded && file) {
+        console.log("coming here or not");
+        try {
+          await uploadNewPolicyImage(policyId, file);
+          successToast("Policy Image updated successfully!");
+
+        } catch (imageError) {
+          errorToast('Failed to upload new image.');
+          return;
+        }
+      }
     } catch (error) {
       errorToast("An error occurred. Please try again.");
     }
@@ -115,15 +141,13 @@ export const AddPolicy = () => {
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={"Create New Policy"} pagePath={"Create-Policy"} pageLink={`/admin/dashboard/${routeParams.id}`} />
+      <AreaTop pageTitle={`Update Policy ${policyId}`} pagePath={"Update-Policy"} pageLink={`/admin/get-policy/${id}`} />
       <section className="content-area-form">
         <form className="policy-form" onSubmit={handleSubmit}>
-            <label className="form-label">
-              Policy Name:<span className="text-danger"> *</span>
-              <input type="text" name="policyName" value={formState.policyName} onChange={handleChange} className="form-input" placeholder="Enter Policy Name" required />
-            </label>
-
-          
+          <label className="form-label">
+            Policy Name:<span className="text-danger"> *</span>
+            <input type="text" name="policyName" value={formState.policyName} onChange={handleChange} className="form-input" placeholder="Enter Policy Name" required />
+          </label>
 
           <div className="form-row">
             <label className="form-label">
@@ -131,7 +155,7 @@ export const AddPolicy = () => {
                 <span>Commission (Registration):</span>
                 <span className="text-danger"> *</span>
               </div>
-              <input type="number" name="commissionNewRegistration" value={formState.commissionRegistration} onChange={handleChange} className="form-input" placeholder="Enter Registration Commission" required />
+              <input type="number" name="commissionNewRegistration" value={formState.commissionNewRegistration} onChange={handleChange} className="form-input" placeholder="Enter Registration Commission" required />
             </label>
             <label className="form-label">
               <div className="label-container">
@@ -217,22 +241,12 @@ export const AddPolicy = () => {
                 <span className="text-danger"> *</span>
               </div>
               <select name="insuranceTypeId" value={formState.insuranceTypeId} onChange={handleChange} className="form-input" required>
-                {investmentTypes.map(type => (
+                {investmentTypes.map((type) => (
                   <option key={type.typeId} value={type.typeId}>{type.insuranceCategory}</option>
                 ))}
               </select>
             </label>
           </div>
-
-          <label className="form-label">
-            Profit Ratio:<span className="text-danger"> *</span>
-            <input type="number" name="profitRatio" value={formState.profitRatio} onChange={handleChange} className="form-input" placeholder="Profit Ratio" required />
-          </label>
-
-          <label className="form-label">
-            Policy Image:<span className="text-danger"> *</span>
-            <input type="file" name="file" onChange={handleFileChange} className="form-input" ref={fileInputRef} required />
-          </label>
 
           <label className="form-label">
             Documents Needed:<span className="text-danger"> *</span>
@@ -254,10 +268,47 @@ export const AddPolicy = () => {
             </div>
           </label>
 
-          <button type="submit" className="form-submit">Submit</button>
+          <div className="form-row">
+            <label className="form-label">
+              <div className="label-container">
+                <span>Profit Ratio (%):</span>
+                <span className="text-danger"> *</span>
+              </div>
+              <input type="number" name="profitRatio" value={formState.profitRatio} onChange={handleChange} className="form-input" placeholder="Profit Ratio" required />
+            </label>
+
+            <label className="form-label">
+                <div className="label-container">
+                    <span>Is Active:</span>
+                    <span className="text-danger"> *</span>
+                </div>
+                <select 
+                name="isActive" 
+                value={String(formState.isActive)}  // Ensure value is passed as string
+                onChange={handleChange} 
+                className="form-input" 
+                required
+                >
+                <option value="true">True</option>
+                <option value="false">False</option>
+                </select>
+            </label>
+
+            
+          </div>
+
+          <label className="form-label">
+              Upload Policy Image:
+              <input type="file" name="file" onChange={handleFileChange} className="form-input" ref={fileInputRef} />
+              {imageSrc && <img src={imageSrc} alt="Document" style={{ width: '100%' }} />}
+            </label>
+          
+
+          <button type="submit" className="form-submit">Update Policy</button>
         </form>
+
+        <ToastContainer  position="bottom-right"/>
       </section>
-      <ToastContainer position="bottom-right" />
     </div>
   );
 };

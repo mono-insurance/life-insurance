@@ -129,4 +129,6 @@ public interface DtoService {
 
 	AdminCreationDTO converAdminToAdminCreationDTO(Admin updatedAdmin);
 
+	EmployeeCreationDTO convertEmployeeToEmployeeCreationDTO(Employee existingEmployee);
+
 }

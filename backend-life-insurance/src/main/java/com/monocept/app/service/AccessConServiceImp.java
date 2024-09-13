@@ -88,7 +88,7 @@ public class AccessConServiceImp implements AccessConService{
     public void checkEmployeeAdminAccess(Long employeeId) {
         CustomUserDetails customUserDetails=checkUserAccess();
         String userRole= getUserRole();
-        if(!(userRole.equals("ROLE_ADMIN") || customUserDetails.getId().equals(employeeId))){
+        if(!(userRole.equals("ADMIN") || customUserDetails.getId().equals(employeeId))){
             throw new RoleAccessException("you don't have access");
         }
     }

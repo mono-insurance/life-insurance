@@ -76,7 +76,7 @@ public class PolicyDTO {
 
     private List<PolicyAccountDTO> policyAccounts;
 
-    private List<DocumentNeededDTO> documentsNeeded;
+    private List<String> documentsNeeded;
 
     @NotNull(message = "Insurance type ID is mandatory")
     private Long insuranceTypeId;

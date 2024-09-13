@@ -5,6 +5,7 @@ import com.monocept.app.dto.*;
 import com.monocept.app.entity.*;
 import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.*;
+import com.monocept.app.utils.DocumentType;
 import com.monocept.app.utils.GlobalSettings;
 import com.monocept.app.utils.PagedResponse;
 
@@ -301,7 +302,12 @@ public class AdminServiceImp implements AdminService {
         if (policyDTO.getDocumentsNeeded() != null) {
 
             existingPolicy.setDocumentsNeeded(policyDTO.getDocumentsNeeded().stream()
-                    .map(dtoService::convertDocumentNeededDtoToEntity)
+            		.map(documentName -> {
+            			DocumentType documentType = DocumentType.valueOf(documentName.toUpperCase());
+            			DocumentNeeded documentNeeded = documentNeededRepository.findByDocumentType(documentType)
+                                .orElseThrow(() -> new UserException("DocumentNeeded not found with name " + documentName));
+                        return documentNeeded;
+                    })
                     .collect(Collectors.toList()
                     ));
         }

@@ -25,6 +25,7 @@ export const GetEmployees = () => {
   const [active, setActive] = useState('');
   const [showPagination, setShowPagination] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
+  const { id: adminId } = useParams();
   const filterOptions = [
     { label: 'Search by Employee Id', value: 'id' },
     { label: 'Search by Active', value: 'active' },
@@ -64,10 +65,9 @@ export const GetEmployees = () => {
     setSearchParams({});
   };
 
-  const actions = (id) => [
-    { name: "View", url: `/employee/view/${id}` },
-    { name: "Edit", url: `/employee/edit/${id}` },
-    { name: "Delete", url: `/employee/delete/${id}` }
+  const actions = (employeeId) => [
+    { name: "Edit", url: `/admin/employee/${adminId}/edit/${employeeId}` },
+    { name: "Delete", url: `/admin/employee/${adminId}/delete/${employeeId}` }
   ];
   
 
