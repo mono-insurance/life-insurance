@@ -1,58 +1,59 @@
-  .login-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 20px;
-    flex-grow: 1;
-  }
-  
-  .login-container label {
-    width: 100%;
-    text-transform: uppercase;
-    font-weight: 900;
-    color: var(--logo-color);
-    margin-bottom: 8px;
-  }
-  
-  .login-container input[type="text"], .login-container input[type="password"] {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 30px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-  }
-  
-  .login-container .registerbtn {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: var(--primary-color);
-    color: white;
-    cursor: pointer;
-    transition: var(--default-transition);
-  }
-  
-  .login-container .registerbtn:hover {
-    background-color: var(--side-link-hover-color);
-    color: var(--side-text-color);
-  }
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 100px;
+  width: 100%;
+  padding: 20px;
+  flex-grow: 1;
+}
+
+.login-container label {
+  width: 20%;
+  text-transform: uppercase;
+  font-weight: 900;
+  color: var(--logo-color);
+  margin-bottom: 8px;
+}
+
+.login-container input[type="text"], .login-container input[type="password"] {
+  width: 20%;
+  padding: 10px;
+  margin-bottom: 30px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.login-container .registerbtn {
+  width: 20%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--primary-color);
+  color: white;
+  cursor: pointer;
+  transition: var(--default-transition);
+}
+
+.login-container .registerbtn:hover {
+  background-color: var(--side-link-hover-color);
+  color: var(--side-text-color);
+}
 
 
-  .custom-modal .modal-dialog {
-    max-width: 600px; /* Adjust width as needed */
+.custom-modal .modal-dialog {
+  max-width: 600px; /* Adjust width as needed */
 }
 
 .custom-modal .modal-body {
-    padding: 2rem; /* Increase padding for more space inside the modal */
+  padding: 2rem; /* Increase padding for more space inside the modal */
 }
 
 .custom-modal .form-group {
-    margin-bottom: 1.5rem; /* Increase space between form elements */
+  margin-bottom: 1.5rem; /* Increase space between form elements */
 }
 
 .custom-modal .form-control {
-    margin-bottom: 0.5rem; /* Add some space below each input field */
+  margin-bottom: 0.5rem; /* Add some space below each input field */
 }

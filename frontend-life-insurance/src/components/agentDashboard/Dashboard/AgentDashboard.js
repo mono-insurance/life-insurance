@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { AreaTop } from '../../../sharedComponents/Title/Title'
 import { Card } from '../../../sharedComponents/Card/Card'
-import './dashboard.scss';
+import './AgentDashboard.scss';
 import { errorToast } from '../../../utils/helper/toast';
 import { ToastContainer } from 'react-toastify';
 import { Table } from '../../../sharedComponents/Table/Table';
@@ -9,13 +9,11 @@ import { PaginationContext } from '../../../context/PaginationContext';
 import { ProgressBar } from '../../../sharedComponents/ProgressBar/ProgresBar';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { covertIdDataIntoTable, formatRoleForTable } from '../../../services/SharedServices';
-import { getAllUsers, getAllUsersByCharacters, getSystemStats, getUserById } from '../../../services/AdminServices';
+import { getAllCustomers, getAllCustomersByCharacters, fetchAgentDashboard, getCustomerById } from '../../../services/AgentService';
 import { FilterButton } from '../../../sharedComponents/FilterButton/FilterButton';
-import { fetchEmployeeDashboard } from '../../../services/EmployeeServices';
 import { validateFirstName, validateUserId } from '../../../utils/validations/Validations';
-import { EmployeeDashboard } from '../../employeeDashboard/Dashboard/EmployeeDashboard';
 
-export const Dashboard = () => {
+export const AgentDashboard = () => {
   const [counts, setCounts] = useState({});
   const { currentPage, itemsPerPage, resetPagination, handlePageChange, handleItemsPerPageChange } = useContext(PaginationContext);
   const [data, setData] = useState({});
@@ -72,17 +70,17 @@ export const Dashboard = () => {
       let formattedData = [];
       if (filterType === 'firstName') {
         validateFirstName(firstName);
-        // response = await getAllUsersByCharacters(currentPage, itemsPerPage, firstName);
+        response = await getAllCustomersByCharacters(currentPage, itemsPerPage, firstName);
         formattedData = formatRoleForTable(response);
       }
       else if (filterType === 'id') {
         validateUserId(id);
-        // const data = await getUserById(id);
+        const data = await getCustomerById(id);
         response = covertIdDataIntoTable(data);
         formattedData = formatRoleForTable(response);
       }
       else {
-        // response = await getAllUsers(currentPage, itemsPerPage);
+        response = await getAllCustomers(currentPage, itemsPerPage);
         formattedData = formatRoleForTable(response);
       }
 
@@ -110,92 +108,61 @@ export const Dashboard = () => {
     return [
       {
         id: 1,
-        name: "Total policyAccounts",
-        percentValues: counts.policyAccounts,
-      },
-      {
-        id: 2,
-        name: "Total activePolicyAccounts",
-        percentValues: counts.activePolicyAccounts,
-      },
-      {
-        id: 3,
-        name: "Total inActivePolicyAccounts",
-        percentValues: counts.inActivePolicyAccounts,
-      },
-      {
-        id: 4,
         name: "Total withdrawals",
         percentValues: counts.withdrawals,
       },
       {
-        id: 5,
+        id: 2,
         name: "Total approvedWithdrawals",
         percentValues: counts.approvedWithdrawals,
       },
       {
-        id: 6,
+        id: 3,
         name: "Total notApprovedWithdrawals",
         percentValues: counts.notApprovedWithdrawals,
       },
+
       {
-        id: 7,
-        name: "Total agents",
-        percentValues: counts.agents,
-      },
-      {
-        id: 8,
-        name: "Total activeAgents",
-        percentValues: counts.activeAgents,
-      },
-      {
-        id: 9,
-        name: "Total inactiveAgents",
-        percentValues: counts.inactiveAgents,
-      },
-      {
-        id: 10,
+        id: 4,
         name: "Total allCommissions",
         percentValues: counts.allCommissions,
       },
 
       {
-        id: 11,
+        id: 5,
         name: "Total approvedCommissions",
         percentValues: counts.approvedCommissions,
       },
       {
-        id: 12,
+        id: 6,
         name: "Total notApprovedCommissions",
         percentValues: counts.notApprovedCommissions,
       },
       {
-        id: 13,
+        id: 7,
         name: "Total customers",
         percentValues: counts.customers,
       },
       {
-        id: 14,
+        id: 8,
         name: "Total activeCustomers",
         percentValues: counts.activeCustomers,
       },
       {
-        id: 15,
+        id: 9,
         name: "Total inactiveCustomers",
         percentValues: counts.inactiveCustomers,
       },
-      {
-        id: 16,
-        name: "Total notApprovedCustomers",
-        percentValues: counts.notApprovedCustomers,
-      },
+
     ];
   };
 
   useEffect(() => {
-    const fetchSystemCounts = async () => {
+    const fetchDashboard = async () => {
       try {
-        const response = await fetchEmployeeDashboard();
+        console.log("in fetchAgentDashboard")
+        const response = await fetchAgentDashboard();
+
         setCounts(response);
         console.log(response);
 
@@ -207,7 +174,7 @@ export const Dashboard = () => {
         }
       }
     };
-    fetchSystemCounts();
+    fetchDashboard();
   }, []);
 
   useEffect(() => {
@@ -265,26 +232,8 @@ export const Dashboard = () => {
 
   return (
     <>
-      <AreaTop pageTitle={"Admin Dashboard"} pagePath={"Dashboard"} pageLink={`/admin/dashboard/${routeParams.id}`} />
+      <AreaTop pageTitle={"Agent Dashboard"} pagePath={"Dashboard"} pageLink={`/agent/dashboard/${routeParams.id}`} />
       <section className="content-area-cards">
-        <Card
-          colors={["#e4e8ef", "#4ce13f"]}
-          percentFillValue={(counts.activePolicyAccounts / (counts.policyAccounts || 1)) * 100}
-          cardInfo={{
-            title: "activePolicyAccounts",
-            value: counts.activePolicyAccounts,
-            text: "activePolicyAccounts",
-          }}
-        />
-        <Card
-          colors={["#e4e8ef", "#f29a2e"]}
-          percentFillValue={(counts.inActivePolicyAccounts / (counts.totalCustomers || 1)) * 100}
-          cardInfo={{
-            title: "Inactive accounts",
-            value: counts.inActivePolicyAccounts,
-            text: "Current Inactive accounts",
-          }}
-        />
         <Card
           colors={["#e4e8ef", "#4ce13f"]}
           percentFillValue={(counts.approvedWithdrawals / (counts.withdrawals || 1)) * 100}
@@ -301,33 +250,6 @@ export const Dashboard = () => {
             title: "not approved withdrawals",
             value: counts.notApprovedWithdrawals,
             text: "not approved withdrawals",
-          }}
-        />
-        <Card
-          colors={["#e4e8ef", "#f29a2e"]}
-          percentFillValue={(counts.agents / (counts.agents || 1)) * 100}
-          cardInfo={{
-            title: "agents",
-            value: counts.agents,
-            text: "agents",
-          }}
-        />
-        <Card
-          colors={["#e4e8ef", "#f29a2e"]}
-          percentFillValue={(counts.activeAgents / (counts.agents || 1)) * 100}
-          cardInfo={{
-            title: "activeAgents",
-            value: counts.activeAgents,
-            text: "activeAgents",
-          }}
-        />
-        <Card
-          colors={["#e4e8ef", "#f29a2e"]}
-          percentFillValue={(counts.inactiveAgents / (counts.agents || 1)) * 100}
-          cardInfo={{
-            title: "inactiveAgents",
-            value: counts.inactiveAgents,
-            text: "inactiveAgents",
           }}
         />
         <Card
@@ -384,20 +306,11 @@ export const Dashboard = () => {
             text: "inactiveCustomers",
           }}
         />
-        <Card
-          colors={["#e4e8ef", "#f29a2e"]}
-          percentFillValue={(counts.notApprovedCustomers / (counts.customers || 1)) * 100}
-          cardInfo={{
-            title: "notApprovedCustomers",
-            value: counts.notApprovedCustomers,
-            text: "notApprovedCustomers",
-          }}
-        />
       </section>
       <section className="content-area-charts">
         <ProgressBar data={generateData()} />
       </section>
-      <section className="content-area-table">
+      {/* <section className="content-area-table">
         <div className="data-table-infor">
           <h3 className="data-table-title">All Users</h3>
           {showFilterButton && (
@@ -431,7 +344,7 @@ export const Dashboard = () => {
             showPagination={showPagination}
           />
         </div>
-      </section>
+      </section> */}
       <ToastContainer position="bottom-right" />
     </>
   )
