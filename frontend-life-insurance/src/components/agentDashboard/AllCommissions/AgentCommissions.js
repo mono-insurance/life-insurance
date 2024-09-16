@@ -108,7 +108,7 @@ export const AgentCommissions = () => {
 
     return (
         <div className='content-area'>
-            <AreaTop pageTitle={"Activate Agents"} pagePath={"Activate-Agents"} pageLink={`/employee/dashboard/${routeParams.id}`} />
+            <AreaTop pageTitle={"My commissions"} pagePath={"agent-commissions"} pageLink={`/agent/dashboard/${routeParams.id}`} />
             <section className='content-area-form'>
                 <div className="admin-form">
                     <div className="data-info">
