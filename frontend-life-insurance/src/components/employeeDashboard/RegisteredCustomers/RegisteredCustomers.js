@@ -74,7 +74,7 @@ export const RegisteredCustomers = () => {
 
     return (
         <div className='content-area'>
-            <AreaTop pageTitle={"Approve Customers"} pagePath={"Activate-Customers"} pageLink={`/admin/dashboard/${routeParams.id}`} />
+            <AreaTop pageTitle={"Registered Customers"} pagePath={"new-Customers"} pageLink={`/admin/dashboard/${routeParams.id}`} />
             <section className='content-area-form'>
                 <div className="admin-form">
                     <div className="data-info">

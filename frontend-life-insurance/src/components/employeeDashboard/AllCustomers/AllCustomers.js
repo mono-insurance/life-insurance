@@ -159,7 +159,7 @@ export const AllCustomers = () => {
     return (
         <>
             <div className='content-area-employees'>
-                <AreaTop pageTitle={"Get All Employees"} pagePath={"Employees"} pageLink={`/admin/dashboard/${routeParams.id}`} />
+                <AreaTop pageTitle={"All Customers"} pagePath={"Customers"} pageLink={`/admin/dashboard/${routeParams.id}`} />
                 <section className="content-area-table-employees">
                     <div className="admin-form">
                         <div className='activate-form'>
