@@ -149,8 +149,8 @@ export const AllAgents = () => {
                     </div>
                     <div className='activate-form'>
                         <form>
-                            <input type="number" name="agentId" value={agentId} onChange={(e) => setAgentId(e.target.value)} className="form-input-form" placeholder='Enter Customer ID' required />
-                            <button type="submit" className="form-submit-form" onClick={(event) => handleFormSubmit(event)}>Make Particular Customer {showActiveAgents ? 'Inactive' : 'Active'}</button>
+                            <input type="number" name="agentId" value={agentId} onChange={(e) => setAgentId(e.target.value)} className="form-input-form" placeholder='Enter Agent ID' required />
+                            <button type="submit" className="form-submit-form" onClick={(event) => handleFormSubmit(event)}>{showActiveAgents ? 'Delete' : 'Activate'} Agent</button>
                         </form>
                     </div>
 

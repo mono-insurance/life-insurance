@@ -215,7 +215,7 @@ export const getAllActiveCustomers = async (formData) => {
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
-        return response;
+        return response.data;
     }
     catch (error) {
         throw error;
@@ -660,7 +660,7 @@ export const makeAllRequestsCustomerActivate = async () => {
 export const activateParticularCustomer = async (customerId) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.put(`http://localhost:8080/suraksha/employee/employee/users/${customerId}/activate`, {}, {
+        const response = await axios.post(`http://localhost:8080/suraksha/employee/activate-customer/${customerId}`, {}, {
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
 

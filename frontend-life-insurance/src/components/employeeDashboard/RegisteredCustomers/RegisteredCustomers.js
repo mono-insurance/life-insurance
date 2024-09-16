@@ -78,7 +78,7 @@ export const RegisteredCustomers = () => {
             <section className='content-area-form'>
                 <div className="admin-form">
                     <div className="data-info">
-                        <h3 className="data-table-title">Add new Customers</h3>
+                        <h3 className="data-table-title">New Registered Customers</h3>
                     </div>
                     <div className='activate-form'>
                         <form>

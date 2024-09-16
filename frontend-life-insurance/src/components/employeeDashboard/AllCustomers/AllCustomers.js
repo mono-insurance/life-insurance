@@ -13,6 +13,7 @@ import { ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useSearchParams } from 'react-router-dom';
 import { covertIdDataIntoTable } from '../../../services/SharedServices';
+import { FilterButton } from '../../../sharedComponents/FilterButton/FilterButton';
 
 export const AllCustomers = () => {
     const navigate = useNavigate()
@@ -31,9 +32,25 @@ export const AllCustomers = () => {
     const [active, setActive] = useState('');
     const [showPagination, setShowPagination] = useState(true);
     const [searchParams, setSearchParams] = useSearchParams();
-    const { currentPage, itemsPerPage, resetPagination, handleItemsPerPageChange, handlePageChange } = 
-    useContext(PaginationContext);
+    const { currentPage, itemsPerPage, resetPagination, handleItemsPerPageChange, handlePageChange } =
+        useContext(PaginationContext);
+    const [showFilterButton, setShowFilterButton] = useState(true);
 
+    const filterOptions = [
+        { label: 'Search by Employee Id', value: 'id' },
+        { label: 'Search by Active', value: 'active' },
+        { label: 'Search by Inactive', value: 'inactive' }
+    ];
+    const handleReset = () => {
+        setFilterType('');
+        setId('');
+        setActive('');
+        setShowFilterButton(true);
+        resetPagination();
+        setFilter(false);
+        setShowPagination(true);
+        setSearchParams({});
+    };
 
 
     const handleFormSubmit = async (e) => {
@@ -55,6 +72,7 @@ export const AllCustomers = () => {
                 successToast("Customer has been deleted successfully!");
                 setCustomerId('');
             }
+            customerTable()
 
 
         }
@@ -66,10 +84,10 @@ export const AllCustomers = () => {
             }
         }
     }
-    const handleCustomerClicked = (customer) => [
-        { name: "View", url: `/employee/view/${customer.id}` },
-        { name: "Edit", url: `/employee/edit/${customer.id}` },
-        { name: "Delete", url: `/employee/delete/${customer.id}` }
+    const actions = (customerId) => [
+        { name: "View", url: `/employee/view/${customerId}` },
+        { name: "Edit", url: `/employee/edit/${customerId}` },
+        { name: "Delete", url: `/employee/delete/${customerId}` }
     ]
     const handleSearch = () => {
         resetPagination();
@@ -80,10 +98,12 @@ export const AllCustomers = () => {
         if (filterType === 'active') {
             setSearchParams({ filterType, active, currentPage, itemsPerPage });
             setShowPagination(true);
+            setShowActiveCustomers(true)
         }
         if (filterType === 'inactive') {
             setSearchParams({ filterType, active, currentPage, itemsPerPage });
             setShowPagination(true);
+            setShowActiveCustomers(false)
         }
         if (filter === false) {
             setFilter(true);
@@ -112,6 +132,7 @@ export const AllCustomers = () => {
                 response = covertIdDataIntoTable(data);
             }
             else {
+                console.log("in default customers ")
                 response = await getAllActiveCustomers(formData);
             }
 
@@ -127,149 +148,94 @@ export const AllCustomers = () => {
             }
         }
     };
-    const handleActivateCustomers = async (e) => {
-        e.preventDefault();
-        try {
 
-            const response = await makeAllRequestsCustomerActivate();
-
-            console.log(response);
-            setData(response?.data ?? []);
-            setNewlyActivated(true);
-
-        }
-        catch (error) {
-            if (error.response?.data?.message || error.specificMessage) {
-                errorToast(error.response?.data?.message || error.specificMessage);
-            } else {
-                errorToast("An error occurred while Activating customers.");
-            }
-        }
-    };
-
-
-    const fetchActiveCustomers = async () => {
-        try {
-            const formData = {
-                pageNo: 0,
-                size: 10,
-                sort: 'ASC',
-            }
-            const response = await getAllActiveCustomers(formData);
-            console.log("in active customer click", response?.data.content ?? [])
-            setData(response?.data ?? []);
-            console.log("data in response", data)
-
-            setKeysToBeIncluded(["customerId", "firstName", "dateOfBirth", "nomineeName", "nomineeRelation"]);
-            setShowActiveCustomers(true);
-            setShowInactiveCustomers(false);
-        }
-        catch (error) {
-            setData([]);
-            if (error.response?.data?.message || error.specificMessage) {
-                errorToast(error.response?.data?.message || error.specificMessage);
-            } else {
-                errorToast("An error occurred while Activating customers.");
-            }
-        }
-    }
-
-    const fetchInactiveCustomers = async () => {
-        try {
-            const formData = {
-                pageNo: 0,
-                size: 10,
-                sort: 'ASC',
-            }
-            const response = await getAllInactiveCustomers(formData);
-            console.log("fetchInactiveCustomers ", response)
-            setData(response?.data ?? []);
-            console.log("fetchInactiveCustomers is in data", data)
-
-            setKeysToBeIncluded(["customerId", "firstName", "dateOfBirth", "nomineeName", "nomineeRelation", "Edit"]);
-            setShowInactiveCustomers(true);
-            setShowActiveCustomers(false);
-        }
-        catch (error) {
-            setData([]);
-            if (error.response?.data?.message || error.specificMessage) {
-                errorToast(error.response?.data?.message || error.specificMessage);
-            } else {
-                errorToast("An error occurred while Activating customers.");
-            }
-        }
-    }
 
 
     useEffect(() => {
-        if (showActiveCustomers) {
-            fetchActiveCustomers();
-        }
-        if (showInactiveCustomers) {
-            fetchInactiveCustomers();
-        }
-        console.log("data in checking is", data)
-    }, [currentPage, itemsPerPage]);
+        customerTable()
+    }, [filter, currentPage, itemsPerPage, searchParams]);
 
-
-    useEffect(() => {
-        resetPagination();
-    }, []);
-
-    useEffect(() => {
-        resetPagination();
-    }, [showActiveCustomers, showInactiveCustomers]);
 
     return (
-        <div className='content-area'>
-            <AreaTop pageTitle={"Activate Customers"} pagePath={"Activate-Customers"} pageLink={`/employee/dashboard/${routeParams.id}`} />
-            <section className='content-area-form'>
-                <div className="admin-form">
-                    <div className="data-info">
-                        <h3 className="data-table-title">Make Activate</h3>
-                        <div className="buttons-container">
-                            <button type="submit" className="form-submit" onClick={fetchActiveCustomers}>Get All Active Customers</button>
-                            <button type="submit" className="form-submit" onClick={fetchInactiveCustomers}>Get All Inactive Customers</button>
+        <>
+            <div className='content-area-employees'>
+                <AreaTop pageTitle={"Get All Employees"} pagePath={"Employees"} pageLink={`/admin/dashboard/${routeParams.id}`} />
+                <section className="content-area-table-employees">
+                    <div className="admin-form">
+                        <div className='activate-form'>
+                            <form>
+                                <input type="number" name="customerId" value={customerId} onChange={(e) => setCustomerId(e.target.value)} className="form-input-form" placeholder='Enter Customer ID' required />
+                                <button type="submit" className="form-submit-form" onClick={(event) => handleFormSubmit(event)}>{showActiveCustomers ? 'Delete' : 'Activate'} Customer</button>
+                            </form>
+
                         </div>
                     </div>
-                    <div className='activate-form'>
-                        <form>
-                            <input type="number" name="customerId" value={customerId} onChange={(e) => setCustomerId(e.target.value)} className="form-input-form" placeholder='Enter Customer ID' required />
-                            <button type="submit" className="form-submit-form" onClick={(event) => handleFormSubmit(event)}>Make Particular Customer {showActiveCustomers ? 'Inactive' : 'Active'}</button>
-                        </form>
-                        <h3 className='or-divider'>OR</h3>
-                    </div>
-                    <div className="deactivate-button-container">
-                        <button type="submit" className="form-submit-deactivation" onClick={(event) => handleActivateCustomers(event)}>
-                            Activate All the Customers who have made the requests
-                        </button>
-                    </div>
+                    <div className="data-table-information">
+                        <h3 className="data-table-title">Employees</h3>
 
-                    {newlyActivated && (
-                        <div className="deactivate-success">
-                            {activatedData}
-                        </div>
-                    )}
-                </div>
-            </section>
-
-            {(showActiveCustomers || showInactiveCustomers) && (
-                <section className="content-area-table">
-                    <div className="data-table-info">
-                        <h3 className="data-table-title">{showActiveCustomers ? 'Active Customers' : 'Inactive Customers'}</h3>
+                        {showFilterButton && (
+                            <FilterButton setShowFilterButton={setShowFilterButton} showFilterButton={showFilterButton} filterOptions={filterOptions} setFilterType={setFilterType} />
+                        )}
+                        {(filterType === 'active' || filterType === 'inactive' || filterType === 'id') && (
+                            <div className="filter-container">
+                                {filterType === 'id' && (
+                                    <div className="filter">
+                                        <input type="number" placeholder="Enter Employee Id" className="form-input" name={id} value={id} onChange={(e) => setId(e.target.value)} />
+                                    </div>
+                                )}
+                                <div className="filter-buttons">
+                                    <button className="form-submit-b" onClick={handleSearch}>Search</button>
+                                    <button className="form-submit-b" onClick={handleReset}>Clear</button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <div className="data-table-diagram">
                         <Table
                             data={data}
                             keysToBeIncluded={keysToBeIncluded}
                             includeButton={true}
-                            handleButtonClick={handleCustomerClicked}
+                            handleButtonClick={actions}
                             showPagination={showPagination}
                         />
                     </div>
                 </section>
-            )}
+
+            </div>
             <ToastContainer position="bottom-right" />
-        </div>
+        </>
+        // <div className='content-area'>
+        //     <AreaTop pageTitle={"Activate Customers"} pagePath={"Activate-Customers"} pageLink={`/employee/dashboard/${routeParams.id}`} />
+        //     <section className='content-area-form'>
+        //         <div className="admin-form">
+
+
+        //             {newlyActivated && (
+
+        //                 <div className="deactivate-success">
+        //                     {activatedData}
+        //                 </div>
+        //             )}
+        //         </div>
+        //     </section>
+
+        //     {(showActiveCustomers || showInactiveCustomers) && (
+        //         <section className="content-area-table">
+        //             <div className="data-table-info">
+        //                 <h3 className="data-table-title">{showActiveCustomers ? 'Active Customers' : 'Inactive Customers'}</h3>
+        //             </div>
+        //             <div className="data-table-diagram">
+        //                 <Table
+        //                     data={data}
+        //                     keysToBeIncluded={keysToBeIncluded}
+        //                     includeButton={true}
+        //                     handleButtonClick={handleCustomerClicked}
+        //                     showPagination={showPagination}
+        //                 />
+        //             </div>
+        //         </section>
+        //     )}
+        //     <ToastContainer position="bottom-right" />
+        // </div>
     )
 }
