@@ -15,4 +15,8 @@ public interface AgentRepository extends JpaRepository<Agent,Long> {
     @Query("UPDATE Agent a SET a.balance = a.balance + :agentCommission WHERE a.agentId = :agentId")
     void updateAgentCommission(@Param("agentId") Long agentId, @Param("agentCommission") Double agentCommission);
 
+	long countByIsActiveTrue();
+
+	long countByIsActiveFalse();
+
 }

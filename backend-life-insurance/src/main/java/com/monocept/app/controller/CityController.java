@@ -1,5 +1,7 @@
 package com.monocept.app.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.monocept.app.dto.CityDTO;
-import com.monocept.app.dto.StateDTO;
 import com.monocept.app.service.CityService;
 import com.monocept.app.utils.PagedResponse;
 
@@ -99,6 +100,17 @@ public class CityController {
     public ResponseEntity<PagedResponse<CityDTO>> getAllActivatedCitiesByStateId(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "cityId") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction, @PathVariable(name = "id") Long id) {
 
         PagedResponse<CityDTO> cities = cityService.getAllActivatedCitiesByStateId(page, size, sortBy, direction, id);
+
+        return new ResponseEntity<>(cities, HttpStatus.OK);
+
+    }
+    
+    
+    @Operation(summary = "By All: Get All Activated Cities by State Id")
+    @GetMapping("/all/active/state")
+    public ResponseEntity<List<CityDTO>> getListOfAllActiveCitiesByState(@RequestParam String stateName) {
+
+    	List<CityDTO> cities = cityService.getListOfAllActiveCitiesByState(stateName);
 
         return new ResponseEntity<>(cities, HttpStatus.OK);
 

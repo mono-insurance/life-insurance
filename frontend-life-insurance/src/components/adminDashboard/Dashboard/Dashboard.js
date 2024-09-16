@@ -113,23 +113,23 @@ export const Dashboard = () => {
         },
         {
           id: 2,
-          name: "Total Requests",
-          percentValues: counts.totalCompletedRequests,
+          name: "Total Customers",
+          percentValues: counts.totalCustomers,
         },
         {
           id: 3,
-          name: "Total Accounts",
-          percentValues: counts.totalAccounts,
+          name: "Total Agents",
+          percentValues: counts.totalAgents,
         },
         {
           id: 4,
-          name: "Total Completed Requests",
-          percentValues: counts.totalCompletedRequests,
+          name: "Total Employees",
+          percentValues: counts.totalEmployees,
         },
         {
           id: 5,
-          name: "Total Requests",
-          percentValues: (counts.totalCompletedRequests + counts.totalAccountPendingRequests + counts.totalCustomerPendingRequests),
+          name: "Total Users",
+          percentValues: (counts.totalAdmins + counts.totalCustomers + counts.totalAgents + counts.totalEmployees),
         },
       ];
     };
@@ -137,8 +137,7 @@ export const Dashboard = () => {
     useEffect(() => {
       const fetchSystemCounts = async () => {
         try {
-            // const response = await getSystemStats();
-            const response = {};
+            const response = await getSystemStats();
             setCounts(response);
             console.log(response);
 
@@ -220,6 +219,25 @@ export const Dashboard = () => {
           }}
         />
         <Card
+          // colors={["#e4e8ef", "#475be8"]}
+          colors={["#e4e8ef", "#4ce13f"]}
+          percentFillValue={(counts.totalActiveAgents / (counts.totalAgents || 1)) * 100} 
+          cardInfo={{
+            title: "Active Agents",
+            value: counts.totalActiveAgents,
+            text: "Current Active agents",
+          }}
+        />
+        <Card
+          colors={["#e4e8ef", "#4ce13f"]}
+          percentFillValue={(counts.totalActiveEmployees / (counts.totalEmployees || 1)) * 100} 
+          cardInfo={{
+            title: "Active Emloyees",
+            value: counts.totalActiveEmployees,
+            text: "Current Active employees",
+          }}
+        />
+        <Card
           colors={["#e4e8ef", "#f29a2e"]}
           percentFillValue={(counts.totalInactiveCustomers / (counts.totalCustomers || 1)) * 100} 
           cardInfo={{
@@ -229,39 +247,21 @@ export const Dashboard = () => {
           }}
         />
         <Card
-          colors={["#e4e8ef", "#475be8"]}
-          percentFillValue={(counts.totalCustomerPendingRequests / ((counts.totalAccountPendingRequests+counts.totalCustomerPendingRequests) || 1)) * 100} 
+          colors={["#e4e8ef", "#f29a2e"]}
+          percentFillValue={(counts.totalInactiveAgents / (counts.totalAgents || 1)) * 100} 
           cardInfo={{
-            title: "Customers Requests",
-            value: counts.totalCustomerPendingRequests,
-            text: "New requests for customers",
-          }}
-        />
-        <Card
-          colors={["#e4e8ef", "#4ce13f"]}
-          percentFillValue={(counts.totalActiveAccounts / (counts.totalAccounts || 1)) * 100} 
-          cardInfo={{
-            title: "Active Accounts",
-            value: counts.totalActiveAccounts,
-            text: "Current Active Accounts",
+            title: "Inactive Agents",
+            value: counts.totalInactiveAgents,
+            text: "Current Inactive agents",
           }}
         />
         <Card
           colors={["#e4e8ef", "#f29a2e"]}
-          percentFillValue={(counts.totalInactiveAccounts / (counts.totalAccounts || 1)) * 100} 
+          percentFillValue={(counts.totalInactiveEmployees / (counts.totalEmployees || 1)) * 100} 
           cardInfo={{
-            title: "Inactive Accounts",
-            value: counts.totalInactiveAccounts,
-            text: "Current Inactive Accounts",
-          }}
-        />
-        <Card
-          colors={["#e4e8ef", "#475be8"]}
-          percentFillValue={(counts.totalAccountPendingRequests / ((counts.totalAccountPendingRequests+counts.totalCustomerPendingRequests) || 1)) * 100} 
-          cardInfo={{
-            title: "Accounts Requests",
-            value: counts.totalAccountPendingRequests,
-            text: "New requests for accounts",
+            title: "Inactive Employees",
+            value: counts.totalInactiveEmployees,
+            text: "Current Inactive employees",
           }}
         />
       </section>

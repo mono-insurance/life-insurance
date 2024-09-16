@@ -8,6 +8,7 @@ import com.monocept.app.repository.*;
 import com.monocept.app.utils.DocumentType;
 import com.monocept.app.utils.GlobalSettings;
 import com.monocept.app.utils.PagedResponse;
+import com.monocept.app.dto.SystemCounts;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -44,6 +45,9 @@ public class AdminServiceImp implements AdminService {
 
     @Autowired
     private AuthRepository credentialsRepository;
+    
+    @Autowired
+    private CustomerRepository customerRepository;
 
 
     @Autowired
@@ -446,6 +450,38 @@ public class AdminServiceImp implements AdminService {
     private Agent findAgentById(Long agentId) {
         return agentRepository.findById(agentId).orElseThrow(() -> new UserException("agent not found"));
     }
+
+	@Override
+	public SystemCounts wholeSystemStats() {
+		try {
+			long totalActiveCustomers = customerRepository.countByIsActiveTrue();
+	        long totalInactiveCustomers = customerRepository.countByIsActiveFalse();
+	        long totalCustomers = customerRepository.count();
+	        long totalActiveAgents = agentRepository.countByIsActiveTrue();
+	        long totalInactiveAgents = agentRepository.countByIsActiveFalse();
+	        long totalAgents = agentRepository.count();
+	        long totalActiveEmployees = employeeRepository.countByIsActiveTrue();
+	        long totalInactiveEmployees = employeeRepository.countByIsActiveFalse();
+	        long totalEmployees = employeeRepository.count();
+	        long totalAdmins = adminRepository.count();
+	        
+	        return new SystemCounts(
+	                totalActiveCustomers,
+	                totalInactiveCustomers,
+	                totalActiveAgents,
+	                totalInactiveAgents,
+	                totalActiveEmployees,
+	                totalInactiveEmployees,
+	                totalAdmins,
+	                totalCustomers,
+	                totalAgents,
+	                totalEmployees
+	            );
+		}
+		catch(Exception e) {
+			throw new UserException("Error getting system stats");
+		}
+	}
 
 
 }

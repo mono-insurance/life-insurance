@@ -1,5 +1,6 @@
 package com.monocept.app.controller;
 
+import com.monocept.app.dto.CustomerCreationDTO;
 import com.monocept.app.dto.CustomerDTO;
 
 import com.monocept.app.service.CustomerService;
@@ -63,7 +64,6 @@ public class CustomerController {
     }
 
 
-    // no testing from here
 
 
     @Operation(summary = "By Customer: Make Policy Account when buy policy")
@@ -139,5 +139,23 @@ public class CustomerController {
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
         PagedResponse<WithdrawalRequestsDTO> allPolicyClaims = customerService.getAllPolicyClaimsApproved(pageNo, size, sort, sortBy, sortDirection);
         return new ResponseEntity<>(allPolicyClaims, HttpStatus.OK);
+    }
+    
+    
+    @Operation(summary = "By Customer: Get the customer profile")
+    @GetMapping("/customer/profile/{cid}")
+    public ResponseEntity<CustomerCreationDTO> getCustomerFullProfile(@PathVariable("cid") Long customerId) {
+
+    	CustomerCreationDTO customer = customerService.getCustomerFullProfile(customerId);
+        return new ResponseEntity<CustomerCreationDTO>(customer, HttpStatus.OK);
+    }
+    
+    
+    @Operation(summary = "By Customer: Update customer")
+    @PutMapping("")
+    public ResponseEntity<CustomerCreationDTO> updateCustomer(@RequestBody @Valid CustomerCreationDTO customerDTO) {
+
+    	CustomerCreationDTO customer = customerService.updateCustomer(customerDTO);
+        return new ResponseEntity<CustomerCreationDTO>(customer, HttpStatus.OK);
     }
 }

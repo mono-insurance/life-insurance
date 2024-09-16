@@ -11,9 +11,6 @@ import './App.scss';
 import { SecurityDashboard } from './components/securityDashboard/SecurityDashboard';
 import { Register } from './components/securityDashboard/Register/Register';
 import { CustomerDashboard } from './components/customerDashboard/CustomerDashboard';
-import { MakeTransactions } from './components/customerDashboard/MakeTransactions/MakeTransactions';
-import { Passbook } from './components/customerDashboard/Passbook/Passbook';
-import { Accounts } from './components/customerDashboard/Accounts/Accounts';
 import { CustomerSettings } from './components/customerDashboard/Settings/Settings';
 import { AddEmployees } from './components/adminDashboard/AddEmployees/AddEmployees';
 import { GetEmployees } from './components/adminDashboard/GetEmployees/GetEmployees';
@@ -53,6 +50,8 @@ import { UpdatePolicy } from './components/adminDashboard/UpdatePolicy/UpdatePol
 import { DeletePolicy } from './components/adminDashboard/DeletePolicy/DeletePolicy';
 import { UpdateEmployee } from './components/adminDashboard/UpdateEmployee/UpdateEmployee';
 import { DeleteEmployee } from './components/adminDashboard/DeleteEmployee/DeleteEmployee';
+import { PolicyAccount } from './components/customerDashboard/PolicyAccount/PolicyAccount';
+import { InsurancePolicy } from './components/customerDashboard/InsurancePolicy/InsurancePolicy';
 
 function App() {
 
@@ -123,10 +122,9 @@ function App() {
 
           <Route element={<CustomerDashboard />}>
 
-            <Route path='/user/transactions/:id' element={<MakeTransactions />}></Route>
-            <Route path='/user/passbook/:id' element={<Passbook />}></Route>
-            <Route path='/user/accounts/:id' element={<Accounts />}></Route>
-            <Route path='/user/settings/:id' element={<CustomerSettings />}></Route>
+            <Route path='/customer/policy-account/:id' element={<PolicyAccount />}></Route>
+            <Route path='/customer/insurance/:id/type/:insuranceId' element={<InsurancePolicy />}></Route>
+            <Route path='/customer/settings/:id' element={<CustomerSettings />}></Route>
             
           </Route>
 

@@ -622,5 +622,34 @@ public class CustomerServiceImp implements CustomerService {
                 customerPage.isLast());
     }
 
+	@Override
+	public CustomerCreationDTO getCustomerFullProfile(Long customerId) {
+		Customer customer = findCustomerById(customerId);
+		
+		return dtoService.convertCustomerToCustomerCreationDTO(customer);
+	}
+
+	@Override
+	public CustomerCreationDTO updateCustomer(CustomerCreationDTO customerDTO) {
+		CustomUserDetails userDetails = accessConService.checkUserAccess();
+        accessConService.checkCustomerAccess(userDetails.getId());
+        // Find the customer by ID
+        Customer customer = findCustomerById(userDetails.getId());
+        
+        customer.setFirstName(customerDTO.getFirstName());
+        customer.setLastName(customerDTO.getLastName());
+        customer.setDateOfBirth(customerDTO.getDateOfBirth());
+        customer.setGender(customerDTO.getGender());
+        customer.setNomineeName(customerDTO.getNomineeName());
+        customer.setNomineeRelation(customerDTO.getNomineeRelation());
+        customer.getCredentials().setUsername(customerDTO.getUsername());
+        customer.getCredentials().setEmail(customerDTO.getEmail());
+        customer.getCredentials().setMobileNumber(customerDTO.getMobileNumber());
+        
+        customer = customerRepository.save(customer);
+        
+        return dtoService.convertCustomerToCustomerCreationDTO(customer);
+	}
+
 
 }

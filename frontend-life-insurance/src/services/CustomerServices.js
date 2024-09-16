@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { AxiosError } from '../utils/errors/APIError';
 
-export const fetchCustomer = async () => {
+export const fetchCustomer = async (customerId) => {
     const token = localStorage.getItem('auth');
 
     try {
-        const response = await axios.get("http://localhost:8080/api/customer", {
+        const response = await axios.get(`http://localhost:8080/suraksha/customer/customer/profile/${customerId}`, {
         headers: {
             'Authorization': `Bearer ${token}`
         }}).catch((error) => {throw new AxiosError(error.response.data.message)});
@@ -17,6 +17,56 @@ export const fetchCustomer = async () => {
     }
 
 }
+
+
+export const getListOfActiveCitiesByState = async (stateName) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/city/all/active/state`, {
+              headers: { 'Authorization': `Bearer ${token}` },
+              params: { stateName }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+export const customerProfileUpdate = async (formState) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.put('http://localhost:8080/suraksha/customer', formState, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+export const updateCustomerAddress = async (formState) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.put('http://localhost:8080/suraksha/address/address', formState, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
 
 export const fetchCustomerAccounts = async () => {
     const token = localStorage.getItem('auth');
@@ -35,20 +85,7 @@ export const fetchCustomerAccounts = async () => {
 }
 
 
-export const customerProfileUpdate = async (formState) => {
-    const token = localStorage.getItem('auth');
-    try {
-        const response = await axios.put('http://localhost:8080/api/customer', formState, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-        return response.data;
-    } 
-    catch (error) {
-        throw error;
-    }
-
-}
 
 
 

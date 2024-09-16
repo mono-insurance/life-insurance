@@ -56,7 +56,7 @@ export const Login = () => {
             }
 
             if(response.data.role === "Customer"){
-                navigate(`/user/transactions/${response.data.id}`)
+                navigate(`/customer/policy-account/${response.data.id}`)
             }
         } 
         catch (error) {

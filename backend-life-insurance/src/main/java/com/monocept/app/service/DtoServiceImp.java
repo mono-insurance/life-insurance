@@ -990,4 +990,30 @@ public class DtoServiceImp implements DtoService {
 		
 		return employeeCreationDTO;
 	}
+
+	@Override
+	public CustomerCreationDTO convertCustomerToCustomerCreationDTO(Customer customer) {
+		CustomerCreationDTO customerCreationDTO = new CustomerCreationDTO();
+		
+		customerCreationDTO.setFirstName(customer.getFirstName());
+		customerCreationDTO.setLastName(customer.getLastName());
+		customerCreationDTO.setDateOfBirth(customer.getDateOfBirth());
+		customerCreationDTO.setGender(customer.getGender());
+		customerCreationDTO.setIsActive(customer.getIsActive());
+		customerCreationDTO.setNomineeName(customer.getNomineeName());
+		customerCreationDTO.setNomineeRelation(customer.getNomineeRelation());
+		customerCreationDTO.setIsApproved(customer.getIsApproved());
+		customerCreationDTO.setFirstStreet(customer.getAddress().getFirstStreet());
+		customerCreationDTO.setLastStreet(customer.getAddress().getLastStreet());
+		customerCreationDTO.setPincode(customer.getAddress().getPincode());
+		customerCreationDTO.setState(customer.getAddress().getState().getStateName());
+		customerCreationDTO.setCity(customer.getAddress().getCity().getCityName());
+		customerCreationDTO.setUsername(customer.getCredentials().getUsername());
+		customerCreationDTO.setEmail(customer.getCredentials().getEmail());
+		customerCreationDTO.setMobileNumber(customer.getCredentials().getMobileNumber());
+		customerCreationDTO.setRole(customer.getCredentials().getRole().getName());
+		
+		return customerCreationDTO;
+		
+	}
 }

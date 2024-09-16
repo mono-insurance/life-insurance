@@ -109,7 +109,7 @@ public class InsuranceTypeController {
 
     }
     
-    @Operation(summary = "By Admin and Employee: Get List of All Active insurance categories")
+    @Operation(summary = "By All: Get List of All Active insurance categories")
     @GetMapping("/all/active")
     public ResponseEntity<List<InsuranceTypeDTO>> getListOfAllActiveInsuranceType() {
 

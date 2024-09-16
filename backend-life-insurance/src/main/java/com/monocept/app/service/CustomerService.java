@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import com.monocept.app.dto.*;
 import com.monocept.app.utils.PagedResponse;
 
+import jakarta.validation.Valid;
+
 public interface CustomerService {
 
 	CustomerDTO getCustomerProfile(Long customerId);
@@ -38,5 +40,9 @@ public interface CustomerService {
 
 	PagedResponse<CustomerDTO> getAllInActiveCustomers(int pageNo, int size, String sort, String sortBy,
 			String sortDirection);
+
+	CustomerCreationDTO getCustomerFullProfile(Long customerId);
+
+	CustomerCreationDTO updateCustomer(CustomerCreationDTO customerDTO);
 
 }

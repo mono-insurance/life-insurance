@@ -131,4 +131,6 @@ public interface DtoService {
 
 	EmployeeCreationDTO convertEmployeeToEmployeeCreationDTO(Employee existingEmployee);
 
+	CustomerCreationDTO convertCustomerToCustomerCreationDTO(Customer customer);
+
 }

@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.monocept.app.dto.*;
 import com.monocept.app.service.*;
+import com.monocept.app.dto.SystemCounts;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -170,6 +172,13 @@ public class AdminController {
     }
 
 
+	@Operation(summary = "By Admin: whole System Stats")
+	@GetMapping("/counts")
+	public ResponseEntity<SystemCounts> wholeSystemStats() {
+		SystemCounts counts = adminService.wholeSystemStats();
+		
+		return new ResponseEntity<SystemCounts>(counts,HttpStatus.OK);
+	}
 
 
 

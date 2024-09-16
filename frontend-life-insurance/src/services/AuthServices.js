@@ -30,7 +30,7 @@ export const verifyCustomer = async ({customerId}) => {
     }
 
     try {
-        const response = await axios.get(`http://localhost:8080/api/auth/verify/customer/${customerId}`, {
+        const response = await axios.get(`http://localhost:8080/public/api/auth/verify/customer/${customerId}`, {
         headers: {
             'Authorization': `${token}`
         }});

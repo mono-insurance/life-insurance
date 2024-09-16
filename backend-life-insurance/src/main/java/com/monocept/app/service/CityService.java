@@ -1,5 +1,7 @@
 package com.monocept.app.service;
 
+import java.util.List;
+
 import com.monocept.app.dto.CityDTO;
 import com.monocept.app.utils.PagedResponse;
 
@@ -22,6 +24,8 @@ public interface CityService {
 	PagedResponse<CityDTO> getAllActivatedCitiesByStateId(int page, int size, String sortBy, String direction, Long id);
 
 	CityDTO getCityById(Long id);
+
+	List<CityDTO> getListOfAllActiveCitiesByState(String stateName);
 
 
 }

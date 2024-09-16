@@ -1083,6 +1083,20 @@ export const deleteEmployee = async (id) => {
 
 
 
+export const getSystemStats = async () => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get('http://localhost:8080/suraksha/admin/counts', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
 
 
 
