@@ -48,6 +48,24 @@ import { DeleteCity } from './components/adminDashboard/DeleteCity/DeleteCity';
 import { AddAdmin } from './components/adminDashboard/AddAdmin/AddAdmin';
 import { UpdateQuery } from './components/adminDashboard/UpdateQuery/UpdateQuery';
 import { DeleteQuery } from './components/adminDashboard/DeleteQuery/DeleteQuery';
+import { AgentDashboard } from './components/agentDashboard/Dashboard/AgentDashboard';
+import { AgentCustomers } from './components/agentDashboard/AllCustomers/AgentCustomers';
+import { AffTransactions } from './components/agentDashboard/AllTransactions/AffTransactions';
+import { AgentAccounts } from './components/agentDashboard/AllAccounts/AgentAccounts';
+import { AgentCommissions } from './components/agentDashboard/AllCommissions/AgentCommissions';
+import AgentBalance from './components/agentDashboard/AgentBalance/AgentBalance';
+import AgentEmails from './components/agentDashboard/AgentEmails/AgentEmails';
+import AgentProfile from './components/agentDashboard/AgentProfile/AgentProfile';
+import { EmployeeDashboard } from './components/employeeDashboard/Dashboard/EmployeeDashboard';
+import { Employee } from './components/employeeDashboard/Employee';
+import { AllCustomers } from './components/employeeDashboard/AllCustomers/AllCustomers';
+import { AllAgents } from './components/employeeDashboard/AllAgents/AllAgents';
+import { AllAccounts } from './components/employeeDashboard/AllAccounts/AllAccounts';
+import { RegisteredCustomers } from './components/employeeDashboard/RegisteredCustomers/RegisteredCustomers';
+import { AllDocuments } from './components/employeeDashboard/AllDocuments/AllDocuments';
+import { AllCommissions } from './components/employeeDashboard/AllCommissions/AllCommissions';
+import { AllTransactions } from './components/employeeDashboard/Transactions/Transactions';
+import { Agent } from './components/agentDashboard/Agent';
 
 function App() {
 
@@ -64,75 +82,98 @@ function App() {
   return (
     <>
 
-        <Routes>
+      <Routes>
 
-          <Route element={<SecurityDashboard/>}>
+        {/* <Routes> */}
 
-            <Route path='/auth/login' element={<Login/>}></Route>
-            <Route path='/auth/register' element={<Register/>}></Route>
+        <Route path='/' element={<Login />}></Route>
+        <Route path='/register' element={<Register />}></Route>
 
-          </Route>
-          <Route element={<AdminDashboard />}>
+        {/* </Routes> */}
+        <Route element={<AdminDashboard />}>
 
-            <Route path='/admin/dashboard/:id' element={<Dashboard />}></Route>
-            <Route path='/admin/add-admin/:id' element={<AddAdmin />}></Route>
-            <Route path='/admin/add-employees/:id' element={<AddEmployees />}></Route>
-            <Route path='/admin/get-employees/:id' element={<GetEmployees />}></Route>
-            <Route path='/admin/add-agents/:id' element={<AddAgents />}></Route>
-            <Route path='/admin/get-agents/:id' element={<GetAgents />}></Route>
-            <Route path='/admin/add-customers/:id' element={<AddCustomers />}></Route>
-            <Route path='/admin/get-customers/:id' element={<GetCustomers />}></Route>
-            <Route path='/admin/add-state/:id' element={<AddState />}></Route>
-            <Route path='/admin/get-state/:id' element={<GetState />}></Route>
-            <Route path='/admin/add-city/:id' element={<AddCity />}></Route>
-            <Route path='/admin/get-city/:id' element={<GetCity />}></Route>
-            <Route path='/admin/add-insurance-categories/:id' element={<AddInsurance />}></Route>
-            <Route path='/admin/get-insurance-categories/:id' element={<GetInsurance />}></Route>
-            <Route path='/admin/add-policy/:id' element={<AddPolicy />}></Route>
-            <Route path='/admin/get-policy/:id' element={<GetPolicy />}></Route>
-            <Route path='/admin/commission/:id' element={<Commission />}></Route>
-            <Route path='/admin/claim/:id' element={<Claim />}></Route>
-            <Route path='/admin/cancel/:id' element={<Cancel />}></Route>
-            <Route path='/admin/requests/:id' element={<Requests />}></Route>
-            <Route path='/admin/transactions/:id' element={<Transactions />}></Route>
-            <Route path='/admin/feedback/:id' element={<Feedback />}></Route>
-            <Route path='/admin/queries/:id' element={<Query/>}></Route>
-            <Route path='/admin/tax-settings/:id' element={<TaxSettings />}></Route>
-            <Route path='/admin/insurance-settings/:id' element={<InsuranceSettings />}></Route>
-            <Route path='/admin/settings/:id' element={<Settings />}></Route>
-            <Route path='/admin/insurance-categories/:id/edit/:insuranceId' element={<UpdateInsurance />}></Route>
-            <Route path='/admin/insurance-categories/:id/delete/:insuranceId' element={<DeleteInsurance />}></Route>
-            <Route path='/admin/state/:id/edit/:stateId' element={<UpdateState />}></Route>
-            <Route path='/admin/state/:id/delete/:stateId' element={<DeleteState />}></Route>
-            <Route path='/admin/city/:id/edit/:cityId' element={<UpdateCity />}></Route>
-            <Route path='/admin/city/:id/delete/:cityId' element={<DeleteCity />}></Route>
-            <Route path='/admin/query/:id/edit/:queryId' element={<UpdateQuery />}></Route>
-            <Route path='/admin/query/:id/delete/:queryId' element={<DeleteQuery />}></Route>
+          <Route path='/admin/dashboard/:id' element={<Dashboard />}></Route>
+          <Route path='/admin/add-admin/:id' element={<AddAdmin />}></Route>
+          <Route path='/admin/add-employees/:id' element={<AddEmployees />}></Route>
+          <Route path='/admin/get-employees/:id' element={<GetEmployees />}></Route>
+          <Route path='/admin/add-agents/:id' element={<AddAgents />}></Route>
+          <Route path='/admin/get-agents/:id' element={<GetAgents />}></Route>
+          <Route path='/admin/add-customers/:id' element={<AddCustomers />}></Route>
+          <Route path='/admin/get-customers/:id' element={<AllCustomers />}></Route>
+          <Route path='/admin/add-state/:id' element={<AddState />}></Route>
+          <Route path='/admin/get-state/:id' element={<GetState />}></Route>
+          <Route path='/admin/add-city/:id' element={<AddCity />}></Route>
+          <Route path='/admin/get-city/:id' element={<GetCity />}></Route>
+          <Route path='/admin/add-insurance-categories/:id' element={<AddInsurance />}></Route>
+          <Route path='/admin/get-insurance-categories/:id' element={<GetInsurance />}></Route>
+          <Route path='/admin/add-policy/:id' element={<AddPolicy />}></Route>
+          <Route path='/admin/get-policy/:id' element={<GetPolicy />}></Route>
+          <Route path='/admin/commission/:id' element={<Commission />}></Route>
+          <Route path='/admin/claim/:id' element={<Claim />}></Route>
+          <Route path='/admin/cancel/:id' element={<Cancel />}></Route>
+          <Route path='/admin/requests/:id' element={<Requests />}></Route>
+          <Route path='/admin/transactions/:id' element={<Transactions />}></Route>
+          <Route path='/admin/feedback/:id' element={<Feedback />}></Route>
+          <Route path='/admin/queries/:id' element={<Query />}></Route>
+          <Route path='/admin/tax-settings/:id' element={<TaxSettings />}></Route>
+          <Route path='/admin/insurance-settings/:id' element={<InsuranceSettings />}></Route>
+          <Route path='/admin/settings/:id' element={<Settings />}></Route>
+          <Route path='/admin/insurance-categories/:id/edit/:insuranceId' element={<UpdateInsurance />}></Route>
+          <Route path='/admin/insurance-categories/:id/delete/:insuranceId' element={<DeleteInsurance />}></Route>
+          <Route path='/admin/state/:id/edit/:stateId' element={<UpdateState />}></Route>
+          <Route path='/admin/state/:id/delete/:stateId' element={<DeleteState />}></Route>
+          <Route path='/admin/city/:id/edit/:cityId' element={<UpdateCity />}></Route>
+          <Route path='/admin/city/:id/delete/:cityId' element={<DeleteCity />}></Route>
+          <Route path='/admin/query/:id/edit/:queryId' element={<UpdateQuery />}></Route>
+          <Route path='/admin/query/:id/delete/:queryId' element={<DeleteQuery />}></Route>
 
-          </Route>
+        </Route>
+        <Route element={<Agent />}>
+          <Route path='/agent/dashboard/:id' element={< AgentDashboard />}></Route>
+          <Route path='/agent/customers/:id' element={<AgentCustomers />}></Route>
+          <Route path='/agent/transactions/:id' element={<AffTransactions />}></Route>
+          <Route path='/agent/accounts/:id' element={<AgentAccounts />}></Route>
+          <Route path='/agent/commissions/:id' element={<AgentCommissions />}></Route>
+          <Route path='/agent/balance/:id' element={<AgentBalance />}></Route>
+          <Route path='/agent/email/:id' element={<AgentEmails />}></Route>
+          <Route path='/agent/profile/:id' element={<AgentProfile />}></Route>
 
-          <Route element={<CustomerDashboard />}>
+        </Route>
+        <Route element={<Employee />}>
 
-            <Route path='/user/transactions/:id' element={<MakeTransactions />}></Route>
-            <Route path='/user/passbook/:id' element={<Passbook />}></Route>
-            <Route path='/user/accounts/:id' element={<Accounts />}></Route>
-            <Route path='/user/settings/:id' element={<CustomerSettings />}></Route>
-            
-          </Route>
+          <Route path='/employee/dashboard/:id' element={< EmployeeDashboard />}></Route>
+          <Route path='/employee/customers/:id' element={<AllCustomers />}></Route>
+          <Route path='/employee/agents/:id' element={<AllAgents />}></Route>
+          <Route path='/employee/accounts/:id' element={<AllAccounts />}></Route>
+          <Route path='/employee/registered-customers/:id' element={<RegisteredCustomers />}></Route>
+          <Route path='/employee/all-documents/:id' element={<AllDocuments />}></Route>
+          <Route path='/employee/commissions/:id' element={<AllCommissions />}></Route>
+          <Route path='/employee/transactions/:id' element={<AllTransactions />}></Route>
 
-        </Routes>
+        </Route>
+
+        <Route element={<CustomerDashboard />}>
+
+          <Route path='/user/transactions/:id' element={<MakeTransactions />}></Route>
+          <Route path='/user/passbook/:id' element={<Passbook />}></Route>
+          <Route path='/user/accounts/:id' element={<Accounts />}></Route>
+          <Route path='/user/settings/:id' element={<CustomerSettings />}></Route>
+
+        </Route>
+
+      </Routes>
 
 
-        <button
-          type="button"
-          className="theme-toggle-btn"
-          onClick={toggleTheme}
-        >
-          <img
-            className="theme-icon"
-            src={theme === "light" ? SunIcon : MoonIcon}
-          />
-        </button>
+      <button
+        type="button"
+        className="theme-toggle-btn"
+        onClick={toggleTheme}
+      >
+        <img
+          className="theme-icon"
+          src={theme === "light" ? SunIcon : MoonIcon}
+        />
+      </button>
 
 
     </>

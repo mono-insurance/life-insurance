@@ -105,55 +105,8 @@ export const GetEmployees = () => {
   };
 
 
-
-    // useEffect(() => {
-    //   const filterTypeParam = searchParams.get('filterType') || '';
-    //   const idParam = searchParams.get('id') || '';
-    //   const firstNameParam = searchParams.get('firstName') || '';
-    //   const currentPageParam = Number(searchParams.get('currentPage')) || 1;
-    //   const itemsPerPageParam = Number(searchParams.get('itemsPerPage')) || 10;
-    //   console.log(filterTypeParam, idParam, firstNameParam, currentPageParam, itemsPerPageParam);
-    //   if (filterTypeParam === 'id' || filterTypeParam === 'firstName') {
-    //     setFilterType(filterTypeParam);
-    //     setShowFilterButton(!filterTypeParam);
-    //     setFilter(true);
-    //     if (filterTypeParam === 'firstName') {
-    //       setFirstName(firstNameParam);
-    //       handlePageChange(currentPageParam);
-    //       handleItemsPerPageChange(itemsPerPageParam);
-    //     } else if (filterTypeParam === 'id') {
-    //       setId(idParam);
-    //       setShowPagination(false);
-    //       resetPagination();
-    //     }
-    //   } else {
-    //     setShowFilterButton(true);
-    //     setId('');
-    //     setFirstName('');
-    //     setFilterType('');
-    //     setFilter(false);
-    //     setShowPagination(true);
-    //     resetPagination();
-    //   }
-    // },[searchParams]);
-
-
     useEffect(() => {
-      // const hasSearchParams = searchParams.toString() !== '';
-
-      // if(!hasSearchParams) {
-      //   setShowFilterButton(true);
-      //   setId('');
-      //   setFirstName('');
-      //   setFilterType('');
-      //   setFilter(false);
-      //   setShowPagination(true);
-      // }
       
-      // const timeoutId = setTimeout(() => {
-      //   customerTable();
-      // }, hasSearchParams ? 0: 0);
-      // return () => clearTimeout(timeoutId);
       employeeTable();
 
     }, [filter, currentPage, itemsPerPage, searchParams]);

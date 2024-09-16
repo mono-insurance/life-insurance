@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AreaTop } from '../../../sharedComponents/Title/Title';
-import './insuranceSettings.scss';
+import './InsuranceSettings.scss';
 import { errorToast, successToast } from '../../../utils/helper/toast';
 import { useParams } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
@@ -8,12 +8,12 @@ import { addOrUpdateSettings, fetchGlobalSettingsByKey } from '../../../services
 
 export const InsuranceSettings = () => {
   const routeParams = useParams();
-  
+
   const [cancellationChargesState, setCancellationChargesState] = useState({
     settingKey: 'CANCELLATION_CHARGES',
     settingValue: '',
   });
-  
+
   const [penaltyChargesState, setPenaltyChargesState] = useState({
     settingKey: 'PENALTY_CHARGES',
     settingValue: '',
@@ -22,17 +22,17 @@ export const InsuranceSettings = () => {
   useEffect(() => {
     const fetchInsuranceData = async () => {
       try {
-        
+
         const cancellationResponse = await fetchGlobalSettingsByKey('CANCELLATION_CHARGES');
-        
+
         const penaltyResponse = await fetchGlobalSettingsByKey('PENALTY_CHARGES');
-        
-        
+
+
         setCancellationChargesState(prevState => ({
           ...prevState,
           settingValue: cancellationResponse.settingValue || ''
         }));
-        
+
         setPenaltyChargesState(prevState => ({
           ...prevState,
           settingValue: penaltyResponse.settingValue || ''
@@ -100,12 +100,12 @@ export const InsuranceSettings = () => {
         <form className="insurance-settings-form" onSubmit={handleCancellationChargesSubmit}>
           <label className="form-label">
             Cancellation Charges:<span className="text-danger"> *</span>
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={cancellationChargesState.settingValue}
-              onChange={handleCancellationChargesChange} 
-              className="form-input" 
-              placeholder='Enter Cancellation Charges' 
+              onChange={handleCancellationChargesChange}
+              className="form-input"
+              placeholder='Enter Cancellation Charges'
               required
             />
             <button type="submit" className="form-submit">Save Cancellation Charges</button>
@@ -115,12 +115,12 @@ export const InsuranceSettings = () => {
         <form className="insurance-settings-form" onSubmit={handlePenaltyChargesSubmit}>
           <label className="form-label">
             Penalty Charges:<span className="text-danger"> *</span>
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={penaltyChargesState.settingValue}
-              onChange={handlePenaltyChargesChange} 
-              className="form-input" 
-              placeholder='Enter Penalty Charges' 
+              onChange={handlePenaltyChargesChange}
+              className="form-input"
+              placeholder='Enter Penalty Charges'
               required
             />
             <button type="submit" className="form-submit">Save Penalty Charges</button>

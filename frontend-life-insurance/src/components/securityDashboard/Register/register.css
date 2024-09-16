@@ -1,63 +1,52 @@
 .register-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
     padding: 20px;
-    flex-grow: 1;
-}
-
-.input-row {
+    background-color: #f7f7f7;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .input-row {
     display: flex;
     justify-content: space-between;
+    margin-bottom: 15px;
+  }
+  
+  .input-group {
+    flex: 1;
+    margin-right: 10px;
+  }
+  
+  .input-group:last-child {
+    margin-right: 0;
+  }
+  
+  .input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .input-group input,
+  .input-group select {
     width: 100%;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-}
-
-.input-group {
-    width: 48%; /* Adjust as needed */
-    display: flex;
-    flex-direction: column;
-}
-
-.input-group input {
-    border-radius: 5px !important;
-}
-
-.register-container label {
-    width: 100%;
-    text-transform: uppercase;
-    font-weight: 900;
-    color: var(--logo-color);
-    margin-bottom: 8px;
-}
-
-.register-container input[type="text"],
-.register-container input[type="email"],
-.register-container input[type="password"],
-.register-container input[type="file"] {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 30px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-}
-
-.register-container .registerbtn {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .submit-button {
     width: 100%;
     padding: 10px;
+    background-color: #007bff;
+    color: #fff;
     border: none;
-    border-radius: 5px;
-    background-color: var(--primary-color);
-    color: white;
+    border-radius: 4px;
     cursor: pointer;
-    transition: var(--default-transition);
-}
-
-.register-container .registerbtn:hover {
-    background-color: var(--side-link-hover-color);
-    color: var(--side-text-color);
-}
+  }
+  
+  .submit-button:hover {
+    background-color: #0056b3;
+  }
+  
