@@ -14,7 +14,8 @@ import { validateCustomerId, validateFirstName } from '../../../utils/validation
 
 export const GetEmployees = () => {
 
-  const {currentPage, itemsPerPage, resetPagination, handleItemsPerPageChange, handlePageChange} = useContext(PaginationContext);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [data, setData] = useState({});
   const [keysToBeIncluded, setKeysToBeIncluded] = useState([]);
   const routeParams = useParams();
@@ -25,11 +26,17 @@ export const GetEmployees = () => {
   const [active, setActive] = useState('');
   const [showPagination, setShowPagination] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
+  const { id: adminId } = useParams();
   const filterOptions = [
     { label: 'Search by Employee Id', value: 'id' },
     { label: 'Search by Active', value: 'active' },
     { label: 'Search by Inactive', value: 'inactive' }
 ];
+
+const resetPagination = () => {
+  setCurrentPage(1);
+  setItemsPerPage(10);
+};
 
   const handleSearch = () => {
     resetPagination();
@@ -64,10 +71,9 @@ export const GetEmployees = () => {
     setSearchParams({});
   };
 
-  const actions = (id) => [
-    { name: "View", url: `/employee/view/${id}` },
-    { name: "Edit", url: `/employee/edit/${id}` },
-    { name: "Delete", url: `/employee/delete/${id}` }
+  const actions = (employeeId) => [
+    { name: "Edit", url: `/admin/employee/${adminId}/edit/${employeeId}` },
+    { name: "Delete", url: `/admin/employee/${adminId}/delete/${employeeId}` }
   ];
   
 
@@ -143,6 +149,10 @@ export const GetEmployees = () => {
                   includeButton={true}
                   handleButtonClick={actions}
                   showPagination={showPagination}
+                  currentPage={currentPage}
+                  pageSize={itemsPerPage}
+                  setPage={setCurrentPage}
+                  setPageSize={setItemsPerPage}
                 />
             </div>
           </section>

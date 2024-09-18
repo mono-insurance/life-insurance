@@ -59,13 +59,15 @@ public class PolicyServiceImp implements PolicyService{
 	    Policy policy = dtoService.convertPolicyDtoToEntity(policyDTO);
 	    policy.setIsActive(true);
 	    policy.setInsuranceType(insuranceType);
+	    
+	    System.out.println("yaha pr to aa gya");
 	    if (policyDTO.getDocumentsNeeded() != null && !policyDTO.getDocumentsNeeded().isEmpty()) {
 	        List<DocumentNeeded> documentNeededEntities = policyDTO.getDocumentsNeeded()
 	            .stream()
 	            .map(dto -> {
 	                try {
 	                    // Convert string to DocumentType enum
-	                    DocumentType documentType = DocumentType.valueOf(dto.getDocumentType());
+	                    DocumentType documentType = DocumentType.valueOf(dto.toUpperCase());
 
 	                    // Find existing DocumentNeeded or create a new one
 	                    DocumentNeeded documentNeeded = documentNeededRepository.findByDocumentType(documentType)
@@ -110,9 +112,9 @@ public class PolicyServiceImp implements PolicyService{
 	        throw new UserException("Cannot update policy in an inactive insurance category");
 	    }
 		
-		if (!existingPolicy.getIsActive()) {
-	        throw new UserException("Cannot update an inactive policy");
-	    }
+//		if (!existingPolicy.getIsActive()) {
+//	        throw new UserException("Cannot update an inactive policy");
+//	    }
 		
 		existingPolicy.setPolicyName(policyDTO.getPolicyName());
 	    existingPolicy.setCommissionNewRegistration(policyDTO.getCommissionNewRegistration());
@@ -129,12 +131,18 @@ public class PolicyServiceImp implements PolicyService{
 	    existingPolicy.setProfitRatio(policyDTO.getProfitRatio());
 	    existingPolicy.setCreatedDate(policyDTO.getCreatedDate());
 	    if (policyDTO.getDocumentsNeeded() != null) {
-	        
-	        existingPolicy.setDocumentsNeeded(policyDTO.getDocumentsNeeded().stream()
-		            .map(dtoService::convertDocumentNeededDtoToEntity)
-		            .collect(Collectors.toList()
-		          ));
-	    }
+
+            existingPolicy.setDocumentsNeeded(policyDTO.getDocumentsNeeded().stream()
+            		.map(documentName -> {
+            			DocumentType documentType = DocumentType.valueOf(documentName.toUpperCase());
+            			DocumentNeeded documentNeeded = documentNeededRepository.findByDocumentType(documentType)
+                                .orElseThrow(() -> new UserException("DocumentNeeded not found with name " + documentName));
+                        return documentNeeded;
+                    })
+                    .collect(Collectors.toList()
+                    ));
+        }
+
 	    
 		if (!existingPolicy.getInsuranceType().equals(insuranceType)) {
 			    	

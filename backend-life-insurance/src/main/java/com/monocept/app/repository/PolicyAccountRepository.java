@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -26,5 +27,12 @@ public interface PolicyAccountRepository extends JpaRepository<PolicyAccount,Lon
 
     List<PolicyAccount> findAllByAgent(Agent agent);
 
+    @Query("SELECT pa FROM PolicyAccount pa WHERE pa.agent IS NOT NULL")
+	Page<PolicyAccount> findByAgentNotNull(Pageable pageable);
+
+    @Query("SELECT pa FROM PolicyAccount pa WHERE pa.agent IS NOT NULL")
+	List<PolicyAccount> findByAgentNotNull();
+
     Long countByIsActiveTrue();
+
 }

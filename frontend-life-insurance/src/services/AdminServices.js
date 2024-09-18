@@ -415,6 +415,7 @@ export const getInsuranceCategoriesById = async (id) => {
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
+
         return response.data;
     }
     catch (error) {
@@ -993,354 +994,468 @@ export const deleteQuery = async (id) => {
 
 
 
+export const updatePolicy = async (id, formState) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.put(`http://localhost:8080/suraksha/employee/policy/${id}`, formState, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
 
+}
 
 
 
-// export const getAllTransactions = async (currentPage, itemsPerPage) => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.get(`http://localhost:8080/api/admin/transaction`, {
-//             params: { page: currentPage - 1, size: itemsPerPage },
-//             headers: { 'Authorization': `Bearer ${token}` }
-//         }).catch((error) => {throw new AxiosError(error.response.data.message)});
+export const getPolicyImage = async (policyId) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/policy/download/policy-image/${policyId}`, {
+              responseType: 'blob',
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
 
-// }
+}
 
 
-// export const getAllTransactionsByAccountNumber = async (currentPage, itemsPerPage, accountNumber) => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.get(`http://localhost:8080/api/admin/transaction/account/${accountNumber}`, {
-//             params: { page: currentPage - 1, size: itemsPerPage },
-//             headers: { 'Authorization': `Bearer ${token}` }
-//         }).catch((error) => {throw new AxiosError(error.response.data.message)});
+export const uploadNewPolicyImage = async (policyId, file) => {
+    const token = localStorage.getItem('auth');
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+        const response = await axios.put(`http://localhost:8080/suraksha/policy/update/policy-image/${policyId}`, formData, {
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
 
-// }
+}
 
 
-// export const getAllTransactionsByDate = async (currentPage, itemsPerPage, startDate, endDate) => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.get(`http://localhost:8080/api/admin/transaction/date`, {
-//             params: { page: currentPage - 1, size: itemsPerPage , startDate: startDate, endDate: endDate},
-//             headers: { 'Authorization': `Bearer ${token}` }
-//         }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
+export const deletePolicy = async (id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.delete(`http://localhost:8080/suraksha/admin/policy/${id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-// }
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
 
+}
 
 
+export const fetchEmployeeById = async (id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/employee/employee/${id}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
 
+}
 
 
 
+export const updateEmployee = async (id, formState) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.put(`http://localhost:8080/suraksha/employee/employee/${id}`, formState, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
 
-// export const makeCustomersInactive = async () => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.put('http://localhost:8080/api/admin/users/inactive',{}, {
-//         headers: { 'Authorization': `Bearer ${token}` }
-//       }).catch((error) => {throw new AxiosError(error.response.data.message)});
+}
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
 
-// }
 
+export const deleteEmployee = async (id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.delete(`http://localhost:8080/suraksha/employee/employee/${id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
 
-// export const getAllActiveAccounts = async (currentPage, itemsPerPage) => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.get('http://localhost:8080/api/admin/accounts/active', {
-//           params: { page: currentPage - 1, size: itemsPerPage },
-//           headers: { 'Authorization': `Bearer ${token}` }
-//         }).catch((error) => {throw new AxiosError(error.response.data.message)});
+}
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
 
-// }
 
 
-// export const getAllInactiveAccounts = async (currentPage, itemsPerPage) => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.get('http://localhost:8080/api/admin/accounts/inactive', {
-//             params: { page: currentPage - 1, size: itemsPerPage },
-//             headers: { 'Authorization': `Bearer ${token}` }
-//           }).catch((error) => {throw new AxiosError(error.response.data.message)});
+export const getSystemStats = async () => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get('http://localhost:8080/suraksha/admin/counts', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
 
-// }
+}
 
 
 
+export const getNewUsers = async (currentPage, itemsPerPage) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get('http://localhost:8080/suraksha/admin/new/users', {
+              params: { page: currentPage - 1, size: itemsPerPage },
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-// export const makeAccountsInactive = async () => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.put('http://localhost:8080/api/admin/user/inactive/accounts',{}, {
-//         headers: { 'Authorization': `Bearer ${token}` }
-//       }).catch((error) => {throw new AxiosError(error.response.data.message)});
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+}
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
 
-// }
+export const getAllClaims = async (currentPage, itemsPerPage) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get('http://localhost:8080/suraksha/withdrawal-request/total/claim', {
+              params: { page: currentPage - 1, size: itemsPerPage },
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
 
-// export const getAllUsers = async (currentPage, itemsPerPage) => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.get('http://localhost:8080/api/admin/users', {
-//                 params: { page: currentPage - 1, size: itemsPerPage },
-//                 headers: { 'Authorization': `Bearer ${token}` }
-//             }).catch((error) => {throw new AxiosError(error.response.data.message)});
+}
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
 
-// }
 
+export const getAllRegistrationCommissions = async (currentPage, itemsPerPage) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get('http://localhost:8080/suraksha/transaction/commissions/registration', {
+              params: { page: currentPage - 1, size: itemsPerPage },
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-// export const getSystemStats = async () => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.get('http://localhost:8080/api/admin/counts', {
-//               headers: { 'Authorization': `Bearer ${token}` }
-//             }).catch((error) => {throw new AxiosError(error.response.data.message)});
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
+}
 
-// }
 
 
 
+export const getAllInstallmentCommissions = async (currentPage, itemsPerPage) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get('http://localhost:8080/suraksha/transaction/commissions/installment', {
+              params: { page: currentPage - 1, size: itemsPerPage },
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-// export const makeAnotherAdmin = async (formState) => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.post('http://localhost:8080/api/admin/user-admin', formState, {
-//           headers: { 'Authorization': `Bearer ${token}` }
-//       }).catch((error) => {throw new AxiosError(error.response.data.message)});
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
+}
 
-// }
 
 
-// export const getCustomerDocument = async (customerId, documentType) => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.get(`http://localhost:8080/api/admin/files/user/${customerId}/${documentType}`, {
-//           responseType: 'blob',
-//           headers: { 'Authorization': `Bearer ${token}` }
-//       }).catch((error) => {throw new AxiosError(error.response.data.message)});
+export const getAllWithdrawalRequests = async (currentPage, itemsPerPage) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get('http://localhost:8080/suraksha/withdrawal-request', {
+              params: { page: currentPage - 1, size: itemsPerPage , direction: 'DESC', sortBy: 'withdrawalRequestsId' },
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
 
-// }
+}
 
 
 
-// export const makeCustomerAccount = async (customerId, updatedFormState) => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.post(`http://localhost:8080/api/admin/user/${customerId}`, updatedFormState, {
-//           headers: { 'Authorization': `Bearer ${token}` }
-//       }).catch((error) => {throw new AxiosError(error.response.data.message)});
+export const getAllWithdrawalRequestsByWithdraw = async (currentPage, itemsPerPage) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get('http://localhost:8080/suraksha/withdrawal-request/withdraw', {
+              params: { page: currentPage - 1, size: itemsPerPage },
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
 
-// }
+}
 
 
-// export const makeAllRequestsCustomerActivate = async () => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.put('http://localhost:8080/api/admin/activate/requests/customer',{}, {
-//         headers: { 'Authorization': `Bearer ${token}` }
-//       }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
 
-// }
+export const getWithdrawalRequestsByCustomerId = async (currentPage, itemsPerPage, id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/withdrawal-request/customer/${id}`, {
+              params: { page: currentPage - 1, size: itemsPerPage },
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
 
-// export const activateParticularCustomer = async (customerId) => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.put(`http://localhost:8080/api/admin/users/${customerId}/activate`, {}, {
-//         headers: { 'Authorization': `Bearer ${token}` }
-//       }).catch((error) => {throw new AxiosError(error.response.data.message)});
+}
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
 
-// }
 
 
+export const getWithdrawalRequestsByAgentId = async (currentPage, itemsPerPage, id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/withdrawal-request/agent/${id}`, {
+              params: { page: currentPage - 1, size: itemsPerPage },
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-// export const makeAllRequestsAccountActivate = async () => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.put('http://localhost:8080/api/admin/activate/requests/account',{}, {
-//         headers: { 'Authorization': `Bearer ${token}` }
-//       }).catch((error) => {throw new AxiosError(error.response.data.message)});
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
+}
 
-// }
 
 
-// export const activateParticularAccount = async (accountNumber) => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.put(`http://localhost:8080/api/admin/accounts/${accountNumber}/activate`, {}, {
-//         headers: { 'Authorization': `Bearer ${token}` }
-//       }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
+export const getWithdrawByCustomerId = async (currentPage, itemsPerPage, id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/withdrawal-request/customer/${id}/withdraw`, {
+              params: { page: currentPage - 1, size: itemsPerPage },
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-// }
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
 
+}
 
 
-// export const getAllCustomersByCharacters = async (currentPage, itemsPerPage, firstName) => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.get('http://localhost:8080/api/admin/customers/starts-with', {
-//               params: { page: currentPage - 1, size: itemsPerPage, startsWith: firstName },
-//               headers: { 'Authorization': `Bearer ${token}` }
-//           }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
 
-// }
+export const getWithdrawByAgentId = async (currentPage, itemsPerPage, id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/withdrawal-request/agent/${id}/withdraw`, {
+              params: { page: currentPage - 1, size: itemsPerPage },
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
 
+}
 
 
 
-// export const getAllUsersByCharacters = async (currentPage, itemsPerPage, firstName) => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.get('http://localhost:8080/api/admin/users/starts-with', {
-//               params: { page: currentPage - 1, size: itemsPerPage, startsWith: firstName },
-//               headers: { 'Authorization': `Bearer ${token}` }
-//           }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
+export const getApprovedByCustomerId = async (currentPage, itemsPerPage, id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/withdrawal-request/customer/${id}/approved`, {
+              params: { page: currentPage - 1, size: itemsPerPage },
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-// }
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
 
+}
 
-// export const getUserById = async (id) => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.get(`http://localhost:8080/api/admin/users/${id}`, {
-//               headers: { 'Authorization': `Bearer ${token}` }
-//           }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
 
-// }
 
+export const getApprovedByAgentId = async (currentPage, itemsPerPage, id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/withdrawal-request/agent/${id}/approved`, {
+              params: { page: currentPage - 1, size: itemsPerPage },
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
-// export const deleteUser = async (id) => {
-//     const token = localStorage.getItem('auth');
-//     try {
-//         const response = await axios.delete(`http://localhost:8080/api/admin/user/${id}`, {
-//               headers: { 'Authorization': `Bearer ${token}` }
-//           }).catch((error) => {throw new AxiosError(error.response.data.message)});
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
 
-//         return response.data;
-//     }
-//     catch (error) {
-//         throw error;
-//     }
+}
 
-// }
+
+
+
+export const fetchWihdrawalRequestById = async (id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/withdrawal-request/${id}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+
+
+export const approveOrRejectWithdrawalRequests = async (id, isApproved) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.post(`http://localhost:8080/suraksha/withdrawal-request/admin/${id}`, isApproved, {
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+
+      }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+
+
+export const getAllTransactions = async (currentPage, itemsPerPage) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/transaction`, {
+            params: { page: currentPage - 1, size: itemsPerPage },
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+export const getAllTransactionsByPolicyAccountId = async (currentPage, itemsPerPage, id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/transaction/transactions/policy-account/${id}`, {
+            params: { page: currentPage - 1, size: itemsPerPage },
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+
+export const getAllTransactionsByCustomerId = async (currentPage, itemsPerPage, id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/transaction/transactions/customer/${id}`, {
+            params: { page: currentPage - 1, size: itemsPerPage },
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+
+export const getAllTransactionsByDate = async (currentPage, itemsPerPage, startDate, endDate) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/transaction/transactions/date`, {
+            params: { page: currentPage - 1, size: itemsPerPage , startDate: startDate, endDate: endDate},
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}

@@ -11,9 +11,6 @@ import './App.scss';
 import { SecurityDashboard } from './components/securityDashboard/SecurityDashboard';
 import { Register } from './components/securityDashboard/Register/Register';
 import { CustomerDashboard } from './components/customerDashboard/CustomerDashboard';
-import { MakeTransactions } from './components/customerDashboard/MakeTransactions/MakeTransactions';
-import { Passbook } from './components/customerDashboard/Passbook/Passbook';
-import { Accounts } from './components/customerDashboard/Accounts/Accounts';
 import { CustomerSettings } from './components/customerDashboard/Settings/Settings';
 import { AddEmployees } from './components/adminDashboard/AddEmployees/AddEmployees';
 import { GetEmployees } from './components/adminDashboard/GetEmployees/GetEmployees';
@@ -31,7 +28,7 @@ import { AddPolicy } from './components/adminDashboard/AddPolicy/AddPolicy';
 import { GetPolicy } from './components/adminDashboard/GetPolicy/GetPolicy';
 import { Commission } from './components/adminDashboard/Commission/Commission';
 import { Claim } from './components/adminDashboard/Claim/Claim';
-import { Cancel } from './components/adminDashboard/Cancel/Cancel';
+import { ViewOrUpdateRequests } from './components/adminDashboard/ViewOrUpdateRequests/ViewOrUpdateRequests';
 import { Requests } from './components/adminDashboard/Requests/Requests';
 import { Transactions } from './components/adminDashboard/Transactions/Transactions';
 import { Feedback } from './components/adminDashboard/Feedback/Feedback';
@@ -48,6 +45,22 @@ import { DeleteCity } from './components/adminDashboard/DeleteCity/DeleteCity';
 import { AddAdmin } from './components/adminDashboard/AddAdmin/AddAdmin';
 import { UpdateQuery } from './components/adminDashboard/UpdateQuery/UpdateQuery';
 import { DeleteQuery } from './components/adminDashboard/DeleteQuery/DeleteQuery';
+
+import { ViewPolicy } from './components/adminDashboard/ViewPolicy/ViewPolicy';
+import { UpdatePolicy } from './components/adminDashboard/UpdatePolicy/UpdatePolicy';
+import { DeletePolicy } from './components/adminDashboard/DeletePolicy/DeletePolicy';
+import { UpdateEmployee } from './components/adminDashboard/UpdateEmployee/UpdateEmployee';
+import { DeleteEmployee } from './components/adminDashboard/DeleteEmployee/DeleteEmployee';
+import { PolicyAccount } from './components/customerDashboard/PolicyAccount/PolicyAccount';
+import { InsurancePolicy } from './components/customerDashboard/InsurancePolicy/InsurancePolicy';
+import { AddFeedback } from './components/customerDashboard/Feedback/AddFeedback';
+import { AddQuery } from './components/customerDashboard/AddQuery/AddQuery';
+import { GetRequests } from './components/customerDashboard/GetRequests/GetRequests';
+import { GetQuery } from './components/customerDashboard/GetQuery/GetQuery';
+import { UpdateCustomerQuery } from './components/customerDashboard/UpdateCustomerQuery/UpdateCustomerQuery';
+import { DeleteCustomerQuery } from './components/customerDashboard/DeleteCustomerQuery/DeleteCustomerQuery';
+import { ViewPolicyAccount } from './components/customerDashboard/ViewPolicyAccount/ViewPolicyAccount';
+
 import { AgentDashboard } from './components/agentDashboard/Dashboard/AgentDashboard';
 import { AgentCustomers } from './components/agentDashboard/AllCustomers/AgentCustomers';
 import { AffTransactions } from './components/agentDashboard/AllTransactions/AffTransactions';
@@ -99,6 +112,13 @@ function App() {
 
         {/* </Routes> */}
         <Route element={<AdminDashboard />}>
+
+            <Route path='/admin/policy/:id/view/:policyId' element={<ViewPolicy />}></Route>
+            <Route path='/admin/policy/:id/edit/:policyId' element={<UpdatePolicy />}></Route>
+            <Route path='/admin/policy/:id/delete/:policyId' element={<DeletePolicy />}></Route>
+            <Route path='/admin/employee/:id/edit/:employeeId' element={<UpdateEmployee />}></Route>
+            <Route path='/admin/employee/:id/delete/:employeeId' element={<DeleteEmployee />}></Route>
+            <Route path='/admin/request/:id/view/:requestsId' element={<ViewOrUpdateRequests />}></Route>
 
           <Route path='/admin/dashboard/:id' element={<Dashboard />}></Route>
           <Route path='/admin/add-admin/:id' element={<AddAdmin />}></Route>
@@ -168,6 +188,19 @@ function App() {
           <Route path='/user/settings/:id' element={<CustomerSettings />}></Route>
           <Route path='/user/documents/upload' element={<DocumentUpload />}></Route>
           <Route path='/user/dashboard/:id' element={<DocumentUpload />}></Route>
+
+                      <Route path='/customer/policy-account/:id' element={<PolicyAccount />}></Route>
+                      <Route path='/customer/insurance/:id/type/:insuranceId' element={<InsurancePolicy />}></Route>
+                      <Route path='/customer/feedback/:id' element={<AddFeedback />}></Route>
+                      <Route path='/customer/add-query/:id' element={<AddQuery />}></Route>
+                      <Route path='/customer/query/:id' element={<GetQuery />}></Route>
+                      <Route path='/customer/query/:id/edit/:queryId' element={<UpdateCustomerQuery />}></Route>
+                      <Route path='/customer/query/:id/delete/:queryId' element={<DeleteCustomerQuery />}></Route>
+                      <Route path='/customer/requests/:id' element={<GetRequests />}></Route>
+                      <Route path='/customer/settings/:id' element={<CustomerSettings />}></Route>
+                      <Route path='/customer/policy-account/:id/view/:policyAccountId' element={<ViewPolicyAccount />}></Route>
+
+                    </Route>
 
         </Route>
 

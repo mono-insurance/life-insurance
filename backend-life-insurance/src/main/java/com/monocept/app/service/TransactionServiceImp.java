@@ -1,5 +1,6 @@
 package com.monocept.app.service;
 
+import com.monocept.app.dto.CommissionDTO;
 import com.monocept.app.dto.CustomUserDetails;
 import com.monocept.app.dto.EmailDTO;
 import com.monocept.app.dto.TransactionsDTO;
@@ -8,6 +9,7 @@ import com.monocept.app.entity.*;
 import com.monocept.app.exception.RoleAccessException;
 import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.*;
+import com.monocept.app.utils.BalancePagedResponse;
 import com.monocept.app.utils.PagedResponse;
 
 import java.time.LocalDate;
@@ -121,9 +123,6 @@ public class TransactionServiceImp implements TransactionService {
         String role = accessConService.getUserRole();
         if (role.equals("AGENT")) throw new RoleAccessException("agent don't have access to see this");
         CustomUserDetails customUserDetails = accessConService.checkUserAccess();
-        if (!customUserDetails.getId().equals(id)) {
-            throw new RoleAccessException("you don't have access to see this");
-        }
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new UserException("Customer not found"));
 
@@ -156,5 +155,74 @@ public class TransactionServiceImp implements TransactionService {
 
         return new PagedResponse<TransactionsDTO>(allTransactionsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
     }
+
+
+	@Override
+	public BalancePagedResponse<CommissionDTO> getAllRegistrationCommissionsByAgent(int page, int size, String sortBy,
+			String sortDirection) {
+		Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+
+        Page<PolicyAccount> pages = policyAccountRepository.findByAgentNotNull(pageable);
+        List<PolicyAccount> allPolicyAccount = pages.getContent();
+        List<CommissionDTO> allCommissionDTO = dtoService.convertPolicyAccountListEntityToCommissionDTO(allPolicyAccount);
+        
+        List<PolicyAccount> policyAccount = policyAccountRepository.findByAgentNotNull();
+        
+        if(policyAccount != null) {
+        	double totalBalance = policyAccount.stream()
+        		.mapToDouble(PolicyAccount::getAgentCommissionForRegistration)
+        		.sum();
+        	
+        	return new BalancePagedResponse<CommissionDTO>(allCommissionDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast(), totalBalance);
+        }
+        else {
+        	return new BalancePagedResponse<CommissionDTO>(allCommissionDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast(), 0.0);
+        }
+        
+	}
+
+
+	@Override
+	public BalancePagedResponse<CommissionDTO> getAllInstallmentCommissionsByAgent(int page, int size, String sortBy,
+			String sortDirection) {
+		
+		Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+
+        Page<Transactions> pages = transactionsRepository.findByStatusAndAgentNotNull("Done", pageable);
+        List<Transactions> allTransactions = pages.getContent();
+        List<CommissionDTO> allCommissionDTO = dtoService.convertTransactionListEntityToCommissionDTO(allTransactions);
+        
+        List<Transactions> transactions = transactionsRepository.findByStatusAndAgentNotNull("Done");
+        
+        if(transactions != null) {
+	        double totalBalance = transactions.stream()
+	        		.mapToDouble(Transactions::getAgentCommission)
+	        		.sum();
+	
+	        return new BalancePagedResponse<CommissionDTO>(allCommissionDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast(), totalBalance);
+        }
+        else {
+        	return new BalancePagedResponse<CommissionDTO>(allCommissionDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast(), 0.0);
+        }
+	}
+
+
+	@Override
+	public PagedResponse<TransactionsDTO> getAllTransactions(int page, int size, String sortBy, String direction) {
+
+        Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+
+        Page<Transactions> pages = transactionsRepository.findByStatus("Done", pageable);
+        List<Transactions> allTransactions = pages.getContent();
+        List<TransactionsDTO> allTransactionsDTO = dtoService.convertTransactionListEntityToDTO(allTransactions);
+
+        return new PagedResponse<TransactionsDTO>(allTransactionsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
 
 }

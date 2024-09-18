@@ -34,10 +34,6 @@ public class DocumentUploaded {
     private Long documentId;
 
 
-    @NotBlank
-    @Column(name = "name")
-    private String name;
-
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "document_type")
@@ -58,6 +54,7 @@ public class DocumentUploaded {
     private Customer customer;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "agent_id")
     @JsonBackReference
     private Agent agent;
 

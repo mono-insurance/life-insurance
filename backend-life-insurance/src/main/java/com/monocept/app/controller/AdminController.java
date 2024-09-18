@@ -184,7 +184,28 @@ public class AdminController {
     }
 
 
+	@Operation(summary = "By Admin: whole System Stats")
+	@GetMapping("/counts")
+	public ResponseEntity<SystemCounts> wholeSystemStats() {
+		SystemCounts counts = adminService.wholeSystemStats();
+		
+		return new ResponseEntity<SystemCounts>(counts,HttpStatus.OK);
+	}
 
+	
+    @Operation(summary = "By Customer: Get New Users")
+    @GetMapping("/new/users")
+    public ResponseEntity<PagedResponse<UserDTO>> getNewUsers(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size,
+            @RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
+            @RequestParam(name = "direction", defaultValue = "desc") String direction) {
+
+        PagedResponse<UserDTO> policyAccounts = adminService.getNewUsers(page, size, sortBy, direction);
+
+        return new ResponseEntity<PagedResponse<UserDTO>>(policyAccounts, HttpStatus.OK);
+
+    }
 
 
 

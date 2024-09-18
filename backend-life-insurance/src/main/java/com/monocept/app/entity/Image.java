@@ -40,7 +40,7 @@ public class Image {
     @Column(name = "cloud_image_name")
     private String cloudImageName;
 
-    @OneToMany(mappedBy = "image", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "image", fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Policy> policies;
 

@@ -12,7 +12,8 @@ import { validateCustomerId } from '../../../utils/validations/Validations';
 import { ToastContainer } from 'react-toastify';
 
 export const Feedback = () => {
-  const {currentPage, itemsPerPage, resetPagination, handleItemsPerPageChange, handlePageChange} = useContext(PaginationContext);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [data, setData] = useState({});
   const [keysToBeIncluded, setKeysToBeIncluded] = useState([]);
   const routeParams = useParams();
@@ -25,6 +26,11 @@ export const Feedback = () => {
   const filterOptions = [
     { label: 'Search by Customer Id', value: 'id' }
 ];
+
+  const resetPagination = () => {
+    setCurrentPage(1);
+    setItemsPerPage(10);
+  };
 
   const handleSearch = () => {
     resetPagination();
@@ -163,6 +169,10 @@ export const Feedback = () => {
                   includeButton={false}
                   handleButtonClick={null}
                   showPagination={showPagination}
+                  currentPage={currentPage}
+                  pageSize={itemsPerPage}
+                  setPage={setCurrentPage}
+                  setPageSize={setItemsPerPage}
                 />
             </div>
           </section>

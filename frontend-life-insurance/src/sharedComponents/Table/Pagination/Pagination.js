@@ -3,14 +3,14 @@ import { Pagesize } from './Pagesize';
 import './pagination.scss';
 import { PaginationContext } from '../../../context/PaginationContext';
 
-export const Pagination = ({ noOfPages, noOfElements}) => {
-  const { currentPage, handlePageChange } = useContext(PaginationContext);
+export const Pagination = ({ currentPage, pageSize, setPage, setPageSize, noOfPages, noOfElements}) => {
+  // const { currentPage, handlePageChange } = useContext(PaginationContext);
     if (currentPage > noOfPages) {
-      handlePageChange(noOfPages > 1 ? noOfPages : 1);
-      }
+      setPage(noOfPages > 1 ? noOfPages : 1);
+    }
       
   const handleClick = (page) => {
-    handlePageChange(page);
+    setPage(page);
   };
 
   const pageNumber = [];
@@ -20,7 +20,7 @@ export const Pagination = ({ noOfPages, noOfElements}) => {
 
   return (
     <div className="pagination-container">
-      <Pagesize noOfElements={noOfElements} />
+      <Pagesize pageSize={pageSize} setPageSize={setPageSize} noOfElements={noOfElements} />
       <nav aria-label="Page navigation example">
         <ul className="pagination">
           {pageNumber.map(p => (

@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.monocept.app.dto.CommissionDTO;
 import com.monocept.app.dto.TransactionsDTO;
 import com.monocept.app.dto.WithdrawalRequestsDTO;
 import com.monocept.app.service.TransactionService;
+import com.monocept.app.utils.BalancePagedResponse;
 import com.monocept.app.utils.PagedResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -57,7 +59,7 @@ public class TransactionController {
 
     @Operation(summary = "By Admin and Employee: Get All the Transactions between Start date and End Date")
     @GetMapping("/transactions/date")
-    public ResponseEntity<PagedResponse<TransactionsDTO>> getAllTransactionsBetweenDate(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "id") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction, @RequestParam(name = "startDate") LocalDate startDate, @RequestParam(name = "endDate") LocalDate endDate) {
+    public ResponseEntity<PagedResponse<TransactionsDTO>> getAllTransactionsBetweenDate(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "transactionId") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction, @RequestParam(name = "startDate") LocalDate startDate, @RequestParam(name = "endDate") LocalDate endDate) {
 
         PagedResponse<TransactionsDTO> transactions = transactionService.getAllTransactionsBetweenDate(page, size, sortBy, direction, startDate, endDate);
 
@@ -65,6 +67,15 @@ public class TransactionController {
 
     }
 
+    @Operation(summary = "By Admin and Employee: Get All the Transactions with status done")
+    @GetMapping("")
+    public ResponseEntity<PagedResponse<TransactionsDTO>> getAllTransactions(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "transactionId") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction) {
+
+        PagedResponse<TransactionsDTO> transactions = transactionService.getAllTransactions(page, size, sortBy, direction);
+
+        return new ResponseEntity<PagedResponse<TransactionsDTO>>(transactions, HttpStatus.OK);
+
+    }
 
     @Operation(summary = "By Admin,emp: Get All Commissions of all agents")
     @GetMapping("/commissions")
@@ -74,6 +85,31 @@ public class TransactionController {
             @RequestParam(name = "sortBy", defaultValue = "withdrawalRequestsId") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
         PagedResponse<WithdrawalRequestsDTO> allCommissions = transactionService.getAllCommissions(pageNo, size, sortBy, sortDirection);
+        return new ResponseEntity<>(allCommissions, HttpStatus.OK);
+    }
+    
+    
+    
+    @Operation(summary = "By Admin,emp: Get All Commissions of all agents")
+    @GetMapping("/commissions/registration")
+    ResponseEntity<BalancePagedResponse<CommissionDTO>> getAllRegistrationCommissionsByAgent(
+            @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sortBy", defaultValue = "policyAccountId") String sortBy,
+            @RequestParam(name = "sortDirection", defaultValue = "desc") String sortDirection) {
+    	BalancePagedResponse<CommissionDTO> allCommissions = transactionService.getAllRegistrationCommissionsByAgent(pageNo, size, sortBy, sortDirection);
+        return new ResponseEntity<>(allCommissions, HttpStatus.OK);
+    }
+    
+    
+    @Operation(summary = "By Admin,emp: Get All Commissions of all agents")
+    @GetMapping("/commissions/installment")
+    ResponseEntity<BalancePagedResponse<CommissionDTO>> getAllInstallmentCommissionsByAgent(
+            @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sortBy", defaultValue = "transactionId") String sortBy,
+            @RequestParam(name = "sortDirection", defaultValue = "desc") String sortDirection) {
+    	BalancePagedResponse<CommissionDTO> allCommissions = transactionService.getAllInstallmentCommissionsByAgent(pageNo, size, sortBy, sortDirection);
         return new ResponseEntity<>(allCommissions, HttpStatus.OK);
     }
 

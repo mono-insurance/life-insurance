@@ -35,6 +35,8 @@ public class EmployeeCreationDTO {
 
     @NotBlank(message = "Password is mandatory")
     private String password;
+    
+    private Boolean isActive;
 
     @Pattern(regexp = "^\\+91[-\\s]?\\d{5}[-\\s]?\\d{5}$", message = "Mobile number must be in the format +91XXXXXXXXXX")
     @NotBlank(message = "Mobile Number is mandatory")

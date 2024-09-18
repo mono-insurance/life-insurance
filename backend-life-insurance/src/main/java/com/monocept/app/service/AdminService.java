@@ -8,9 +8,6 @@ import com.monocept.app.utils.PagedResponse;
 
 import jakarta.validation.Valid;
 
-import com.monocept.app.dto.AdminCreationDTO;
-import com.monocept.app.dto.AdminDTO;
-
 
 public interface AdminService {
 
@@ -63,4 +60,8 @@ public interface AdminService {
 
 
     List<InsuranceTypeDTO> getInsuranceTypes();
+
+	SystemCounts wholeSystemStats();
+
+	PagedResponse<UserDTO> getNewUsers(int page, int size, String sortBy, String direction);
 }

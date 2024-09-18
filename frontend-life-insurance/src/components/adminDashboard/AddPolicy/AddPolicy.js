@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createRef } from 'react';
 import { AreaTop } from '../../../sharedComponents/Title/Title';
 import './addPolicy.scss';
 import { errorToast, successToast } from '../../../utils/helper/toast';
@@ -12,7 +12,7 @@ export const AddPolicy = () => {
   const routeParams = useParams();
 
   const [investmentTypes, setInvestmentTypes] = useState([]);
-  const [documentsNeeded, setDocumentsNeeded] = useState([]);
+  const [documents, setDocuments] = useState([]);
   const [formState, setFormState] = useState({
     policyName: '',
     commissionNewRegistration: '',
@@ -27,10 +27,12 @@ export const AddPolicy = () => {
     eligibleGender: 'both',
     insuranceTypeId: '',
     profitRatio: '',
-    image: '',
+    file: '',
     isActive: true,
-    documents: []
+    documentsNeeded: []
   });
+
+  const fileInputRef = createRef();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,7 +40,7 @@ export const AddPolicy = () => {
         const investmentTypesData = await fetchListOfActiveInsuranceCategories();
         const documentsNeededData = await fetchListOfAllDocuments();
         setInvestmentTypes(investmentTypesData);
-        setDocumentsNeeded(documentsNeededData);
+        setDocuments(documentsNeededData);
       } catch (error) {
         errorToast('Error fetching data');
       }
@@ -47,7 +49,6 @@ export const AddPolicy = () => {
   }, []);
 
   const handleChange = (event) => {
-    console.log("handle change", event.target.value)
     setFormState({
       ...formState,
       [event.target.name]: event.target.value,
@@ -63,37 +64,19 @@ export const AddPolicy = () => {
 
   const handleDocumentSelect = (documentId) => {
     setFormState((prevState) => {
-      const selectedDocuments = prevState.documents.includes(documentId)
-        ? prevState.documents.filter((id) => id !== documentId)
-        : [...prevState.documents, documentId];
+      const selectedDocuments = prevState.documentsNeeded.includes(documentId)
+        ? prevState.documentsNeeded.filter((id) => id !== documentId)
+        : [...prevState.documentsNeeded, documentId];
       return {
         ...prevState,
-        documents: selectedDocuments,
+        documentsNeeded: selectedDocuments,
       };
     });
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // Create a FormData object
-    const formData = new FormData();
-
-    // Append all form fields to FormData
-    for (const key in formState) {
-      if (key === 'image') {
-        // Append the file separately
-        formData.append('file', formState.image);
-      } else if (key === 'documents') {
-        // Append documents as an array
-        formState.documents.forEach((doc, index) => {
-          formData.append(`documents[${index}]`, doc);
-        });
-      } else {
-        formData.append(key, formState[key]);
-      }
-    }
     try {
-
       // const formErrors = validateForm(formState);
 
       // if (Object.keys(formErrors).length > 0) {
@@ -102,8 +85,8 @@ export const AddPolicy = () => {
       //   });
       //   return;
       // }
-      console.log("in form change", formData)
-      await createNewPolicy(formData);
+
+      await createNewPolicy(formState);
       successToast("Policy created successfully!");
 
       setFormState({
@@ -118,11 +101,11 @@ export const AddPolicy = () => {
         minInvestmentAmount: '',
         maxInvestmentAmount: '',
         eligibleGender: 'both',
-        insuranceTypeId: '',
+        investmentTypeId: '',
         profitRatio: '',
-        image: '',
+        file: '',
         isActive: true,
-        documents: []
+        documentsNeeded: []
       });
 
     } catch (error) {
@@ -135,10 +118,10 @@ export const AddPolicy = () => {
       <AreaTop pageTitle={"Create New Policy"} pagePath={"Create-Policy"} pageLink={`/admin/dashboard/${routeParams.id}`} />
       <section className="content-area-form">
         <form className="policy-form" onSubmit={handleSubmit}>
-          <label className="form-label">
-            Policy Name:<span className="text-danger"> *</span>
-            <input type="text" name="policyName" value={formState.policyName} onChange={handleChange} className="form-input" placeholder="Enter Policy Name" required />
-          </label>
+            <label className="form-label">
+              Policy Name:<span className="text-danger"> *</span>
+              <input type="text" name="policyName" value={formState.policyName} onChange={handleChange} className="form-input" placeholder="Enter Policy Name" required />
+            </label>
 
 
 
@@ -148,7 +131,7 @@ export const AddPolicy = () => {
                 <span>Commission (Registration):</span>
                 <span className="text-danger"> *</span>
               </div>
-              <input type="number" name="commissionNewRegistration" value={formState.commissionNewRegistration} onChange={handleChange} className="form-input" placeholder="Enter Registration Commission" required />
+              <input type="number" name="commissionNewRegistration" value={formState.commissionRegistration} onChange={handleChange} className="form-input" placeholder="Enter Registration Commission" required />
             </label>
             <label className="form-label">
               <div className="label-container">
@@ -222,9 +205,9 @@ export const AddPolicy = () => {
                 <span className="text-danger"> *</span>
               </div>
               <select name="eligibleGender" value={formState.eligibleGender} onChange={handleChange} className="form-input" required>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="both">Both</option>
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
+                <option value="BOTH">Both</option>
               </select>
             </label>
 
@@ -248,25 +231,25 @@ export const AddPolicy = () => {
 
           <label className="form-label">
             Policy Image:<span className="text-danger"> *</span>
-            <input type="file" name="file" onChange={handleFileChange} className="form-input" required />
+            <input type="file" name="file" onChange={handleFileChange} className="form-input" ref={fileInputRef} required />
           </label>
 
           <label className="form-label">
             Documents Needed:<span className="text-danger"> *</span>
             <DropdownButton id="dropdown-basic-button" title="Select Documents" variant="primary" drop="up" className="custom-dropdown">
-              {documentsNeeded.map((doc) => (
+              {documents.map((doc) => (
                 <Dropdown.Item
                   key={doc}
                   onClick={() => handleDocumentSelect(doc)}
-                  active={formState.documents.includes(doc)}
+                  active={formState.documentsNeeded.includes(doc)}
                 >
                   {doc.replace(/_/g, ' ')}
                 </Dropdown.Item>
               ))}
             </DropdownButton>
             <div className="selected-documents">
-              {formState.documents.length > 0 && (
-                <p>Selected Documents: <br />{formState.documents.join(', ').replace(/_/g, ' ')}</p>
+              {formState.documentsNeeded.length > 0 && (
+                <p>Selected Documents: <br/>{formState.documentsNeeded.join(', ').replace(/_/g, ' ')}</p>
               )}
             </div>
           </label>

@@ -10,7 +10,7 @@ function camelToTitle(camelCase) {
       .replace(/^./, match => match.toUpperCase());
   }
 
-export const Table = ({ data, keysToBeIncluded, includeButton, handleButtonClick, showPagination = true}) => {
+export const Table = ({ data, keysToBeIncluded, includeButton, currentPage, pageSize, setPage, setPageSize, handleButtonClick, showPagination = true}) => {
     let tableHeaders;
     let rows;
     let sanitizedData = {};
@@ -50,6 +50,10 @@ export const Table = ({ data, keysToBeIncluded, includeButton, handleButtonClick
             )}
             {showPagination && (
                 <Pagination
+                    currentPage={currentPage}
+                    pageSize={pageSize}
+                    setPage={setPage}
+                    setPageSize={setPageSize}
                     noOfPages={data.totalPages}
                     noOfElements={data.totalElements}
                 />

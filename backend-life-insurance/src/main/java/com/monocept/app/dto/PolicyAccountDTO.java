@@ -4,8 +4,10 @@ import java.time.LocalDate;
 
 import com.monocept.app.utils.NomineeRelation;
 import jakarta.persistence.Column;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,7 +37,6 @@ public class PolicyAccountDTO {
     @NotNull(message = "Payment time in months is mandatory")
     @Positive(message = "Payment time in months must be positive")
     private Integer paymentTimeInMonths;
-
 
     @NotNull(message = "Investment Amount is mandatory")
     @Positive(message = "Investment Amount must be positive")

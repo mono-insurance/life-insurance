@@ -14,7 +14,8 @@ import { useContext, useEffect, useState } from 'react'
 
 
 export const GetPolicy = () => {
-    const {currentPage, itemsPerPage, resetPagination, handleItemsPerPageChange, handlePageChange} = useContext(PaginationContext);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [data, setData] = useState({});
     const [keysToBeIncluded, setKeysToBeIncluded] = useState([]);
     const routeParams = useParams();
@@ -25,11 +26,17 @@ export const GetPolicy = () => {
     const [active, setActive] = useState('');
     const [showPagination, setShowPagination] = useState(true);
     const [searchParams, setSearchParams] = useSearchParams();
+    const { id: adminId } = useParams();
     const filterOptions = [
       { label: 'Search by Policy Id', value: 'id' },
       { label: 'Search by Active', value: 'active' },
       { label: 'Search by Inactive', value: 'inactive' }
   ];
+
+  const resetPagination = () => {
+    setCurrentPage(1);
+    setItemsPerPage(10);
+  };
 
     const handleSearch = () => {
       resetPagination();
@@ -64,10 +71,11 @@ export const GetPolicy = () => {
       setSearchParams({});
     };
   
-    const actions = (id) => [
-      { name: "View", url: `/policy/view/${id}` },
-      { name: "Edit", url: `/policy/edit/${id}` },
-      { name: "Delete", url: `/policy/delete/${id}` }
+
+    const actions = (policyId) => [
+      { name: "View", url: `/admin/policy/${adminId}/view/${policyId}` },
+      { name: "Edit", url: `/admin/policy/${adminId}/edit/${policyId}` },
+      { name: "Delete", url: `/admin/policy/${adminId}/delete/${policyId}` }
     ];
     
   
@@ -189,6 +197,10 @@ export const GetPolicy = () => {
                   includeButton={true}
                   handleButtonClick={actions}
                   showPagination={showPagination}
+                  currentPage={currentPage}
+                  pageSize={itemsPerPage}
+                  setPage={setCurrentPage}
+                  setPageSize={setItemsPerPage}
                 />
             </div>
           </section>

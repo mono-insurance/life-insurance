@@ -9,6 +9,8 @@ import com.monocept.app.utils.PagedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
@@ -39,6 +41,23 @@ public class PolicyController {
     public PolicyController(StorageService storageService) {
         this.storageService = storageService;
     }
+
+
+	
+	
+	@PutMapping(value ="/update/policy-image/{pid}" ,consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+	public ResponseEntity<ByteArrayResource> updatePolicyImage(@PathVariable("pid") Long pid,@RequestParam("file") MultipartFile file) {
+		byte[] data = storageService.updatePolicyImage(pid, file);
+		ByteArrayResource resource = new ByteArrayResource(data);
+		return ResponseEntity
+				.ok()
+				.contentLength(data.length)
+				.header("Content-type", "image/jpeg")
+				.header("Content-disposition", "attachment; filename=\"" + "test" + "\"")
+				.body(resource);
+	}
+	
+	
 
     @GetMapping("/download/policy-image/{pid}")
     public ResponseEntity<ByteArrayResource> downloadPolicyImage(@PathVariable("pid") Long pid) {

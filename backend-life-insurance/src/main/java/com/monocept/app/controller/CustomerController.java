@@ -1,5 +1,6 @@
 package com.monocept.app.controller;
 
+import com.monocept.app.dto.CustomerCreationDTO;
 import com.monocept.app.dto.CustomerDTO;
 
 import com.monocept.app.service.CustomerService;
@@ -55,12 +56,11 @@ public class CustomerController {
     }
 
 
-    // no testing from here
 
 
     @Operation(summary = "By Customer: Make Policy Account when buy policy")
     @PostMapping("/policy-account")
-    public ResponseEntity<PolicyAccountDTO> createPolicyAccount(@RequestBody PolicyAccountDTO policyAccountDTO) {
+    public ResponseEntity<PolicyAccountDTO> createPolicyAccount(@RequestBody @Valid PolicyAccountDTO policyAccountDTO) {
 
         PolicyAccountDTO policyAccount = customerService.createPolicyAccount(policyAccountDTO);
 
@@ -97,7 +97,7 @@ public class CustomerController {
     public ResponseEntity<PagedResponse<PolicyAccountDTO>> getAllPolicyAccounts(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "transactionId") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "policyAccountId") String sortBy,
             @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
         PagedResponse<PolicyAccountDTO> policyAccounts = customerService.getAllPolicyAccounts(page, size, sortBy, direction);
@@ -131,5 +131,23 @@ public class CustomerController {
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
         PagedResponse<WithdrawalRequestsDTO> allPolicyClaims = customerService.getAllPolicyClaimsApproved(pageNo, size, sort, sortBy, sortDirection);
         return new ResponseEntity<>(allPolicyClaims, HttpStatus.OK);
+    }
+    
+    
+    @Operation(summary = "By Customer: Get the customer profile")
+    @GetMapping("/customer/profile/{cid}")
+    public ResponseEntity<CustomerCreationDTO> getCustomerFullProfile(@PathVariable("cid") Long customerId) {
+
+    	CustomerCreationDTO customer = customerService.getCustomerFullProfile(customerId);
+        return new ResponseEntity<CustomerCreationDTO>(customer, HttpStatus.OK);
+    }
+    
+    
+    @Operation(summary = "By Customer: Update customer")
+    @PutMapping("")
+    public ResponseEntity<CustomerCreationDTO> updateCustomer(@RequestBody @Valid CustomerCreationDTO customerDTO) {
+
+    	CustomerCreationDTO customer = customerService.updateCustomer(customerDTO);
+        return new ResponseEntity<CustomerCreationDTO>(customer, HttpStatus.OK);
     }
 }

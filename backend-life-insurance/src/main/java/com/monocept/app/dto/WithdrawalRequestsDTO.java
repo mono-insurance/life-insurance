@@ -24,7 +24,6 @@ public class WithdrawalRequestsDTO {
 
     private Boolean isApproved;
 
-    @NotNull
     private Long policyAccountId;
     
 
@@ -34,6 +33,7 @@ public class WithdrawalRequestsDTO {
     
     
     private Long transactionId;
+    
     
     
 }

@@ -5,6 +5,7 @@ import com.monocept.app.dto.*;
 import com.monocept.app.entity.*;
 import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.*;
+import com.monocept.app.utils.DocumentType;
 import com.monocept.app.utils.GlobalSettings;
 import com.monocept.app.utils.PagedResponse;
 
@@ -43,6 +44,9 @@ public class AdminServiceImp implements AdminService {
 
     @Autowired
     private AuthRepository credentialsRepository;
+    
+    @Autowired
+    private CustomerRepository customerRepository;
 
 
     @Autowired
@@ -301,7 +305,12 @@ public class AdminServiceImp implements AdminService {
         if (policyDTO.getDocumentsNeeded() != null) {
 
             existingPolicy.setDocumentsNeeded(policyDTO.getDocumentsNeeded().stream()
-                    .map(dtoService::convertDocumentNeededDtoToEntity)
+            		.map(documentName -> {
+            			DocumentType documentType = DocumentType.valueOf(documentName.toUpperCase());
+            			DocumentNeeded documentNeeded = documentNeededRepository.findByDocumentType(documentType)
+                                .orElseThrow(() -> new UserException("DocumentNeeded not found with name " + documentName));
+                        return documentNeeded;
+                    })
                     .collect(Collectors.toList()
                     ));
         }
@@ -440,6 +449,51 @@ public class AdminServiceImp implements AdminService {
     private Agent findAgentById(Long agentId) {
         return agentRepository.findById(agentId).orElseThrow(() -> new UserException("agent not found"));
     }
+
+	@Override
+	public SystemCounts wholeSystemStats() {
+		try {
+			long totalActiveCustomers = customerRepository.countByIsActiveTrue();
+	        long totalInactiveCustomers = customerRepository.countByIsActiveFalse();
+	        long totalCustomers = customerRepository.count();
+	        long totalActiveAgents = agentRepository.countByIsActiveTrue();
+	        long totalInactiveAgents = agentRepository.countByIsActiveFalse();
+	        long totalAgents = agentRepository.count();
+	        long totalActiveEmployees = employeeRepository.countByIsActiveTrue();
+	        long totalInactiveEmployees = employeeRepository.countByIsActiveFalse();
+	        long totalEmployees = employeeRepository.count();
+	        long totalAdmins = adminRepository.count();
+	        
+	        return new SystemCounts(
+	                totalActiveCustomers,
+	                totalInactiveCustomers,
+	                totalActiveAgents,
+	                totalInactiveAgents,
+	                totalActiveEmployees,
+	                totalInactiveEmployees,
+	                totalAdmins,
+	                totalCustomers,
+	                totalAgents,
+	                totalEmployees
+	            );
+		}
+		catch(Exception e) {
+			throw new UserException("Error getting system stats");
+		}
+	}
+
+	@Override
+	public PagedResponse<UserDTO> getNewUsers(int page, int size, String sortBy, String direction) {
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+
+        Page<Credentials> pages = credentialsRepository.findAll(pageable);
+        List<Credentials> allCredentials = pages.getContent();
+        List<UserDTO> allCredentialsDTO = dtoService.convertCredentialsListEntityToUserDTO(allCredentials);
+
+        return new PagedResponse<UserDTO>(allCredentialsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
 
 
 }

@@ -31,6 +31,7 @@ public interface CustomerRepository extends JpaRepository<Customer,Long> {
     @Query("UPDATE Customer c SET c.isApproved = true WHERE c.id = :customerId")
     int findByIdAndSetIsApprovedTrue(@Param("customerId") Long customerId);
 
+
     Long countByIsActiveTrue();
 
     Long countByIsApprovedFalse();

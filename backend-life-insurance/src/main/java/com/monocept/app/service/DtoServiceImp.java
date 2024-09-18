@@ -596,14 +596,6 @@ public class DtoServiceImp implements DtoService {
 //            policy.setDocumentUploaded(convertDocumentUploadedDtoToEntity(policyDTO.getDocumentUploaded()));
 //        }
 
-        if (policyDTO.getDocumentsNeeded() != null) {
-            policy.setDocumentsNeeded(
-                    policyDTO.getDocumentsNeeded().stream()
-                            .map(this::convertDocumentNeededDtoToEntity)
-                            .collect(Collectors.toList())
-            );
-        }
-
         return policy;
     }
 
@@ -633,7 +625,7 @@ public class DtoServiceImp implements DtoService {
         if (policy.getDocumentsNeeded() != null) {
             policyDTO.setDocumentsNeeded(
                     policy.getDocumentsNeeded().stream()
-                            .map(this::convertDocumentNeededToDTO)
+                            .map(doc -> doc.getDocumentType().name())
                             .collect(Collectors.toList())
             );
         }
@@ -795,6 +787,7 @@ public class DtoServiceImp implements DtoService {
         transactionsDTO.setAmount(transaction.getAmount());
         transactionsDTO.setTransactionDate(transaction.getTransactionDate());
         transactionsDTO.setStatus(transaction.getStatus());
+        transactionsDTO.setSerialNo(transaction.getSerialNo());
         transactionsDTO.setPolicyAccountId(transaction.getPolicyAccount().getPolicyAccountId());
         return transactionsDTO;
     }
@@ -910,6 +903,8 @@ public class DtoServiceImp implements DtoService {
         policyAccountDTO.setInvestmentAmount(policyAccount.getInvestmentAmount());
         policyAccountDTO.setTotalAmountPaid(policyAccount.getTotalAmountPaid());
         policyAccountDTO.setClaimAmount(policyAccount.getClaimAmount());
+        policyAccountDTO.setNomineeName(policyAccount.getNomineeName());
+        policyAccountDTO.setNomineeRelation(policyAccount.getNomineeRelation());
 
         if (policyAccount.getPolicy() != null) {
             policyAccountDTO.setPolicyId(policyAccount.getPolicy().getPolicyId());
@@ -931,15 +926,9 @@ public class DtoServiceImp implements DtoService {
         PolicyAccount policyAccount = new PolicyAccount();
 
         policyAccount.setPolicyAccountId(policyAccountDTO.getPolicyAccountId());
-//        policyAccount.setCreatedDate(policyAccountDTO.getCreatedDate());
-//        policyAccount.setMaturedDate(policyAccountDTO.getMaturedDate());
-//        policyAccount.setIsActive(policyAccountDTO.getIsActive());
         policyAccount.setPolicyTerm(policyAccountDTO.getPolicyTerm());
         policyAccount.setPaymentTimeInMonths(policyAccountDTO.getPaymentTimeInMonths());
-//        policyAccount.setTimelyBalance(policyAccountDTO.getTimelyBalance());
         policyAccount.setInvestmentAmount(policyAccountDTO.getInvestmentAmount());
-//        policyAccount.setTotalAmountPaid(policyAccountDTO.getTotalAmountPaid());
-//        policyAccount.setClaimAmount(policyAccountDTO.getClaimAmount());
         policyAccount.setNomineeName(policyAccountDTO.getNomineeName());
         policyAccount.setNomineeRelation(policyAccountDTO.getNomineeRelation());
 
@@ -961,7 +950,7 @@ public class DtoServiceImp implements DtoService {
         dto.setAmount(withdrawalRequest.getAmount());
         dto.setIsWithdraw(withdrawalRequest.getIsWithdraw());
         dto.setIsApproved(withdrawalRequest.getIsApproved());
-        dto.setPolicyAccountId(withdrawalRequest.getPolicyAccount().getPolicyAccountId());
+        dto.setPolicyAccountId(withdrawalRequest.getPolicyAccount()!= null ? withdrawalRequest.getPolicyAccount().getPolicyAccountId(): null);
         dto.setAgentId(withdrawalRequest.getAgent() != null ? withdrawalRequest.getAgent().getAgentId() : null);
         dto.setCustomerId(withdrawalRequest.getCustomer() != null ? withdrawalRequest.getCustomer().getCustomerId() : null);
 
@@ -996,4 +985,135 @@ public class DtoServiceImp implements DtoService {
 		
 		return adminCreationDTO;
 	}
+
+	@Override
+	public EmployeeCreationDTO convertEmployeeToEmployeeCreationDTO(Employee existingEmployee) {
+		// TODO Auto-generated method stub
+		EmployeeCreationDTO employeeCreationDTO = new EmployeeCreationDTO();
+		employeeCreationDTO.setEmployeeId(existingEmployee.getEmployeeId());
+		employeeCreationDTO.setFirstName(existingEmployee.getFirstName());
+		employeeCreationDTO.setLastName(existingEmployee.getLastName());
+		employeeCreationDTO.setQualification(existingEmployee.getQualification());
+		employeeCreationDTO.setDateOfBirth(existingEmployee.getDateOfBirth());
+		employeeCreationDTO.setEmail(existingEmployee.getCredentials().getEmail());
+		employeeCreationDTO.setUsername(existingEmployee.getCredentials().getUsername());
+		employeeCreationDTO.setMobileNumber(existingEmployee.getCredentials().getMobileNumber());
+		employeeCreationDTO.setIsActive(existingEmployee.getIsActive());
+		
+		return employeeCreationDTO;
+	}
+
+	@Override
+	public CustomerCreationDTO convertCustomerToCustomerCreationDTO(Customer customer) {
+		CustomerCreationDTO customerCreationDTO = new CustomerCreationDTO();
+		
+		customerCreationDTO.setFirstName(customer.getFirstName());
+		customerCreationDTO.setLastName(customer.getLastName());
+		customerCreationDTO.setDateOfBirth(customer.getDateOfBirth());
+		customerCreationDTO.setGender(customer.getGender());
+		customerCreationDTO.setIsActive(customer.getIsActive());
+		customerCreationDTO.setNomineeName(customer.getNomineeName());
+		customerCreationDTO.setNomineeRelation(customer.getNomineeRelation());
+		customerCreationDTO.setIsApproved(customer.getIsApproved());
+		customerCreationDTO.setFirstStreet(customer.getAddress().getFirstStreet());
+		customerCreationDTO.setLastStreet(customer.getAddress().getLastStreet());
+		customerCreationDTO.setPincode(customer.getAddress().getPincode());
+		customerCreationDTO.setState(customer.getAddress().getState().getStateName());
+		customerCreationDTO.setCity(customer.getAddress().getCity().getCityName());
+		customerCreationDTO.setUsername(customer.getCredentials().getUsername());
+		customerCreationDTO.setEmail(customer.getCredentials().getEmail());
+		customerCreationDTO.setMobileNumber(customer.getCredentials().getMobileNumber());
+		customerCreationDTO.setRole(customer.getCredentials().getRole().getName());
+		
+		return customerCreationDTO;
+		
+	}
+
+	@Override
+	public List<UserDTO> convertCredentialsListEntityToUserDTO(List<Credentials> allCredentials) {
+		return allCredentials.stream()
+                .map(this::convertCredentialsEntityToUserDTO)
+                .collect(Collectors.toList());
+	}
+	
+	@Override
+	public UserDTO convertCredentialsEntityToUserDTO(Credentials credentials) {
+		
+		String firstName = "";
+		String lastName = "";
+
+		
+		if(credentials.getAdmin() != null) {
+			firstName = credentials.getAdmin().getFirstName();
+			lastName = credentials.getAdmin().getLastName();
+		}
+		
+		if(credentials.getAgent() != null) {
+			firstName = credentials.getAgent().getFirstName();
+			lastName = credentials.getAgent().getLastName();
+		}
+		
+		if(credentials.getCustomer() != null) {
+			firstName = credentials.getCustomer().getFirstName();
+			lastName = credentials.getCustomer().getLastName();
+		}
+		
+		if(credentials.getEmployee() != null) {
+			firstName = credentials.getEmployee().getFirstName();
+			lastName = credentials.getEmployee().getLastName();
+		}
+		
+		UserDTO user = new UserDTO();
+		user.setId(credentials.getId());
+		user.setEmail(credentials.getEmail());
+		user.setUsername(credentials.getUsername());
+		user.setMobileNumber(credentials.getMobileNumber());
+		user.setRole(credentials.getRole().getName());
+		user.setFirstName(firstName);
+		user.setLastName(lastName);
+		
+		return user;
+		
+	}
+
+	@Override
+	public List<CommissionDTO> convertPolicyAccountListEntityToCommissionDTO(List<PolicyAccount> allPolicyAccount) {
+		return allPolicyAccount.stream()
+                .map(this::convertPolicyAccountEntityToCommissionDTO)
+                .collect(Collectors.toList());
+	}
+	
+	
+	@Override
+	public CommissionDTO convertPolicyAccountEntityToCommissionDTO(PolicyAccount policyAccount) {
+		CommissionDTO commissionDTO = new CommissionDTO();
+		
+		commissionDTO.setAgentId(policyAccount.getAgent().getAgentId());
+		commissionDTO.setAgentName(policyAccount.getAgent().getFirstName()+" "+policyAccount.getAgent().getLastName());
+		commissionDTO.setAmount(policyAccount.getAgentCommissionForRegistration());
+		commissionDTO.setPolicyAccountId(policyAccount.getPolicyAccountId());
+		
+		return commissionDTO;
+		
+	}
+
+	@Override
+	public List<CommissionDTO> convertTransactionListEntityToCommissionDTO(List<Transactions> allTransactions) {
+		return allTransactions.stream()
+                .map(this::convertTransactionEntityToCommissionDTO)
+                .collect(Collectors.toList());
+	}
+	
+	
+	@Override
+	public CommissionDTO convertTransactionEntityToCommissionDTO(Transactions transactions) {
+		CommissionDTO commissionDTO = new CommissionDTO();
+		
+		commissionDTO.setAgentId(transactions.getPolicyAccount().getAgent().getAgentId());
+		commissionDTO.setAgentName(transactions.getPolicyAccount().getAgent().getFirstName()+" "+transactions.getPolicyAccount().getAgent().getLastName());
+		commissionDTO.setAmount(transactions.getAgentCommission());
+		commissionDTO.setPolicyAccountId(transactions.getPolicyAccount().getPolicyAccountId());
+		return commissionDTO;
+	}
+	
 }

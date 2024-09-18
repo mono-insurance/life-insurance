@@ -3,7 +3,7 @@ import { TableAction } from '../../sharedComponents/Table/TableAction/TableActio
 
 export const sanitizeTableData = (data, keysToBeIncluded, includeButton, handleButtonClick) => {
 
-    const possibleIdFields = ['feedbackId', 'queryId', 'customerId', 'agentId', 'employeeId', 'cityId', 'stateId', 'policyId', 'typeId', 'id'];
+    const possibleIdFields = ['requestsId', 'feedbackId', 'queryId', 'policyAccountId', 'customerId', 'agentId', 'employeeId', 'cityId', 'stateId', 'policyId', 'typeId', 'id'];
 
     const findKeyInObject = (obj, key) => {
         if (!obj || typeof obj !== 'object') return undefined;

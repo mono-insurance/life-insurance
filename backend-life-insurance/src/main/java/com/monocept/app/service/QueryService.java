@@ -28,4 +28,10 @@ public interface QueryService {
 
 	QueryDTO getQueryById(Long id);
 
+	PagedResponse<QueryDTO> getAllResolvedQueriesByCustomer(int page, int size, String sortBy, String direction,
+			Long id);
+
+	PagedResponse<QueryDTO> getAllUnresolvedQueriesByCustomer(int page, int size, String sortBy, String direction,
+			Long id);
+
 }

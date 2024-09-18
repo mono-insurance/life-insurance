@@ -6,5 +6,6 @@ public enum NomineeRelation {
     MOTHER,
     FATHER,
     DAUGHTER,
-    SON
+    SON,
+    SPOUSE
 }

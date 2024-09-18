@@ -320,9 +320,11 @@ public class CustomerServiceImp implements CustomerService {
 
         Customer customer = findCustomerById(userDetails.getId());
 
+        System.out.print(policyAccountDTO);
         Policy policy = policyRepository.findById(policyAccountDTO.getPolicyId())
                 .orElseThrow(() -> new UserException("Policy not found"));
-
+        
+        
         checkEligibility(customer, policy, policyAccountDTO);
 
         policyAccountDTO.setPolicyAccountId(0L);
@@ -340,9 +342,11 @@ public class CustomerServiceImp implements CustomerService {
         policyAccount.setTotalAmountPaid(0.0);
 
         Double claimAmount = policyAccountDTO.getInvestmentAmount() * (1 + policy.getProfitRatio() / 100);
+        claimAmount = Double.valueOf(String.format("%.2f", claimAmount));
         policyAccount.setClaimAmount(claimAmount);
         policyAccount.setPolicy(policy);
         policyAccount.setCustomer(customer);
+
         Agent agent = null;
         if (policyAccountDTO.getAgentId() != null) {
             agent = agentRepository.findById(policyAccountDTO.getAgentId())
@@ -357,9 +361,10 @@ public class CustomerServiceImp implements CustomerService {
                 policyAccount.setAgent(null);
             }
         }
-        PolicyAccount savedPolicyAccount = policyAccountRepository.save(policyAccount);
-        createFutureTransactions(savedPolicyAccount, policyAccountDTO.getPaymentTimeInMonths(), balancePerPayment);
 
+        PolicyAccount savedPolicyAccount = policyAccountRepository.save(policyAccount);
+        
+        createFutureTransactions(savedPolicyAccount, policyAccountDTO.getPaymentTimeInMonths(), balancePerPayment);
 
         if (policy.getPolicyAccounts() != null) policy.getPolicyAccounts().add(savedPolicyAccount);
         else policy.setPolicyAccounts(addFirstPolicyAccount(savedPolicyAccount));
@@ -369,11 +374,16 @@ public class CustomerServiceImp implements CustomerService {
 
         customerRepository.save(customer);
         policyRepository.save(policy);
-        assert agent != null;
-        if (agent.getPolicyAccounts() != null) agent.getPolicyAccounts().add(savedPolicyAccount);
-        else agent.setPolicyAccounts(addFirstPolicyAccount(savedPolicyAccount));
-
-        agentRepository.save(agent);
+        
+        
+        if (agent != null) {
+            if (agent.getPolicyAccounts() != null) {
+                agent.getPolicyAccounts().add(savedPolicyAccount);
+            } else {
+                agent.setPolicyAccounts(addFirstPolicyAccount(savedPolicyAccount));
+            }
+            agentRepository.save(agent);
+        }
 
         EmailDTO emailDTO = new EmailDTO();
         emailDTO.setEmailId(customer.getCredentials().getEmail());
@@ -448,7 +458,7 @@ public class CustomerServiceImp implements CustomerService {
         transactionsRepository.save(initialPayment);
 
         // Create future scheduled payments
-        while (nextPaymentDate.isBefore(policyAccount.getMaturedDate()) || nextPaymentDate.isEqual(policyAccount.getMaturedDate())) {
+        while (nextPaymentDate.isBefore(policyAccount.getMaturedDate())) {
             Transactions transaction = new Transactions();
             transaction.setAmount(balancePerPayment);
             transaction.setTransactionDate(nextPaymentDate);
@@ -635,6 +645,35 @@ public class CustomerServiceImp implements CustomerService {
                 customerPage.getSize(), customerPage.getTotalElements(), customerPage.getTotalPages(),
                 customerPage.isLast());
     }
+
+	@Override
+	public CustomerCreationDTO getCustomerFullProfile(Long customerId) {
+		Customer customer = findCustomerById(customerId);
+		
+		return dtoService.convertCustomerToCustomerCreationDTO(customer);
+	}
+
+	@Override
+	public CustomerCreationDTO updateCustomer(CustomerCreationDTO customerDTO) {
+		CustomUserDetails userDetails = accessConService.checkUserAccess();
+        accessConService.checkCustomerAccess(userDetails.getId());
+        // Find the customer by ID
+        Customer customer = findCustomerById(userDetails.getId());
+        
+        customer.setFirstName(customerDTO.getFirstName());
+        customer.setLastName(customerDTO.getLastName());
+        customer.setDateOfBirth(customerDTO.getDateOfBirth());
+        customer.setGender(customerDTO.getGender());
+        customer.setNomineeName(customerDTO.getNomineeName());
+        customer.setNomineeRelation(customerDTO.getNomineeRelation());
+        customer.getCredentials().setUsername(customerDTO.getUsername());
+        customer.getCredentials().setEmail(customerDTO.getEmail());
+        customer.getCredentials().setMobileNumber(customerDTO.getMobileNumber());
+        
+        customer = customerRepository.save(customer);
+        
+        return dtoService.convertCustomerToCustomerCreationDTO(customer);
+	}
 
 
 }

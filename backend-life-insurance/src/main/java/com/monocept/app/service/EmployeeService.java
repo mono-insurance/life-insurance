@@ -12,7 +12,7 @@ public interface EmployeeService {
 
 	EmployeeDTO createEmployee(EmployeeCreationDTO employeeDTO);
 
-	EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO);
+	EmployeeCreationDTO updateEmployee(Long id, EmployeeCreationDTO employeeDTO);
 
 	void deleteEmployee(Long id);
 
@@ -55,6 +55,8 @@ public interface EmployeeService {
 
     Boolean approveDocument(Long documentId, Boolean isApproved);
 	PagedResponse<EmployeeDTO> getAllInactiveEmployees(int page, int size, String sortBy, String direction);
+
+	EmployeeCreationDTO getEmployeeById(Long id);
 
     DashBoardDTO employeeDashboard();
 

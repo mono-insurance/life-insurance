@@ -3,6 +3,7 @@ package com.monocept.app.repository;
 import com.monocept.app.entity.City;
 import com.monocept.app.entity.State;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -21,4 +22,6 @@ public interface CityRepository extends JpaRepository<City,Long> {
 	Page<City> findByIsActiveFalse(Pageable pageable);
 
 	Page<City> findByIsActiveTrueAndState(State state, Pageable pageable);
+
+	List<City> findByIsActiveTrueAndState(State state);
 }

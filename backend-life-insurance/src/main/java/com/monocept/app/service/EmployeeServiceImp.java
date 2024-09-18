@@ -99,10 +99,20 @@ public class EmployeeServiceImp implements EmployeeService {
 
         return dtoService.converEmployeeToEmployeeResponseDTO(credentials.getEmployee());
     }
+    
+
+	@Override
+	public EmployeeCreationDTO getEmployeeById(Long id) {
+		accessConService.checkEmployeeAdminAccess(id);
+        Employee existingEmployee = employeeRepository.findById(id)
+                .orElseThrow(() -> new UserException("Employee not found"));
+        
+        return dtoService.convertEmployeeToEmployeeCreationDTO(existingEmployee);
+	}
 
 
     @Override
-    public EmployeeDTO updateEmployee(Long empId, EmployeeDTO employeeDTO) {
+    public EmployeeCreationDTO updateEmployee(Long empId, EmployeeCreationDTO employeeDTO) {
         accessConService.checkEmployeeAdminAccess(empId);
         Employee existingEmployee = employeeRepository.findById(empId)
                 .orElseThrow(() -> new UserException("Employee not found"));
@@ -112,14 +122,14 @@ public class EmployeeServiceImp implements EmployeeService {
         existingEmployee.setDateOfBirth(employeeDTO.getDateOfBirth());
         existingEmployee.setQualification(employeeDTO.getQualification());
         existingEmployee.setIsActive(employeeDTO.getIsActive());
-        existingEmployee.getCredentials().setUsername(employeeDTO.getCredentials().getUsername());
-        existingEmployee.getCredentials().setEmail(employeeDTO.getCredentials().getEmail());
-        existingEmployee.getCredentials().setMobileNumber(employeeDTO.getCredentials().getMobileNumber());
+        existingEmployee.getCredentials().setUsername(employeeDTO.getUsername());
+        existingEmployee.getCredentials().setEmail(employeeDTO.getEmail());
+        existingEmployee.getCredentials().setMobileNumber(employeeDTO.getMobileNumber());
 
         Employee updatedEmployee = employeeRepository.save(existingEmployee);
 
 
-        return dtoService.converEmployeeToEmployeeResponseDTO(updatedEmployee);
+        return dtoService.convertEmployeeToEmployeeCreationDTO(updatedEmployee);
     }
 
 
@@ -568,4 +578,6 @@ public class EmployeeServiceImp implements EmployeeService {
     private DocumentUploaded findDocumentById(Long documentId) {
         return documentUploadedRepository.findById(documentId).orElseThrow(() -> new UserException("document not found"));
     }
+
+
 }
