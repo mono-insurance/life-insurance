@@ -13,4 +13,5 @@ public interface EmployeeRepository extends JpaRepository<Employee,Long> {
 	Page<Employee> findByIsActiveTrue(Pageable pageable);
 
 	Page<Employee> findByIsActiveFalse(Pageable pageable);
+
 }

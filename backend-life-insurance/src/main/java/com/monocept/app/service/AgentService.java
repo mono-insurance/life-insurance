@@ -5,7 +5,7 @@ import com.monocept.app.utils.PagedResponse;
 import jakarta.validation.Valid;
 
 public interface AgentService {
-    Long agentRegisterRequest(@Valid CredentialsDTO registrationDTO);
+    Long agentRegisterRequest( RegistrationDTO registrationDTO);
 
     AgentDTO updateAgent(AgentDTO agentDTO);
 

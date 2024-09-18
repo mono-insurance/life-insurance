@@ -3,6 +3,7 @@ package com.monocept.app.service;
 import java.util.List;
 
 import com.monocept.app.dto.*;
+import com.monocept.app.entity.Agent;
 import com.monocept.app.utils.PagedResponse;
 
 import jakarta.validation.Valid;
@@ -51,7 +52,7 @@ public interface AdminService {
 
     SettingsDTO getSetting(String settingKey);
 
-    PagedResponse<EmployeeDTO> getAllEmployees(int page, int size, String sortBy, String direction);
+    PagedResponse<AgentDTO> getAllRegisteredAgents(int page, int size, String sortBy, String direction);
 
     PagedResponse<EmployeeDTO> getAllActiveEmployees(int page, int size, String sortBy, String direction);
 

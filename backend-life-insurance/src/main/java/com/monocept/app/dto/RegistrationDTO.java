@@ -43,6 +43,7 @@ public class RegistrationDTO {
     private String firstStreet;
 
     private String lastStreet;
+    private String qualification;
 
     @NotBlank(message = "Pincode is mandatory")
     @Pattern(regexp = "\\d{6}", message = "Pincode must be exactly 6 digits")

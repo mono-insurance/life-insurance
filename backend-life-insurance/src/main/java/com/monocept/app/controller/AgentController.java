@@ -21,11 +21,6 @@ public class AgentController {
         this.agentService = agentService;
         this.emailService = emailService;
     }
-    
-    
-    
-    // no testing done here
-
 
     @GetMapping("/balance")
     ResponseEntity<BalanceDTO> getAgentBalance() {
@@ -44,7 +39,7 @@ public class AgentController {
         return new ResponseEntity<>(dashBoardDTO, HttpStatus.OK);
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     ResponseEntity<AgentDTO> updateAgent(@RequestBody @Valid AgentDTO agentDTO) {
         AgentDTO updatedAgent = agentService.updateAgent(agentDTO);
         return new ResponseEntity<>(updatedAgent, HttpStatus.OK);
