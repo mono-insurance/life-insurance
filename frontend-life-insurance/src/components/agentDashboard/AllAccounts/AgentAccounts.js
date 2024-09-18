@@ -80,7 +80,6 @@ export const AgentAccounts = () => {
     useEffect(() => {
         resetPagination();
     }, [showActiveAccounts, showInactiveAccounts]);
-
     return (
         <div className='content-area'>
             <AreaTop pageTitle={"Agent Accounts"} pagePath={"agent-accounts"} pageLink={`/agent/dashboard/${routeParams.id}`} />

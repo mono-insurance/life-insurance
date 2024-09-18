@@ -7,40 +7,40 @@ import { Sidebar } from './Sidebar/Sidebar';
 import { errorToast } from '../../utils/helper/toast';
 
 export const CustomerDashboard = () => {
-    const [isCustomer, setIsCustomer] = useState(false);
-    const navigate = useNavigate();
-    const routeParams = useParams();
+  const [isCustomer, setIsCustomer] = useState(false);
+  const navigate = useNavigate();
+  const routeParams = useParams();
 
-    useEffect(() => {
-        const checkCustomer = async () => {
-          try{
-              const customerStatus = await verifyCustomer({customerId : routeParams.id});
-              setIsCustomer(customerStatus);
-              if (!customerStatus) {
-                navigate('/auth/login');
-              }
-        } catch (error) {
-              if (error.response?.data?.message || error.specificMessage) {
-                errorToast(error.response?.data?.message || error.specificMessage);
-              } else {
-                errorToast("An error occurred while Activating account.");
-              }
-          }
-        };
-        checkCustomer();
-      }, [navigate]);
+  useEffect(() => {
+    const checkCustomer = async () => {
+      try {
+        const customerStatus = await verifyCustomer({ customerId: routeParams.id });
+        setIsCustomer(customerStatus);
+        if (!customerStatus) {
+          navigate('/login');
+        }
+      } catch (error) {
+        if (error.response?.data?.message || error.specificMessage) {
+          errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+          errorToast("An error occurred while Activating account.");
+        }
+      }
+    };
+    checkCustomer();
+  }, [navigate]);
 
   return (
     <>
-    {isCustomer && (
+      {isCustomer && (
         <main className="page-wrapper">
-        <Sidebar />
-            <div className="content-wrapper">
-                <Outlet />
-            </div>
+          <Sidebar />
+          <div className="content-wrapper">
+            <Outlet />
+          </div>
         </main>)
-    }
-    <ToastContainer position="bottom-right" />
+      }
+      <ToastContainer position="bottom-right" />
     </>
   )
 }

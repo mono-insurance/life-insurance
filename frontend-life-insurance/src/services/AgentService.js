@@ -19,6 +19,21 @@ export const fetchAgent = async (aid) => {
         throw error;
     }
 }
+export const updateAgent = async (agentId, editAgent) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.put(`http://localhost:8080/suraksha/agent/update`, editAgent, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
+
+        return response;
+    }
+    catch (error) {
+        throw error;
+    }
+}
 export const fetchAgentDashboard = async () => {
     const token = localStorage.getItem('auth');
     try {

@@ -57,7 +57,7 @@ export const Login = () => {
                 navigate(`/employee/dashboard/${response.data.id}`)
             }
             if (response.data.role === "Customer") {
-                navigate(`/user/transactions/${response.data.id}`)
+                navigate(`/user/dashboard/${response.data.id}`)
             }
         }
         catch (error) {
@@ -136,6 +136,15 @@ export const Login = () => {
                         <span>Don't have an account? </span>
                         <a
                             href="/register"
+                            className="text-blue-500 hover:underline"
+                        >
+                            Register here
+                        </a>
+                    </div>
+                    <div className="text-center mt-4">
+                        <span>forgot password?</span>
+                        <a
+                            href="/change-password"
                             className="text-blue-500 hover:underline"
                         >
                             Register here

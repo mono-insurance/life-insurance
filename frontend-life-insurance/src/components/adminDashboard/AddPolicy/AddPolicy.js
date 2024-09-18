@@ -10,12 +10,12 @@ import { Dropdown, DropdownButton } from 'react-bootstrap';
 
 export const AddPolicy = () => {
   const routeParams = useParams();
-  
+
   const [investmentTypes, setInvestmentTypes] = useState([]);
   const [documentsNeeded, setDocumentsNeeded] = useState([]);
   const [formState, setFormState] = useState({
     policyName: '',
-    commissionRegistration: '',
+    commissionNewRegistration: '',
     commissionInstallment: '',
     description: '',
     minPolicyTerm: '',
@@ -25,7 +25,7 @@ export const AddPolicy = () => {
     minInvestmentAmount: '',
     maxInvestmentAmount: '',
     eligibleGender: 'both',
-    investmentTypeId: '',
+    insuranceTypeId: '',
     profitRatio: '',
     image: '',
     isActive: true,
@@ -47,6 +47,7 @@ export const AddPolicy = () => {
   }, []);
 
   const handleChange = (event) => {
+    console.log("handle change", event.target.value)
     setFormState({
       ...formState,
       [event.target.name]: event.target.value,
@@ -74,22 +75,40 @@ export const AddPolicy = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    try {
-      const formErrors = validateForm(formState);
+    // Create a FormData object
+    const formData = new FormData();
 
-      if (Object.keys(formErrors).length > 0) {
-        Object.values(formErrors).forEach((errorMessage) => {
-          errorToast(errorMessage);
+    // Append all form fields to FormData
+    for (const key in formState) {
+      if (key === 'image') {
+        // Append the file separately
+        formData.append('file', formState.image);
+      } else if (key === 'documents') {
+        // Append documents as an array
+        formState.documents.forEach((doc, index) => {
+          formData.append(`documents[${index}]`, doc);
         });
-        return;
+      } else {
+        formData.append(key, formState[key]);
       }
+    }
+    try {
 
-      await createNewPolicy(formState);
+      // const formErrors = validateForm(formState);
+
+      // if (Object.keys(formErrors).length > 0) {
+      //   Object.values(formErrors).forEach((errorMessage) => {
+      //     errorToast(errorMessage);
+      //   });
+      //   return;
+      // }
+      console.log("in form change", formData)
+      await createNewPolicy(formData);
       successToast("Policy created successfully!");
-      
+
       setFormState({
         policyName: '',
-        commissionRegistration: '',
+        commissionNewRegistration: '',
         commissionInstallment: '',
         description: '',
         minPolicyTerm: '',
@@ -99,7 +118,7 @@ export const AddPolicy = () => {
         minInvestmentAmount: '',
         maxInvestmentAmount: '',
         eligibleGender: 'both',
-        investmentTypeId: '',
+        insuranceTypeId: '',
         profitRatio: '',
         image: '',
         isActive: true,
@@ -116,12 +135,12 @@ export const AddPolicy = () => {
       <AreaTop pageTitle={"Create New Policy"} pagePath={"Create-Policy"} pageLink={`/admin/dashboard/${routeParams.id}`} />
       <section className="content-area-form">
         <form className="policy-form" onSubmit={handleSubmit}>
-            <label className="form-label">
-              Policy Name:<span className="text-danger"> *</span>
-              <input type="text" name="policyName" value={formState.policyName} onChange={handleChange} className="form-input" placeholder="Enter Policy Name" required />
-            </label>
+          <label className="form-label">
+            Policy Name:<span className="text-danger"> *</span>
+            <input type="text" name="policyName" value={formState.policyName} onChange={handleChange} className="form-input" placeholder="Enter Policy Name" required />
+          </label>
 
-          
+
 
           <div className="form-row">
             <label className="form-label">
@@ -129,7 +148,7 @@ export const AddPolicy = () => {
                 <span>Commission (Registration):</span>
                 <span className="text-danger"> *</span>
               </div>
-              <input type="number" name="commissionRegistration" value={formState.commissionRegistration} onChange={handleChange} className="form-input" placeholder="Enter Registration Commission" required />
+              <input type="number" name="commissionNewRegistration" value={formState.commissionNewRegistration} onChange={handleChange} className="form-input" placeholder="Enter Registration Commission" required />
             </label>
             <label className="form-label">
               <div className="label-container">
@@ -214,7 +233,7 @@ export const AddPolicy = () => {
                 <span>Insurance Type:</span>
                 <span className="text-danger"> *</span>
               </div>
-              <select name="investmentTypeId" value={formState.investmentTypeId} onChange={handleChange} className="form-input" required>
+              <select name="insuranceTypeId" value={formState.insuranceTypeId} onChange={handleChange} className="form-input" required>
                 {investmentTypes.map(type => (
                   <option key={type.typeId} value={type.typeId}>{type.insuranceCategory}</option>
                 ))}
@@ -229,7 +248,7 @@ export const AddPolicy = () => {
 
           <label className="form-label">
             Policy Image:<span className="text-danger"> *</span>
-            <input type="file" name="image" onChange={handleFileChange} className="form-input" required />
+            <input type="file" name="file" onChange={handleFileChange} className="form-input" required />
           </label>
 
           <label className="form-label">
@@ -247,7 +266,7 @@ export const AddPolicy = () => {
             </DropdownButton>
             <div className="selected-documents">
               {formState.documents.length > 0 && (
-                <p>Selected Documents: <br/>{formState.documents.join(', ').replace(/_/g, ' ')}</p>
+                <p>Selected Documents: <br />{formState.documents.join(', ').replace(/_/g, ' ')}</p>
               )}
             </div>
           </label>

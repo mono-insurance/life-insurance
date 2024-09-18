@@ -66,6 +66,11 @@ import { AllDocuments } from './components/employeeDashboard/AllDocuments/AllDoc
 import { AllCommissions } from './components/employeeDashboard/AllCommissions/AllCommissions';
 import { AllTransactions } from './components/employeeDashboard/Transactions/Transactions';
 import { Agent } from './components/agentDashboard/Agent';
+import PoliciesPage from './components/publicDashboard/PoliciesPage';
+import PolicyDetailPage from './components/publicDashboard/PolicyDetailPage';
+import UploadDocument from './components/customerDashboard/Documents/DocumentUpload';
+import DocumentUpload from './components/customerDashboard/Documents/DocumentUpload';
+import PasswordReset from './components/securityDashboard/PasswordChange/PasswordReset';
 
 function App() {
 
@@ -85,8 +90,11 @@ function App() {
       <Routes>
 
         {/* <Routes> */}
+        <Route path='/' element={<PoliciesPage />}></Route>
+        <Route path="/policy/:id" element={<PolicyDetailPage />} />
 
-        <Route path='/' element={<Login />}></Route>
+        <Route path='/login' element={<Login />}></Route>
+        <Route path='/change-password' element={<PasswordReset />}></Route>
         <Route path='/register' element={<Register />}></Route>
 
         {/* </Routes> */}
@@ -158,6 +166,8 @@ function App() {
           <Route path='/user/passbook/:id' element={<Passbook />}></Route>
           <Route path='/user/accounts/:id' element={<Accounts />}></Route>
           <Route path='/user/settings/:id' element={<CustomerSettings />}></Route>
+          <Route path='/user/documents/upload' element={<DocumentUpload />}></Route>
+          <Route path='/user/dashboard/:id' element={<DocumentUpload />}></Route>
 
         </Route>
 
