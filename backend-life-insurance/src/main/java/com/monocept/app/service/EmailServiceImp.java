@@ -31,8 +31,8 @@ public class EmailServiceImp implements EmailService{
                     = new MimeMessageHelper(mimeMessage, true);
             mimeMessageHelper.setFrom(sender);
             mimeMessageHelper.setTo(emailDTO.getEmailId());
-            String body= emailDTO.getBody()+ " please use below link to register your  account";
-            String link="http:localhost/policy/"+emailDTO.getPolicyId()+"?agentId="+emailDTO.getAgentId();
+            String body= emailDTO.getBody();
+            String link="http://localhost:3000/policy/"+emailDTO.getPolicyId()+"?agentId="+emailDTO.getAgentId();
             String htmlContent = "<p>" + body + "</p>" +
                     "<p>Click the link: <a href='" + link + "'>Referral Link</a></p>";
 
