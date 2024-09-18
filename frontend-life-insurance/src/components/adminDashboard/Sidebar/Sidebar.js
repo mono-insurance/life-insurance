@@ -185,14 +185,14 @@ export const Sidebar = () => {
                     </button>
                     {(activeMenu === 'agents' || activeMenu === 'add-agents' || activeMenu === 'get-agents') && (
                       <ul className="menu-list" >
-                        <li className={`menu-item ${activeMenu === 'add-agents' ? 'active' : ''}`} style={{marginBottom: '4px'}}>
+                        {/* <li className={`menu-item ${activeMenu === 'add-agents' ? 'active' : ''}`} style={{marginBottom: '4px'}}>
                           <NavLink to={`/admin/add-agents/${routeParams.id}`} className="menu-link" onClick={() => handleMenuClick('add-agents')}>
                           <span className="menu-link-icon">
                             <MdOutlinePersonAdd size={20} />
                           </span>
                           <span className="menu-link-text">Add Agents</span>
                           </NavLink>
-                        </li>
+                        </li> */}
                         <li className={`menu-item ${activeMenu === 'get-agents' ? 'active' : ''}`}>
                           <NavLink to={`/admin/get-agents/${routeParams.id}`} className="menu-link" onClick={() => handleMenuClick('get-agents')}>
                           <span className="menu-link-icon">
@@ -213,14 +213,14 @@ export const Sidebar = () => {
                     </button>
                     {(activeMenu === 'customers' || activeMenu === 'add-customers' || activeMenu === 'get-customers') && (
                       <ul className="menu-list" >
-                        <li className={`menu-item ${activeMenu === 'add-customers' ? 'active' : ''}`} style={{marginBottom: '4px'}}>
+                        {/* <li className={`menu-item ${activeMenu === 'add-customers' ? 'active' : ''}`} style={{marginBottom: '4px'}}>
                           <NavLink to={`/admin/add-customers/${routeParams.id}`} className="menu-link" onClick={() => handleMenuClick('add-customers')}>
                           <span className="menu-link-icon">
                             <MdOutlinePersonAdd size={20} />
                           </span>
                           <span className="menu-link-text">Add Customers</span>
                           </NavLink>
-                        </li>
+                        </li> */}
                         <li className={`menu-item ${activeMenu === 'get-customers' ? 'active' : ''}`}>
                           <NavLink to={`/admin/get-customers/${routeParams.id}`} className="menu-link" onClick={() => handleMenuClick('get-customers')}>
                           <span className="menu-link-icon">
@@ -382,14 +382,6 @@ export const Sidebar = () => {
                       <MdOutlineAttachMoney size={20} />
                     </span>
                     <span className="menu-link-text">Claim</span>
-                    </NavLink>
-                  </li>
-                  <li className={`menu-item ${activeMenu === 'cancel' ? 'active' : ''}`} style={{marginBottom: '4px'}}>
-                    <NavLink to={`/admin/cancel/${routeParams.id}`} className="menu-link" onClick={() => handleMenuClick('cancel')}>
-                    <span className="menu-link-icon">
-                      <MdOutlineCancel size={20} />
-                    </span>
-                    <span className="menu-link-text">Cancel</span>
                     </NavLink>
                   </li>
                   <li className={`menu-item ${activeMenu === 'requests' ? 'active' : ''}`} style={{marginBottom: '4px'}}>

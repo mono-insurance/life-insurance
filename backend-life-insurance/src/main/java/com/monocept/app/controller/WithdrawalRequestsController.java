@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.monocept.app.dto.StateDTO;
 import com.monocept.app.dto.WithdrawalRequestsDTO;
 import com.monocept.app.service.TransactionService;
 import com.monocept.app.service.WithdrawalRequestsService;
+import com.monocept.app.utils.BalancePagedResponse;
 import com.monocept.app.utils.PagedResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +32,7 @@ public class WithdrawalRequestsController {
 	@Operation(summary = "By Customer: Create a withdrawal request")
     @PostMapping("/customer")
     public ResponseEntity<WithdrawalRequestsDTO> createWithdrawalRequestForCustomer(@RequestBody @Valid WithdrawalRequestsDTO withdrawalRequestDTO) {
-		 
+		System.out.print(withdrawalRequestDTO);
         WithdrawalRequestsDTO createdRequest = withdrawalRequestsService.createWithdrawalRequestForCustomer(withdrawalRequestDTO);
         return new ResponseEntity<>(createdRequest, HttpStatus.CREATED);
     }
@@ -39,6 +41,7 @@ public class WithdrawalRequestsController {
     @PostMapping("/agent")
     public ResponseEntity<WithdrawalRequestsDTO> createWithdrawalRequestForAgent(@RequestBody @Valid WithdrawalRequestsDTO withdrawalRequestDTO) {
 		 
+		System.out.print(withdrawalRequestDTO);
         WithdrawalRequestsDTO createdRequest = withdrawalRequestsService.createWithdrawalRequestForAgent(withdrawalRequestDTO);
         return new ResponseEntity<>(createdRequest, HttpStatus.CREATED);
     }
@@ -57,7 +60,7 @@ public class WithdrawalRequestsController {
     public ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllWithdrawalRequests(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "requestId") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "withdrawalRequestsId") String sortBy,
             @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
         PagedResponse<WithdrawalRequestsDTO> requests = withdrawalRequestsService.getAllWithdrawalRequests(page, size, sortBy, direction);
@@ -70,7 +73,7 @@ public class WithdrawalRequestsController {
             @PathVariable(name = "customerId") Long customerId,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "requestId") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "withdrawalRequestsId") String sortBy,
             @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
         PagedResponse<WithdrawalRequestsDTO> requests = withdrawalRequestsService.getAllWithdrawalRequestsByCustomer(customerId, page, size, sortBy, direction);
@@ -83,7 +86,7 @@ public class WithdrawalRequestsController {
             @PathVariable(name = "agentId") Long agentId,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "requestId") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "withdrawalRequestsId") String sortBy,
             @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
         PagedResponse<WithdrawalRequestsDTO> requests = withdrawalRequestsService.getAllWithdrawalRequestsByAgent(agentId, page, size, sortBy, direction);
@@ -96,7 +99,7 @@ public class WithdrawalRequestsController {
             @PathVariable(name = "customerId") Long customerId,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "requestId") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "withdrawalRequestsId") String sortBy,
             @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
         PagedResponse<WithdrawalRequestsDTO> requests = withdrawalRequestsService.getAllApprovedWithdrawalRequestsByCustomer(customerId, page, size, sortBy, direction);
@@ -109,7 +112,7 @@ public class WithdrawalRequestsController {
             @PathVariable(name = "agentId") Long agentId,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "requestId") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "withdrawalRequestsId") String sortBy,
             @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
         PagedResponse<WithdrawalRequestsDTO> requests = withdrawalRequestsService.getAllApprovedWithdrawalRequestsByAgent(agentId, page, size, sortBy, direction);
@@ -122,7 +125,7 @@ public class WithdrawalRequestsController {
             @PathVariable(name = "agentId") Long agentId,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "requestId") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "withdrawalRequestsId") String sortBy,
             @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
         PagedResponse<WithdrawalRequestsDTO> requests = withdrawalRequestsService.getAllWithdrawWithdrawalRequestsByAgent(agentId, page, size, sortBy, direction);
@@ -135,7 +138,7 @@ public class WithdrawalRequestsController {
             @PathVariable(name = "customerId") Long customerId,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "requestId") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "withdrawalRequestsId") String sortBy,
             @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
         PagedResponse<WithdrawalRequestsDTO> requests = withdrawalRequestsService.getAllWithdrawWithdrawalRequestsByCustomer(customerId, page, size, sortBy, direction);
@@ -147,12 +150,46 @@ public class WithdrawalRequestsController {
     public ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllWithdrawWithdrawalRequests(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "requestId") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "withdrawalRequestsId") String sortBy,
             @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
         PagedResponse<WithdrawalRequestsDTO> requests = withdrawalRequestsService.getAllWithdrawWithdrawalRequests(page, size, sortBy, direction);
         return new ResponseEntity<>(requests, HttpStatus.OK);
     }
   
+    
+	@Operation(summary = "By Admin and Employee: get request by policy account and customer")
+    @GetMapping("/policy-account/{id}/customer/{customerId}")
+    public ResponseEntity<WithdrawalRequestsDTO> getWithdrawalRequestsByPolicyAccountAndCustomer(@PathVariable(name = "id") Long id, @PathVariable(name = "customerId") Long customerId) {
+
+		WithdrawalRequestsDTO withdrawalRequestsDTO = withdrawalRequestsService.getWithdrawalRequestsByPolicyAccountAndCustomer(id, customerId);
+
+        return new ResponseEntity<>(withdrawalRequestsDTO, HttpStatus.OK);
+    }
+	
+	
+	
+	@Operation(summary = "By Customer: Get All Claims")
+	@GetMapping("/total/claim")
+	public ResponseEntity<BalancePagedResponse<WithdrawalRequestsDTO>> getAllClaims(
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "5") int size,
+			@RequestParam(name = "sortBy", defaultValue = "withdrawalRequestsId") String sortBy,
+			@RequestParam(name = "direction", defaultValue = "desc") String direction){
+
+		BalancePagedResponse<WithdrawalRequestsDTO> balances = withdrawalRequestsService.getAllClaims(page,size,sortBy,direction);
+		
+		return new ResponseEntity<BalancePagedResponse<WithdrawalRequestsDTO>>(balances, HttpStatus.CREATED);
+		
+	}
+	
+	
+	@Operation(summary = "By Admin: Get Withdrawal Requests By Id")
+    @GetMapping("/{id}")
+    public ResponseEntity<WithdrawalRequestsDTO> getWithdrawalRequestsById(@PathVariable(name= "id") Long id) {
+
+        WithdrawalRequestsDTO requests = withdrawalRequestsService.getWithdrawalRequestsById(id);
+        return new ResponseEntity<>(requests, HttpStatus.OK);
+    }
 
 }

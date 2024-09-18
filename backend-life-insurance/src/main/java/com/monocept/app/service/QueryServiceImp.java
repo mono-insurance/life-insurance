@@ -207,4 +207,40 @@ public class QueryServiceImp implements QueryService{
 		return dtoService.convertQueryToQueryDTO(existingQuery);
 	}
 
+
+	@Override
+	public PagedResponse<QueryDTO> getAllResolvedQueriesByCustomer(int page, int size, String sortBy, String direction,
+			Long id) {
+		
+		Customer customer = customerRepository.findById(id).orElseThrow(()-> new UserException("Customer not found"));
+
+        Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+
+        Page<Query> pages = queryRepository.findByCustomerAndIsResolvedTrue(customer, pageable);
+        List<Query> allQueries = pages.getContent();
+        List<QueryDTO> allQueriesDTO = dtoService.convertQueryListEntityToDTO(allQueries);
+
+        return new PagedResponse<QueryDTO>(allQueriesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+
+	@Override
+	public PagedResponse<QueryDTO> getAllUnresolvedQueriesByCustomer(int page, int size, String sortBy,
+			String direction, Long id) {
+		
+		Customer customer = customerRepository.findById(id).orElseThrow(()-> new UserException("Customer not found"));
+
+        Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+
+        Page<Query> pages = queryRepository.findByCustomerAndIsResolvedFalse(customer, pageable);
+        List<Query> allQueries = pages.getContent();
+        List<QueryDTO> allQueriesDTO = dtoService.convertQueryListEntityToDTO(allQueries);
+
+        return new PagedResponse<QueryDTO>(allQueriesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
 }

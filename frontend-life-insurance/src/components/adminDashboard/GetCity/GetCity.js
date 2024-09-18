@@ -14,7 +14,8 @@ import { FilterButton } from '../../../sharedComponents/FilterButton/FilterButto
 export const GetCity = () => {
 
 
-  const {currentPage, itemsPerPage, resetPagination, handleItemsPerPageChange, handlePageChange} = useContext(PaginationContext);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [data, setData] = useState({});
   const [keysToBeIncluded, setKeysToBeIncluded] = useState([]);
   const routeParams = useParams();
@@ -29,6 +30,11 @@ export const GetCity = () => {
     { label: 'Search by Active', value: 'active' },
     { label: 'Search by Inactive', value: 'inactive' }
 ];
+
+const resetPagination = () => {
+  setCurrentPage(1);
+  setItemsPerPage(10);
+};
 
   const handleSearch = () => {
     resetPagination();
@@ -175,6 +181,10 @@ export const GetCity = () => {
                 includeButton={true}
                 handleButtonClick={actions}
                 showPagination={showPagination}
+                currentPage={currentPage}
+                pageSize={itemsPerPage}
+                setPage={setCurrentPage}
+                setPageSize={setItemsPerPage}
               />
           </div>
         </section>

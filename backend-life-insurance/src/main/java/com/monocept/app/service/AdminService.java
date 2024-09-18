@@ -61,4 +61,6 @@ public interface AdminService {
     List<InsuranceTypeDTO> getInsuranceTypes();
 
 	SystemCounts wholeSystemStats();
+
+	PagedResponse<UserDTO> getNewUsers(int page, int size, String sortBy, String direction);
 }

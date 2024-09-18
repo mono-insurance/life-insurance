@@ -23,14 +23,25 @@ export const formatDateTimeForBackend = (dateStr, isStartDate) => {
         date.setHours(29, 29, 59, 999);
     }
 
-    return date.toISOString().slice(0, 19);
+    return date.toISOString().slice(0, 10);
   };
 
 
-export const formatRoleForTable = (data) => {
+  export const formatRoleForTable = (data) => {
     return data.content.map(item => {
-        const role = item.roles.includes("ROLE_ADMIN") ? "Admin" : "Customer";
-        item.role = role;
+        let role = "Unknown"; // Default if none of the roles match
+
+        if (item.role.includes("ROLE_ADMIN")) {
+            role = "Admin";
+        } else if (item.role.includes("ROLE_AGENT")) {
+            role = "Agent";
+        } else if (item.role.includes("ROLE_CUSTOMER")) {
+            role = "Customer";
+        } else if (item.role.includes("ROLE_EMPLOYEE")) {
+            role = "Employee";
+        }
+
+        item.role = role; // Assign the role to the item
         return item;
     });
 }

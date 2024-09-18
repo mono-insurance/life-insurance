@@ -28,6 +28,7 @@ import com.monocept.app.repository.PolicyAccountRepository;
 import com.monocept.app.repository.SettingsRepository;
 import com.monocept.app.repository.TransactionsRepository;
 import com.monocept.app.repository.WithdrawalRequestsRepository;
+import com.monocept.app.utils.BalancePagedResponse;
 import com.monocept.app.utils.GlobalSettings;
 import com.monocept.app.utils.PagedResponse;
 
@@ -373,6 +374,54 @@ public class WithdrawalRequestsServiceImp implements WithdrawalRequestsService {
 
         return new PagedResponse<WithdrawalRequestsDTO>(allWithdrawalRequestsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
     }
+
+
+	@Override
+	public WithdrawalRequestsDTO getWithdrawalRequestsByPolicyAccountAndCustomer(Long policyAccountId, Long customerId) {
+		Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new UserException("Customer not found"));
+		
+		PolicyAccount policyAccount = policyAccountRepository.findById(policyAccountId)
+                .orElseThrow(() -> new UserException("Policy account not found"));
+		
+		
+		
+		WithdrawalRequests withdrawalRequest = withdrawalRequestRepository.findByPolicyAccountAndCustomer(policyAccount, customer);
+		
+		if(withdrawalRequest != null) return dtoService.convertWithdrawalRequestToDTO(withdrawalRequest);
+		
+		return null;
+	}
+
+
+	@Override
+	public BalancePagedResponse<WithdrawalRequestsDTO> getAllClaims(int page, int size, String sortBy,
+			String direction) {
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+
+        Page<WithdrawalRequests> pages = withdrawalRequestRepository.findByIsWithdrawTrue(pageable);
+        List<WithdrawalRequests> allWithdrawalRequests = pages.getContent();
+        List<WithdrawalRequestsDTO> allWithdrawalRequestsDTO = dtoService.convertWithdrawalRequestsListEntityToDTO(allWithdrawalRequests);
+        
+        List<WithdrawalRequests> withdrawalRequests = withdrawalRequestRepository.findByIsWithdrawTrue();
+        
+        double totalBalance = withdrawalRequests.stream()
+        		.mapToDouble(WithdrawalRequests::getAmount)
+        		.sum();
+
+        return new BalancePagedResponse<WithdrawalRequestsDTO>(allWithdrawalRequestsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast(), totalBalance);
+	}
+
+
+	@Override
+	public WithdrawalRequestsDTO getWithdrawalRequestsById(Long id) {
+		 WithdrawalRequests withdrawalRequest = withdrawalRequestRepository.findById(id)
+	                .orElseThrow(() -> new UserException("Withdrawal request not found"));
+		 
+		 return dtoService.convertWithdrawalRequestToDTO(withdrawalRequest);
+	}
 
 
 }

@@ -782,6 +782,7 @@ public class DtoServiceImp implements DtoService {
         transactionsDTO.setAmount(transaction.getAmount());
         transactionsDTO.setTransactionDate(transaction.getTransactionDate());
         transactionsDTO.setStatus(transaction.getStatus());
+        transactionsDTO.setSerialNo(transaction.getSerialNo());
         transactionsDTO.setPolicyAccountId(transaction.getPolicyAccount().getPolicyAccountId());
         return transactionsDTO;
     }
@@ -897,6 +898,8 @@ public class DtoServiceImp implements DtoService {
         policyAccountDTO.setInvestmentAmount(policyAccount.getInvestmentAmount());
         policyAccountDTO.setTotalAmountPaid(policyAccount.getTotalAmountPaid());
         policyAccountDTO.setClaimAmount(policyAccount.getClaimAmount());
+        policyAccountDTO.setNomineeName(policyAccount.getNomineeName());
+        policyAccountDTO.setNomineeRelation(policyAccount.getNomineeRelation());
 
         if (policyAccount.getPolicy() != null) {
             policyAccountDTO.setPolicyId(policyAccount.getPolicy().getPolicyId());
@@ -918,15 +921,11 @@ public class DtoServiceImp implements DtoService {
         PolicyAccount policyAccount = new PolicyAccount();
 
         policyAccount.setPolicyAccountId(policyAccountDTO.getPolicyAccountId());
-        policyAccount.setCreatedDate(policyAccountDTO.getCreatedDate());
-        policyAccount.setMaturedDate(policyAccountDTO.getMaturedDate());
-        policyAccount.setIsActive(policyAccountDTO.getIsActive());
         policyAccount.setPolicyTerm(policyAccountDTO.getPolicyTerm());
         policyAccount.setPaymentTimeInMonths(policyAccountDTO.getPaymentTimeInMonths());
-        policyAccount.setTimelyBalance(policyAccountDTO.getTimelyBalance());
         policyAccount.setInvestmentAmount(policyAccountDTO.getInvestmentAmount());
-        policyAccount.setTotalAmountPaid(policyAccountDTO.getTotalAmountPaid());
-        policyAccount.setClaimAmount(policyAccountDTO.getClaimAmount());
+        policyAccount.setNomineeName(policyAccountDTO.getNomineeName());
+        policyAccount.setNomineeRelation(policyAccountDTO.getNomineeRelation());
 
         return policyAccount;
     }
@@ -946,7 +945,7 @@ public class DtoServiceImp implements DtoService {
         dto.setAmount(withdrawalRequest.getAmount());
         dto.setIsWithdraw(withdrawalRequest.getIsWithdraw());
         dto.setIsApproved(withdrawalRequest.getIsApproved());
-        dto.setPolicyAccountId(withdrawalRequest.getPolicyAccount().getPolicyAccountId());
+        dto.setPolicyAccountId(withdrawalRequest.getPolicyAccount()!= null ? withdrawalRequest.getPolicyAccount().getPolicyAccountId(): null);
         dto.setAgentId(withdrawalRequest.getAgent() != null ? withdrawalRequest.getAgent().getAgentId() : null);
         dto.setCustomerId(withdrawalRequest.getCustomer() != null ? withdrawalRequest.getCustomer().getCustomerId() : null);
 
@@ -1016,4 +1015,92 @@ public class DtoServiceImp implements DtoService {
 		return customerCreationDTO;
 		
 	}
+
+	@Override
+	public List<UserDTO> convertCredentialsListEntityToUserDTO(List<Credentials> allCredentials) {
+		return allCredentials.stream()
+                .map(this::convertCredentialsEntityToUserDTO)
+                .collect(Collectors.toList());
+	}
+	
+	@Override
+	public UserDTO convertCredentialsEntityToUserDTO(Credentials credentials) {
+		
+		String firstName = "";
+		String lastName = "";
+
+		
+		if(credentials.getAdmin() != null) {
+			firstName = credentials.getAdmin().getFirstName();
+			lastName = credentials.getAdmin().getLastName();
+		}
+		
+		if(credentials.getAgent() != null) {
+			firstName = credentials.getAgent().getFirstName();
+			lastName = credentials.getAgent().getLastName();
+		}
+		
+		if(credentials.getCustomer() != null) {
+			firstName = credentials.getCustomer().getFirstName();
+			lastName = credentials.getCustomer().getLastName();
+		}
+		
+		if(credentials.getEmployee() != null) {
+			firstName = credentials.getEmployee().getFirstName();
+			lastName = credentials.getEmployee().getLastName();
+		}
+		
+		UserDTO user = new UserDTO();
+		user.setId(credentials.getId());
+		user.setEmail(credentials.getEmail());
+		user.setUsername(credentials.getUsername());
+		user.setMobileNumber(credentials.getMobileNumber());
+		user.setRole(credentials.getRole().getName());
+		user.setFirstName(firstName);
+		user.setLastName(lastName);
+		
+		return user;
+		
+	}
+
+	@Override
+	public List<CommissionDTO> convertPolicyAccountListEntityToCommissionDTO(List<PolicyAccount> allPolicyAccount) {
+		return allPolicyAccount.stream()
+                .map(this::convertPolicyAccountEntityToCommissionDTO)
+                .collect(Collectors.toList());
+	}
+	
+	
+	@Override
+	public CommissionDTO convertPolicyAccountEntityToCommissionDTO(PolicyAccount policyAccount) {
+		CommissionDTO commissionDTO = new CommissionDTO();
+		
+		commissionDTO.setAgentId(policyAccount.getAgent().getAgentId());
+		commissionDTO.setAgentName(policyAccount.getAgent().getFirstName()+" "+policyAccount.getAgent().getLastName());
+		commissionDTO.setAmount(policyAccount.getAgentCommissionForRegistration());
+		commissionDTO.setPolicyAccountId(policyAccount.getPolicyAccountId());
+		
+		return commissionDTO;
+		
+	}
+
+	@Override
+	public List<CommissionDTO> convertTransactionListEntityToCommissionDTO(List<Transactions> allTransactions) {
+		return allTransactions.stream()
+                .map(this::convertTransactionEntityToCommissionDTO)
+                .collect(Collectors.toList());
+	}
+	
+	
+	@Override
+	public CommissionDTO convertTransactionEntityToCommissionDTO(Transactions transactions) {
+		CommissionDTO commissionDTO = new CommissionDTO();
+		
+		commissionDTO.setAgentId(transactions.getPolicyAccount().getAgent().getAgentId());
+		commissionDTO.setAgentName(transactions.getPolicyAccount().getAgent().getFirstName()+" "+transactions.getPolicyAccount().getAgent().getLastName());
+		commissionDTO.setAmount(transactions.getAgentCommission());
+		commissionDTO.setPolicyAccountId(transactions.getPolicyAccount().getPolicyAccountId());
+		return commissionDTO;
+	}
+	
 }

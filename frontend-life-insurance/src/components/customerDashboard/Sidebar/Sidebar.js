@@ -7,7 +7,12 @@ import {
     MdOutlineLogout,
     MdOutlineSettings,
     MdOutlinePolicy,
-    MdOutlineBook
+    MdOutlineBook,
+    MdOutlineQueryBuilder,
+    MdOutlineQuestionAnswer,
+    MdOutlineFeedback,
+    MdOutlineQuestionMark,
+    MdOutlineRequestPage
   } from "react-icons/md";
 import LogoBlue from "../../../assets/images/logo_blue.svg";
 import LogoWhite from "../../../assets/images/logo_white.svg";
@@ -127,6 +132,50 @@ export const Sidebar = () => {
                   <MdOutlineBook size={18} />
                 </span>
                 <span className="menu-link-text">Policy Accounts</span>
+              </NavLink>
+            </li>
+            <li className={`menu-item ${activeMenu === 'requests' ? 'active' : ''}`}>
+              <NavLink to={`/customer/requests/${routeParams.id}`} className="menu-link" onClick={() => handleMenuClick('requests')}>
+                <span className="menu-link-icon">
+                  <MdOutlineRequestPage size={18} />
+                </span>
+                <span className="menu-link-text">Requests</span>
+              </NavLink>
+            </li>
+            <li className={`menu-item ${activeMenu === 'query' ? 'active' : ''}`}>
+              <button className="menu-link" onClick={() => handleMenuClick('query')} style={{marginBottom: '6px'}}>
+                <span className="menu-link-icon">
+                  <MdOutlineQuestionMark size={20} />
+                </span>
+                <span className="menu-link-text">Queries</span>
+              </button>
+              {(activeMenu === 'query' || activeMenu === 'add-query' || activeMenu === 'get-query') && (
+                <ul className="menu-list" >
+                  <li className={`menu-item ${activeMenu === 'add-query' ? 'active' : ''}`} style={{marginBottom: '4px'}}>
+                    <NavLink to={`/customer/add-query/${routeParams.id}`} className="menu-link" activeClassName="active" onClick={() => handleMenuClick('add-query')}>
+                    <span className="menu-link-icon">
+                      <MdOutlineQueryBuilder size={18} />
+                    </span>
+                      <span className="menu-link-text">Add Query</span>
+                    </NavLink>
+                  </li>
+                  <li className={`menu-item ${activeMenu === 'get-query' ? 'active' : ''}`} style={{marginBottom: '4px'}}>
+                    <NavLink to={`/customer/query/${routeParams.id}`} className="menu-link" activeClassName="active" onClick={() => handleMenuClick('get-query')}>
+                    <span className="menu-link-icon">
+                      <MdOutlineQuestionAnswer size={18} />
+                    </span>
+                      <span className="menu-link-text">View FAQs</span>
+                    </NavLink>
+                  </li>
+                </ul>
+              )}
+            </li>
+            <li className={`menu-item ${activeMenu === 'feedback' ? 'active' : ''}`}>
+              <NavLink to={`/customer/feedback/${routeParams.id}`} className="menu-link" onClick={() => handleMenuClick('feedback')}>
+                <span className="menu-link-icon">
+                  <MdOutlineFeedback size={18} />
+                </span>
+                <span className="menu-link-text">Feedback</span>
               </NavLink>
             </li>
           </ul>

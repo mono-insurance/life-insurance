@@ -28,7 +28,7 @@ import { AddPolicy } from './components/adminDashboard/AddPolicy/AddPolicy';
 import { GetPolicy } from './components/adminDashboard/GetPolicy/GetPolicy';
 import { Commission } from './components/adminDashboard/Commission/Commission';
 import { Claim } from './components/adminDashboard/Claim/Claim';
-import { Cancel } from './components/adminDashboard/Cancel/Cancel';
+import { ViewOrUpdateRequests } from './components/adminDashboard/ViewOrUpdateRequests/ViewOrUpdateRequests';
 import { Requests } from './components/adminDashboard/Requests/Requests';
 import { Transactions } from './components/adminDashboard/Transactions/Transactions';
 import { Feedback } from './components/adminDashboard/Feedback/Feedback';
@@ -52,6 +52,13 @@ import { UpdateEmployee } from './components/adminDashboard/UpdateEmployee/Updat
 import { DeleteEmployee } from './components/adminDashboard/DeleteEmployee/DeleteEmployee';
 import { PolicyAccount } from './components/customerDashboard/PolicyAccount/PolicyAccount';
 import { InsurancePolicy } from './components/customerDashboard/InsurancePolicy/InsurancePolicy';
+import { AddFeedback } from './components/customerDashboard/Feedback/AddFeedback';
+import { AddQuery } from './components/customerDashboard/AddQuery/AddQuery';
+import { GetRequests } from './components/customerDashboard/GetRequests/GetRequests';
+import { GetQuery } from './components/customerDashboard/GetQuery/GetQuery';
+import { UpdateCustomerQuery } from './components/customerDashboard/UpdateCustomerQuery/UpdateCustomerQuery';
+import { DeleteCustomerQuery } from './components/customerDashboard/DeleteCustomerQuery/DeleteCustomerQuery';
+import { ViewPolicyAccount } from './components/customerDashboard/ViewPolicyAccount/ViewPolicyAccount';
 
 function App() {
 
@@ -96,7 +103,6 @@ function App() {
             <Route path='/admin/get-policy/:id' element={<GetPolicy />}></Route>
             <Route path='/admin/commission/:id' element={<Commission />}></Route>
             <Route path='/admin/claim/:id' element={<Claim />}></Route>
-            <Route path='/admin/cancel/:id' element={<Cancel />}></Route>
             <Route path='/admin/requests/:id' element={<Requests />}></Route>
             <Route path='/admin/transactions/:id' element={<Transactions />}></Route>
             <Route path='/admin/feedback/:id' element={<Feedback />}></Route>
@@ -117,6 +123,7 @@ function App() {
             <Route path='/admin/policy/:id/delete/:policyId' element={<DeletePolicy />}></Route>
             <Route path='/admin/employee/:id/edit/:employeeId' element={<UpdateEmployee />}></Route>
             <Route path='/admin/employee/:id/delete/:employeeId' element={<DeleteEmployee />}></Route>
+            <Route path='/admin/request/:id/view/:requestsId' element={<ViewOrUpdateRequests />}></Route>
 
           </Route>
 
@@ -124,7 +131,14 @@ function App() {
 
             <Route path='/customer/policy-account/:id' element={<PolicyAccount />}></Route>
             <Route path='/customer/insurance/:id/type/:insuranceId' element={<InsurancePolicy />}></Route>
+            <Route path='/customer/feedback/:id' element={<AddFeedback />}></Route>
+            <Route path='/customer/add-query/:id' element={<AddQuery />}></Route>
+            <Route path='/customer/query/:id' element={<GetQuery />}></Route>
+            <Route path='/customer/query/:id/edit/:queryId' element={<UpdateCustomerQuery />}></Route>
+            <Route path='/customer/query/:id/delete/:queryId' element={<DeleteCustomerQuery />}></Route>
+            <Route path='/customer/requests/:id' element={<GetRequests />}></Route>
             <Route path='/customer/settings/:id' element={<CustomerSettings />}></Route>
+            <Route path='/customer/policy-account/:id/view/:policyAccountId' element={<ViewPolicyAccount />}></Route>
             
           </Route>
 

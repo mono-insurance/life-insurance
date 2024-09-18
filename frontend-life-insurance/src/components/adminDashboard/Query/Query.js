@@ -13,7 +13,8 @@ import { errorToast } from '../../../utils/helper/toast';
 import './query.scss';
 
 export const Query = () => {
-  const {currentPage, itemsPerPage, resetPagination, handleItemsPerPageChange, handlePageChange} = useContext(PaginationContext);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [data, setData] = useState({});
   const [keysToBeIncluded, setKeysToBeIncluded] = useState([]);
   const routeParams = useParams();
@@ -30,6 +31,11 @@ export const Query = () => {
     { label: 'Search by Resolved', value: 'resolved' },
     { label: 'Search by Unresolved', value: 'unresolved' }
 ];
+
+const resetPagination = () => {
+  setCurrentPage(1);
+  setItemsPerPage(10);
+};
 
   const handleSearch = () => {
     resetPagination();
@@ -188,6 +194,10 @@ export const Query = () => {
                   includeButton={true}
                   handleButtonClick={actions}
                   showPagination={showPagination}
+                  currentPage={currentPage}
+                  pageSize={itemsPerPage}
+                  setPage={setCurrentPage}
+                  setPageSize={setItemsPerPage}
                 />
             </div>
           </section>

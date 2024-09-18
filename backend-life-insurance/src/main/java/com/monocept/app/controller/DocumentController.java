@@ -39,9 +39,9 @@ public class DocumentController {
     }
     
     
-    @PostMapping(value="/upload",consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @GetMapping(value="/upload",consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     ResponseEntity<Boolean> addUserDocument(
-            @RequestBody @Valid DocumentUploadedDTO documentUploadedDTO,
+            @ModelAttribute @Valid DocumentUploadedDTO documentUploadedDTO,
             @RequestParam("file") MultipartFile file) {
         Boolean isAdded = storageService.addUserDocuments(documentUploadedDTO, file);
         return new ResponseEntity<>(isAdded, HttpStatus.OK);

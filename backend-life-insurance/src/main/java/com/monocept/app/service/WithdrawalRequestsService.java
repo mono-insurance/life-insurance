@@ -1,6 +1,7 @@
 package com.monocept.app.service;
 
 import com.monocept.app.dto.WithdrawalRequestsDTO;
+import com.monocept.app.utils.BalancePagedResponse;
 import com.monocept.app.utils.PagedResponse;
 
 import jakarta.validation.Valid;
@@ -35,5 +36,11 @@ public interface WithdrawalRequestsService {
 
 	PagedResponse<WithdrawalRequestsDTO> getAllWithdrawWithdrawalRequests(int page, int size, String sortBy,
 			String direction);
+
+	WithdrawalRequestsDTO getWithdrawalRequestsByPolicyAccountAndCustomer(Long id, Long customerId);
+
+	BalancePagedResponse<WithdrawalRequestsDTO> getAllClaims(int page, int size, String sortBy, String direction);
+
+	WithdrawalRequestsDTO getWithdrawalRequestsById(Long id);
 
 }

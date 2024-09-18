@@ -140,9 +140,8 @@ export const CustomerSettings = () => {
 
   return (
     <div className='content-area'>
-        <AreaTop pageTitle={"Settings"} pagePath={"Settings"} pageLink={`/user/transactions/${routeParams.id}`}/>
+        <AreaTop pageTitle={"Settings"} pagePath={"Settings"} pageLink={`/customer/policy-account/${routeParams.id}`}/>
         
-        {/* Personal Info Form */}
         <section className="content-area-form">
           <form className="admin-form" onSubmit={handlePersonalInfoSubmit}>
             <h3 className="data-table-title">Update Personal Info</h3>

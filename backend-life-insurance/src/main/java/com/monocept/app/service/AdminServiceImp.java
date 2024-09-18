@@ -8,7 +8,6 @@ import com.monocept.app.repository.*;
 import com.monocept.app.utils.DocumentType;
 import com.monocept.app.utils.GlobalSettings;
 import com.monocept.app.utils.PagedResponse;
-import com.monocept.app.dto.SystemCounts;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -481,6 +480,19 @@ public class AdminServiceImp implements AdminService {
 		catch(Exception e) {
 			throw new UserException("Error getting system stats");
 		}
+	}
+
+	@Override
+	public PagedResponse<UserDTO> getNewUsers(int page, int size, String sortBy, String direction) {
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+
+        Page<Credentials> pages = credentialsRepository.findAll(pageable);
+        List<Credentials> allCredentials = pages.getContent();
+        List<UserDTO> allCredentialsDTO = dtoService.convertCredentialsListEntityToUserDTO(allCredentials);
+
+        return new PagedResponse<UserDTO>(allCredentialsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
 	}
 
 

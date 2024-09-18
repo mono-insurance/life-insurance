@@ -319,9 +319,11 @@ public class CustomerServiceImp implements CustomerService {
 
         Customer customer = findCustomerById(userDetails.getId());
 
+        System.out.print(policyAccountDTO);
         Policy policy = policyRepository.findById(policyAccountDTO.getPolicyId())
                 .orElseThrow(() -> new UserException("Policy not found"));
-
+        
+        
         checkEligibility(customer, policy, policyAccountDTO);
 
         policyAccountDTO.setPolicyAccountId(0L);
@@ -338,9 +340,11 @@ public class CustomerServiceImp implements CustomerService {
         policyAccount.setTotalAmountPaid(0.0);
 
         Double claimAmount = policyAccountDTO.getInvestmentAmount() * (1 + policy.getProfitRatio() / 100);
+        claimAmount = Double.valueOf(String.format("%.2f", claimAmount));
         policyAccount.setClaimAmount(claimAmount);
         policyAccount.setPolicy(policy);
         policyAccount.setCustomer(customer);
+
         Agent agent = null;
         if (policyAccountDTO.getAgentId() != null) {
             agent = agentRepository.findById(policyAccountDTO.getAgentId())
@@ -357,10 +361,11 @@ public class CustomerServiceImp implements CustomerService {
                 policyAccount.setAgent(null);
             }
         }
-
-        createFutureTransactions(policyAccount, policyAccountDTO.getPaymentTimeInMonths(), balancePerPayment);
+        
 
         PolicyAccount savedPolicyAccount = policyAccountRepository.save(policyAccount);
+        
+        createFutureTransactions(savedPolicyAccount, policyAccountDTO.getPaymentTimeInMonths(), balancePerPayment);
 
         if (policy.getPolicyAccounts() != null) policy.getPolicyAccounts().add(savedPolicyAccount);
         else policy.setPolicyAccounts(addFirstPolicyAccount(savedPolicyAccount));
@@ -370,11 +375,16 @@ public class CustomerServiceImp implements CustomerService {
 
         customerRepository.save(customer);
         policyRepository.save(policy);
-        assert agent != null;
-        if (agent.getPolicyAccounts() != null) agent.getPolicyAccounts().add(savedPolicyAccount);
-        else agent.setPolicyAccounts(addFirstPolicyAccount(savedPolicyAccount));
-
-        agentRepository.save(agent);
+        
+        
+        if (agent != null) {
+            if (agent.getPolicyAccounts() != null) {
+                agent.getPolicyAccounts().add(savedPolicyAccount);
+            } else {
+                agent.setPolicyAccounts(addFirstPolicyAccount(savedPolicyAccount));
+            }
+            agentRepository.save(agent);
+        }
 
         EmailDTO emailDTO = new EmailDTO();
         emailDTO.setEmailId(customer.getCredentials().getEmail());
@@ -443,18 +453,18 @@ public class CustomerServiceImp implements CustomerService {
         initialPayment.setAmount(balancePerPayment);
         initialPayment.setTransactionDate(currentDate);
         initialPayment.setStatus("pending");
-        initialPayment.setPosition(1L);
+        initialPayment.setSerialNo(1L);
         Long position = 2L;
         initialPayment.setPolicyAccount(policyAccount);
         transactionsRepository.save(initialPayment);
 
         // Create future scheduled payments
-        while (nextPaymentDate.isBefore(policyAccount.getMaturedDate()) || nextPaymentDate.isEqual(policyAccount.getMaturedDate())) {
+        while (nextPaymentDate.isBefore(policyAccount.getMaturedDate())) {
             Transactions transaction = new Transactions();
             transaction.setAmount(balancePerPayment);
             transaction.setTransactionDate(nextPaymentDate);
             transaction.setStatus("pending");
-            transaction.setPosition(position);
+            transaction.setSerialNo(position);
             position += 1L;
             transaction.setPolicyAccount(policyAccount);
             transactionsRepository.save(transaction);

@@ -73,7 +73,6 @@ public class PolicyAccount {
     
     
     @NotNull
-    @Positive
     @Column(name = "total_amount_paid")
     private Double totalAmountPaid;
     
@@ -109,7 +108,7 @@ public class PolicyAccount {
     private Customer customer;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "agent_id", nullable = false)
+    @JoinColumn(name = "agent_id")
     @JsonBackReference
     private Agent agent;
     

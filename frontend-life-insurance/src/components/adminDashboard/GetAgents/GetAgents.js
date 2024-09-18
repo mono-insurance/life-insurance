@@ -15,7 +15,8 @@ import { useContext, useEffect, useState } from 'react';
 
 export const GetAgents = () => {
 
-  const {currentPage, itemsPerPage, resetPagination, handleItemsPerPageChange, handlePageChange} = useContext(PaginationContext);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [data, setData] = useState({});
   const [keysToBeIncluded, setKeysToBeIncluded] = useState([]);
   const routeParams = useParams();
@@ -31,6 +32,11 @@ export const GetAgents = () => {
     { label: 'Search by Active', value: 'active' },
     { label: 'Search by Inactive', value: 'inactive' }
 ];
+
+const resetPagination = () => {
+  setCurrentPage(1);
+  setItemsPerPage(10);
+};
 
   const handleSearch = () => {
     resetPagination();
@@ -188,9 +194,13 @@ export const GetAgents = () => {
                 <Table
                   data={data}
                   keysToBeIncluded={keysToBeIncluded} 
-                  includeButton={true}
-                  handleButtonClick={actions}
+                  includeButton={false}
+                  handleButtonClick={null}
                   showPagination={showPagination}
+                  currentPage={currentPage}
+                  pageSize={itemsPerPage}
+                  setPage={setCurrentPage}
+                  setPageSize={setItemsPerPage}
                 />
             </div>
           </section>

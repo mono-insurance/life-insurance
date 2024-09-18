@@ -133,4 +133,16 @@ public interface DtoService {
 
 	CustomerCreationDTO convertCustomerToCustomerCreationDTO(Customer customer);
 
+	List<UserDTO> convertCredentialsListEntityToUserDTO(List<Credentials> allCredentials);
+
+	UserDTO convertCredentialsEntityToUserDTO(Credentials credentials);
+
+	List<CommissionDTO> convertPolicyAccountListEntityToCommissionDTO(List<PolicyAccount> allPolicyAccount);
+
+	CommissionDTO convertPolicyAccountEntityToCommissionDTO(PolicyAccount policyAccount);
+
+	List<CommissionDTO> convertTransactionListEntityToCommissionDTO(List<Transactions> allTransactions);
+
+	CommissionDTO convertTransactionEntityToCommissionDTO(Transactions transactions);
+
 }

@@ -12,6 +12,8 @@ import com.monocept.app.entity.*;
 import com.monocept.app.exception.RoleAccessException;
 import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.*;
+import com.monocept.app.utils.DocumentType;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,7 +80,7 @@ public class StorageServiceImp implements StorageService {
         accessConService.checkDocumentAccess(documentId);
 
         DocumentUploaded documentUploaded = findDocumentById(documentId);
-        String fileName = documentUploaded.getName();
+        String fileName = documentUploaded.getDocumentType().toString();
         return downloadFromS3(fileName);
     }
 
@@ -114,8 +116,9 @@ public class StorageServiceImp implements StorageService {
         uploadDocToS3(fileObj, newFileName);
         DocumentUploaded documentUploaded = new DocumentUploaded();
         documentUploaded.setIsApproved(false);
-        documentUploaded.setName(documentUploadedDTO.getDocumentType());
         documentUploaded.setCloudFileName(newFileName);
+        DocumentType document = DocumentType.valueOf(documentUploadedDTO.getDocumentType().toUpperCase());
+        documentUploaded.setDocumentType(document);
         mapWithUser(documentUploaded, documentUploadedDTO);
 
         return true;

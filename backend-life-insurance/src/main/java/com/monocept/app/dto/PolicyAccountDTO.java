@@ -2,9 +2,13 @@ package com.monocept.app.dto;
 
 import java.time.LocalDate;
 
+import com.monocept.app.utils.NomineeRelation;
+
 import jakarta.persistence.Column;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,10 +22,8 @@ public class PolicyAccountDTO {
 
     private LocalDate createdDate;
 
-    @NotNull(message = "Matured date is mandatory")
     private LocalDate maturedDate;
 
-    @NotNull(message = "Active status is mandatory")
     private Boolean isActive;
 
     @NotNull(message = "Policy term is mandatory")
@@ -32,20 +34,14 @@ public class PolicyAccountDTO {
     @Positive(message = "Payment time in months must be positive")
     private Integer paymentTimeInMonths;
 
-    @NotNull(message = "Timely balance is mandatory")
-    @Positive(message = "Timely balance must be positive")
     private Double timelyBalance;
     
     @NotNull(message = "Investment Amount is mandatory")
     @Positive(message = "Investment Amount must be positive")
     private Double investmentAmount;
 
-    @NotNull(message = "Total amount paid is mandatory")
-    @Positive(message = "Total amount paid must be positive")
     private Double totalAmountPaid;
 
-    @NotNull(message = "Claim amount is mandatory")
-    @Positive(message = "Claim amount must be positive")
     private Double claimAmount;
 
     @NotNull(message = "Policy ID is mandatory")
@@ -54,5 +50,14 @@ public class PolicyAccountDTO {
     private Long customerId;
 
     private Long agentId;
+    
+    
+    @NotBlank(message = "Nominee name is mandatory")
+    @Size(max = 50, message = "Nominee name can be at most 50 characters long")
+    private String nomineeName;
+
+    
+    @NotNull(message = "Nominee relation is mandatory")
+    private NomineeRelation nomineeRelation;
 
 }

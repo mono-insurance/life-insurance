@@ -68,7 +68,7 @@ public class CustomerController {
 
     @Operation(summary = "By Customer: Make Policy Account when buy policy")
     @PostMapping("/policy-account")
-    public ResponseEntity<PolicyAccountDTO> createPolicyAccount(PolicyAccountDTO policyAccountDTO) {
+    public ResponseEntity<PolicyAccountDTO> createPolicyAccount(@RequestBody @Valid PolicyAccountDTO policyAccountDTO) {
 
         PolicyAccountDTO policyAccount = customerService.createPolicyAccount(policyAccountDTO);
 
@@ -105,7 +105,7 @@ public class CustomerController {
     public ResponseEntity<PagedResponse<PolicyAccountDTO>> getAllPolicyAccounts(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "transactionId") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "policyAccountId") String sortBy,
             @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
         PagedResponse<PolicyAccountDTO> policyAccounts = customerService.getAllPolicyAccounts(page, size, sortBy, direction);

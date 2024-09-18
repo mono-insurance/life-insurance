@@ -29,7 +29,7 @@ public class QueryController {
 	private QueryService queryService;
 	
 	
-	@Operation(summary = "By Admin and Employee: get Query by id")
+	@Operation(summary = "By All: get Query by id")
     @GetMapping("/{id}")
     public ResponseEntity<QueryDTO> getQueryById(@PathVariable(name = "id") Long id) {
 
@@ -125,6 +125,26 @@ public class QueryController {
     public ResponseEntity<PagedResponse<QueryDTO>> getAllQueriesByCustomer(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "queryId") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction, @PathVariable(name = "id") Long id) {
 
         PagedResponse<QueryDTO> queries = queryService.getAllQueriesByCustomer(page, size, sortBy, direction, id);
+
+        return new ResponseEntity<PagedResponse<QueryDTO>>(queries, HttpStatus.OK);
+
+    }
+    
+    @Operation(summary = "By Customer: Get All Resolved Queries By Customer")
+    @GetMapping("/queries/customer/{id}/resolved")
+    public ResponseEntity<PagedResponse<QueryDTO>> getAllResolvedQueriesByCustomer(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "queryId") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction, @PathVariable(name = "id") Long id) {
+
+        PagedResponse<QueryDTO> queries = queryService.getAllResolvedQueriesByCustomer(page, size, sortBy, direction, id);
+
+        return new ResponseEntity<PagedResponse<QueryDTO>>(queries, HttpStatus.OK);
+
+    }
+    
+    @Operation(summary = "By Customer: Get All Unresolved Queries By Customer")
+    @GetMapping("/queries/customer/{id}/unresolved")
+    public ResponseEntity<PagedResponse<QueryDTO>> getAllUnresolvedQueriesByCustomer(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "queryId") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction, @PathVariable(name = "id") Long id) {
+
+        PagedResponse<QueryDTO> queries = queryService.getAllUnresolvedQueriesByCustomer(page, size, sortBy, direction, id);
 
         return new ResponseEntity<PagedResponse<QueryDTO>>(queries, HttpStatus.OK);
 
