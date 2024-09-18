@@ -50,8 +50,6 @@ export const AffTransactions = () => {
     useEffect(() => {
         fetchAllTransactions();
     }, [currentPage, itemsPerPage]);
-
-
     return (
         <div className='content-area'>
             <AreaTop pageTitle={"All Transactions"} pagePath={"customer-transactions"} pageLink={`/agent/dashboard/${routeParams.id}`} />

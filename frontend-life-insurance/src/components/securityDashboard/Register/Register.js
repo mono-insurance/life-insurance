@@ -146,6 +146,10 @@ export const Register = () => {
               <input className="w-full p-2 border border-gray-300 rounded" type="text" placeholder="Enter Nominee Relation" name="nomineeRelation" value={formState.nomineeRelation} onChange={handleChange} required />
             </div>
           </div>
+          <div className="flex-1">
+            <label className="block mb-2 font-semibold"><b>Qualification</b></label>
+            <input className="w-full p-2 border border-gray-300 rounded" type="text" placeholder="Enter Mobile Number" name="qualification" value={formState.qualification} onChange={handleChange} required />
+          </div>
 
           {/* Address Details */}
           <div className="flex gap-4">
@@ -217,8 +221,8 @@ export const Register = () => {
             <label className="block mb-2 font-semibold"><b>Role</b></label>
             <select className="w-full p-2 border border-gray-300 rounded" name="role" value={formState.role} onChange={handleChange} required>
               <option value="">Select Role</option>
-              <option value="admin">Agent</option>
-              <option value="customer">Customer</option>
+              <option value="AGENT">Agent</option>
+              <option value="CUSTOMER">Customer</option>
             </select>
           </div>
 
@@ -235,7 +239,7 @@ export const Register = () => {
           href="/"
           className="text-blue-500 hover:underline"
         >
-          Register here
+          Login here
         </a>
       </div>
 

@@ -81,7 +81,7 @@ export const verifyCustomer = async ({ customerId }) => {
     }
 
     try {
-        const response = await axios.get(`http://localhost:8080/api/auth/verify/customer/${customerId}`, {
+        const response = await axios.get(`http://localhost:8080/public/api/auth/verify/customer/${customerId}`, {
             headers: {
                 'Authorization': `${token}`
             }
@@ -112,7 +112,7 @@ export const login = async (usernameOrEmail, password) => {
 
 export const customerRequestActivation = async (usernameOrEmail, password, customerId) => {
     try {
-        const response = await axios.post(`http://localhost:8080/api/auth/request-activation/${customerId}`, {
+        const response = await axios.post(`http://localhost:8080/public/api/auth/request-activation/${customerId}`, {
             usernameOrEmail, password
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
@@ -126,8 +126,50 @@ export const customerRequestActivation = async (usernameOrEmail, password, custo
 
 export const register = async (formData) => {
     try {
-        const response = await axios.post('http://localhost:8080/api/auth/register', formData, {
-            headers: { 'Content-Type': 'multipart/form-data', }
+        let userType = 'customer'
+        if (formData.role == "AGENT") {
+            userType = 'agent'
+        }
+        const response = await axios.post(`http://localhost:8080/public/api/auth/register-${userType}`, formData, {
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
+
+        return response;
+
+    }
+    catch (error) {
+        throw error;
+    }
+}
+export const SendOtp = async (usernameOrEmail) => {
+    try {
+        const response = await axios.post(`http://localhost:8080/public/api/auth/change-password-request/${usernameOrEmail}`, {},
+         {
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
+
+        return response;
+
+    }
+    catch (error) {
+        throw error;
+    }
+}
+export const VerifyOpt = async (otp,usernameOrEmail) => {
+    try {
+        const response = await axios.post(`http://localhost:8080/public/api/auth/otp-confirmation/${usernameOrEmail}/${otp}`, {},
+         {
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
+
+        return response;
+
+    }
+    catch (error) {
+        throw error;
+    }
+}
+export const PasswordResetRequest = async (formData) => {
+    try {
+        const response = await axios.post(`http://localhost:8080/public/api/auth/password-reset`,formData,
+         {
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
         return response;
