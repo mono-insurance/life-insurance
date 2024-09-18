@@ -20,4 +20,6 @@ public interface PolicyService {
 	PagedResponse<PolicyDTO> getAllActivePolicies(int page, int size, String sortBy, String direction);
 
 	PagedResponse<PolicyDTO> getAllInactivePolicies(int page, int size, String sortBy, String direction);
+
+    Boolean isCustomerEligible(Long policyId);
 }

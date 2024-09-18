@@ -328,6 +328,7 @@ public class CustomerServiceImp implements CustomerService {
         policyAccountDTO.setPolicyAccountId(0L);
         PolicyAccount policyAccount = dtoService.convertPolicyAccountDtoToPolicyAccount(policyAccountDTO);
 
+
         LocalDate maturedDate = LocalDate.now().plusYears(policyAccountDTO.getPolicyTerm());
         policyAccount.setMaturedDate(maturedDate);
         policyAccount.setIsActive(true);
@@ -349,8 +350,6 @@ public class CustomerServiceImp implements CustomerService {
 
             if (customer.getAddress().getState().getStateId().equals(agent.getAddress().getState().getStateId())) {
                 policyAccount.setAgent(agent);
-
-
                 Double commission = ((policy.getCommissionNewRegistration() / 100) * policyAccountDTO.getInvestmentAmount());
 
                 policyAccount.setAgentCommissionForRegistration(commission);
@@ -358,10 +357,9 @@ public class CustomerServiceImp implements CustomerService {
                 policyAccount.setAgent(null);
             }
         }
-
-        createFutureTransactions(policyAccount, policyAccountDTO.getPaymentTimeInMonths(), balancePerPayment);
-
         PolicyAccount savedPolicyAccount = policyAccountRepository.save(policyAccount);
+        createFutureTransactions(savedPolicyAccount, policyAccountDTO.getPaymentTimeInMonths(), balancePerPayment);
+
 
         if (policy.getPolicyAccounts() != null) policy.getPolicyAccounts().add(savedPolicyAccount);
         else policy.setPolicyAccounts(addFirstPolicyAccount(savedPolicyAccount));
@@ -444,7 +442,7 @@ public class CustomerServiceImp implements CustomerService {
         initialPayment.setAmount(balancePerPayment);
         initialPayment.setTransactionDate(currentDate);
         initialPayment.setStatus("pending");
-        initialPayment.setPosition(1L);
+        initialPayment.setSerialNo(1L);
         Long position = 2L;
         initialPayment.setPolicyAccount(policyAccount);
         transactionsRepository.save(initialPayment);
@@ -455,7 +453,7 @@ public class CustomerServiceImp implements CustomerService {
             transaction.setAmount(balancePerPayment);
             transaction.setTransactionDate(nextPaymentDate);
             transaction.setStatus("pending");
-            transaction.setPosition(position);
+            transaction.setSerialNo(position);
             position += 1L;
             transaction.setPolicyAccount(policyAccount);
             transactionsRepository.save(transaction);

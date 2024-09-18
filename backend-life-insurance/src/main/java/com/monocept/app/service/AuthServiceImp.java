@@ -1,26 +1,29 @@
 package com.monocept.app.service;
 
-import com.monocept.app.dto.JWTAuthResponse;
-import com.monocept.app.dto.LoginDTO;
-import com.monocept.app.dto.LoginResponseDTO;
+import com.monocept.app.dto.*;
 import com.monocept.app.entity.Credentials;
+import com.monocept.app.entity.Password;
 import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.AuthRepository;
 import com.monocept.app.repository.CustomerRepository;
+import com.monocept.app.repository.PasswordRepository;
 import com.monocept.app.security.JwtTokenProvider;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 
-import java.security.Key;
+import java.security.SecureRandom;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -34,18 +37,22 @@ public class AuthServiceImp implements AuthService{
     private AuthRepository authRepository;
     private CustomerRepository customerRepository;
     private AccessConService accessConService;
+	private final PasswordRepository passwordRepository;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 
     public AuthServiceImp(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider,
-                          EmailService emailService, AuthRepository authRepository,
-                          CustomerRepository customerRepository, AccessConService accessConService) {
+						  EmailService emailService, AuthRepository authRepository,
+						  CustomerRepository customerRepository, AccessConService accessConService, PasswordRepository passwordRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.emailService = emailService;
         this.authRepository = authRepository;
         this.customerRepository = customerRepository;
         this.accessConService = accessConService;
-    }
+		this.passwordRepository = passwordRepository;
+	}
 
     @Value("${app.jwt-secret}")
     private String secretKey;
@@ -64,9 +71,15 @@ public class AuthServiceImp implements AuthService{
 	        String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 		    Credentials credentials = authRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
 		            .orElseThrow(() -> new UserException("User not found with username or email: " + usernameOrEmail));
-//	        if (user.getCustomer() != null && !user.getCustomer().isActive()) {
-//	            throw new UserException("Your account is inactive. Please contact Admin to make it active.");
-//	        }
+	        if (credentials.getRole().getName().equals("ROLE_AGENT") && !credentials.getAgent().getIsActive()) {
+	            throw new UserException("Your account is inactive. Please contact Admin to make it active.");
+	        }
+			if (credentials.getRole().getName().equals("ROLE_CUSTOMER") && !credentials.getCustomer().getIsActive()) {
+				throw new UserException("Your account is inactive. Please contact Admin to make it active.");
+			}
+			if (credentials.getRole().getName().equals("ROLE_EMPLOYEE") && !credentials.getEmployee().getIsActive()) {
+				throw new UserException("Your account is inactive. Please contact Admin to make it active.");
+			}
 	        
 	        String token = jwtTokenProvider.generateToken(authentication);
 	        
@@ -165,5 +178,76 @@ public class AuthServiceImp implements AuthService{
 	    String role = claims.get("role", String.class);
 	    System.out.println("Role: " + role);
 	    return "ROLE_CUSTOMER".equals(role);
+	}
+
+	@Override
+	public void changePasswordRequest(String userId) {
+		Credentials credentials=authRepository.findByUsernameOrEmail(userId,userId).
+				orElseThrow(()->new UserException("user not found of this email or username"));
+		Password password=new Password();
+		password.setCreatedAt(LocalDateTime.now());
+		password.setUserNameOrEmail(credentials.getEmail());
+		String otp=generateOTP();
+		password.setOtp(otp);
+		passwordRepository.save(password);
+		EmailDTO emailDTO = new EmailDTO();
+		emailDTO.setEmailId(credentials.getEmail());
+		emailDTO.setTitle("Password Reset Request OTP");
+		emailDTO.setBody("You have made request to update your password\n your otp is : "+otp+"\n this otp will expire after 5 minutes");
+		emailService.sendAccountCreationEmail(emailDTO);
+	}
+
+	@Override
+	public Boolean otpConfirmation(String otp, String userId) {
+		Password password=passwordRepository.findByOtp(otp);
+		if(!password.getOtp().equals(otp)) throw new UserException("wrong otp");
+		if(!password.getUserNameOrEmail().equals(userId)) throw new UserException("wrong username");
+		LocalDateTime passwordCreatedAt=password.getCreatedAt();
+		Duration duration = Duration.between(passwordCreatedAt, LocalDateTime.now());
+		boolean isMoreThan5Minutes = duration.toMinutes() > 5;
+		if(isMoreThan5Minutes){
+			throw new UserException("otp expired");
+		}
+		return true;
+	}
+
+	@Override
+	public Boolean passwordReset(PasswordResetDTO passwordResetDTO) {
+		Password password=passwordRepository.findByOtp(passwordResetDTO.getOtp());
+
+		if(!password.getUserNameOrEmail().equals(passwordResetDTO.getUserNameOrEmail())){
+			throw new UserException("invalid username or email not found");
+		}
+		if(!password.getOtp().equals(passwordResetDTO.getOtp())){
+			throw new UserException("invalid otp not found");
+		}
+		LocalDateTime passwordCreatedAt=password.getCreatedAt();
+		Duration duration = Duration.between(passwordCreatedAt, LocalDateTime.now());
+		boolean isMoreThan5Minutes = duration.toMinutes() > 5;
+		if(isMoreThan5Minutes){
+			throw new UserException("otp expired");
+		}
+		Credentials credentials=authRepository.findByUsernameOrEmail
+				(passwordResetDTO.getUserNameOrEmail(),passwordResetDTO.getUserNameOrEmail()).orElseThrow(()->new UserException("username not found"));
+		String encriptedPassword = passwordEncoder.encode(passwordResetDTO.getNewPassword());
+		System.out.println("new password is"+encriptedPassword);
+		credentials.setPassword(encriptedPassword);
+		authRepository.save(credentials);
+		return true;
+
+	}
+
+	public static String generateOTP() {
+		String numbers = "0123456789";
+		SecureRandom random = new SecureRandom();
+		StringBuilder otp = new StringBuilder(6);
+
+		for (int i = 0; i < 6; i++) {
+			int index = random.nextInt(numbers.length());
+			otp.append(numbers.charAt(index));
+		}
+
+		return otp.toString();
+
 	}
 }

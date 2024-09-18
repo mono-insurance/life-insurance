@@ -6,7 +6,6 @@ import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.*;
 import com.monocept.app.utils.PageResult;
 import com.monocept.app.utils.PagedResponse;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -36,12 +35,13 @@ public class AgentServiceImp implements AgentService {
 
     private final EmailService emailService;
     private final WithdrawalRequestsRepository withdrawalRequestsRepository;
+    private final AuthRepository credentialsRepository;
 
 
     public AgentServiceImp(DtoService dtoService, AccessConService accessConService, AgentRepository agentRepository,
                            CityRepository cityRepository, StateRepository stateRepository, AuthRepository authRepository,
                            AddressRepository addressRepository, RoleRepository roleRepository, EmailService emailService,
-                           WithdrawalRequestsRepository withdrawalRequestsRepository) {
+                           WithdrawalRequestsRepository withdrawalRequestsRepository, AuthRepository credentialsRepository) {
         this.dtoService = dtoService;
         this.accessConService = accessConService;
         this.agentRepository = agentRepository;
@@ -52,23 +52,68 @@ public class AgentServiceImp implements AgentService {
         this.roleRepository = roleRepository;
         this.emailService = emailService;
         this.withdrawalRequestsRepository = withdrawalRequestsRepository;
+        this.credentialsRepository = credentialsRepository;
     }
 
     @Override
-    public Long agentRegisterRequest(@Valid CredentialsDTO credentialsDTO) {
-        Credentials credentials = dtoService.convertCredentialsDtoToCredentials(credentialsDTO);
-        credentials.getAgent().setIsActive(false);
+    public Long agentRegisterRequest( RegistrationDTO registrationDTO) {
+        registrationDTO.setId(0L);
+        Agent agent = new Agent();
+        agent.setFirstName(registrationDTO.getFirstName());
+        agent.setLastName(registrationDTO.getLastName());
+        agent.setDateOfBirth(registrationDTO.getDateOfBirth());
+        agent.setIsActive(false);
+        agent.setIsApproved(false);
+        Credentials credentials = new Credentials();
+        credentials.setUsername(registrationDTO.getUsername());
+        credentials.setEmail(registrationDTO.getEmail());
+        String encriptedPassword = passwordEncoder.encode(registrationDTO.getPassword());
+        credentials.setPassword(encriptedPassword);
+        credentials.setMobileNumber(registrationDTO.getMobileNumber());
+        credentials.setAgent(agent);
+        Role role = roleRepository.findByName("ROLE_AGENT")
+                .orElseThrow(() -> new RuntimeException("Role agent not found"));
+        credentials.setRole(role);
 
-        Long id= authRepository.save(credentials).getId();
-        EmailDTO emailDTO=new EmailDTO();
-        emailDTO.setEmailId(credentialsDTO.getEmail());
+        Address address = new Address();
+        address.setFirstStreet(registrationDTO.getFirstStreet());
+        address.setLastStreet(registrationDTO.getLastStreet());
+        address.setPincode(registrationDTO.getPincode());
+
+        State state = stateRepository.findById(registrationDTO.getStateId())
+                .orElseThrow(() -> new UserException("State not found"));
+        if (!state.getIsActive()) {
+            throw new UserException("Selected state is inactive");
+        }
+
+        City city = cityRepository.findById(registrationDTO.getCityId())
+                .orElseThrow(() -> new UserException("City not found"));
+        if (!city.getIsActive()) {
+            throw new UserException("Selected city is inactive");
+        }
+
+        address.setState(state);
+        address.setCity(city);
+
+        address = addressRepository.save(address);
+        agent.setAddress(address);
+        agent.setCredentials(credentials);
+        agent.setWithdrawalAmount(0D);
+        agent.setBalance(0D);
+        agent.setQualification(registrationDTO.getQualification());
+        credentials = credentialsRepository.save(credentials);
+
+
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setEmailId(credentials.getEmail());
         emailDTO.setTitle("Registration Success");
         emailDTO.setBody("Congrats!! you have registered with our company as an agent.\n" +
                 " Now, your details will be verified by our company employees" +
                 " and your account will be activated\n We will inform you once details verified" +
-                "your username is "+credentialsDTO.getUsername());
+                "your username is " + credentials.getUsername());
         emailService.sendAccountCreationEmail(emailDTO);
-        return id;
+
+        return credentials.getAgent().getAgentId();
     }
 
     @Override

@@ -380,16 +380,16 @@ public class AdminServiceImp implements AdminService {
     }
 
     @Override
-    public PagedResponse<EmployeeDTO> getAllEmployees(int page, int size, String sortBy, String direction) {
+    public PagedResponse<AgentDTO> getAllRegisteredAgents(int page, int size, String sortBy, String direction) {
         Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
 
         Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
 
-        Page<Employee> pages = employeeRepository.findAll(pageable);
-        List<Employee> allEmployees = pages.getContent();
-        List<EmployeeDTO> allEmployeesDTO = dtoService.convertEmployeeListEntityToDTO(allEmployees);
+        Page<Agent> pages = agentRepository.findAllByIsApprovedFalse(pageable);
+        List<Agent> allEmployees = pages.getContent();
+        List<AgentDTO> allEmployeesDTO = dtoService.convertAgentsToDto(allEmployees);
 
-        return new PagedResponse<EmployeeDTO>(allEmployeesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+        return new PagedResponse<AgentDTO>(allEmployeesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
     }
 
 

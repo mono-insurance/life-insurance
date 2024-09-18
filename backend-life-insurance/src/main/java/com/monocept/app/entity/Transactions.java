@@ -41,8 +41,8 @@ public class Transactions {
 
     @NotNull
     @Positive
-    @Column(name="position")
-    private Long position;
+    @Column(name="serial_no")
+    private Long serialNo;
     
 
 	@Column(name = "transaction_date")

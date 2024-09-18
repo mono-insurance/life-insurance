@@ -60,4 +60,5 @@ public class DocumentUploaded {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     private Agent agent;
+
 }

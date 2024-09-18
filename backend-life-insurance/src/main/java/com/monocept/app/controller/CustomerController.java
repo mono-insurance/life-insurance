@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/suraksha")
+@RequestMapping("/suraksha/customer")
 public class CustomerController {
 
     @Autowired
@@ -35,9 +35,6 @@ public class CustomerController {
     public CustomerController(CustomerService customerService) {
         this.customerService = customerService;
     }
-
-
-
 
 
     @Operation(summary = "By Customer: Get the customer profile")
@@ -63,7 +60,7 @@ public class CustomerController {
 
     @Operation(summary = "By Customer: Make Policy Account when buy policy")
     @PostMapping("/policy-account")
-    public ResponseEntity<PolicyAccountDTO> createPolicyAccount(PolicyAccountDTO policyAccountDTO) {
+    public ResponseEntity<PolicyAccountDTO> createPolicyAccount(@RequestBody PolicyAccountDTO policyAccountDTO) {
 
         PolicyAccountDTO policyAccount = customerService.createPolicyAccount(policyAccountDTO);
 
@@ -113,13 +110,13 @@ public class CustomerController {
     @Operation(summary = "By Admin,emp: Get All policyClaims by Customer")
     @GetMapping("/policy-claims-request/{cid}")
     ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllPolicyClaimsRequest(
-            @PathVariable("cid")Long customerId,
+            @PathVariable("cid") Long customerId,
             @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sort", defaultValue = "ASC") String sort,
             @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
-        PagedResponse<WithdrawalRequestsDTO> allPolicyClaims = customerService.getAllPolicyClaimsRequest(pageNo, size, sort, sortBy, sortDirection,customerId);
+        PagedResponse<WithdrawalRequestsDTO> allPolicyClaims = customerService.getAllPolicyClaimsRequest(pageNo, size, sort, sortBy, sortDirection, customerId);
         return new ResponseEntity<>(allPolicyClaims, HttpStatus.OK);
     }
 

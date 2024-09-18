@@ -65,7 +65,24 @@ public class AuthController {
         Long id = customerService.customerRegistration(registrationDTO);
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
+    @PostMapping("/change-password-request/{userId}")
+    ResponseEntity<HttpStatus> changePasswordRequest(@PathVariable("userId")String userId) {
 
+        authService.changePasswordRequest(userId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    @PostMapping("/otp-confirmation/{userId}/{otp}")
+    ResponseEntity<Boolean> otpConfirmation(@PathVariable("userId")String userId,@PathVariable("otp")String otp) {
+
+        Boolean isTrue=authService.otpConfirmation(otp,userId);
+        return new ResponseEntity<>(isTrue,HttpStatus.OK);
+    }
+    @PostMapping("/password-reset")
+    ResponseEntity<Boolean> passwordReset(@RequestBody @Valid PasswordResetDTO passwordResetDTO) {
+
+        Boolean isSuccess=authService.passwordReset(passwordResetDTO);
+        return new ResponseEntity<>(isSuccess,HttpStatus.OK);
+    }
     @Operation(summary = "By Admin and Employee: Get All States")
     @GetMapping("/all-states")
     public ResponseEntity<PagedResponse<StateDTO>> getAllStates(
@@ -82,8 +99,8 @@ public class AuthController {
 
 
     @PostMapping("/register-agent")
-    ResponseEntity<Long> agentRegisterRequest(@RequestBody @Valid CredentialsDTO credentialsDTO) {
-        Long id = agentService.agentRegisterRequest(credentialsDTO);
+    ResponseEntity<Long> agentRegisterRequest(@RequestBody @Valid RegistrationDTO registrationDTO) {
+        Long id = agentService.agentRegisterRequest(registrationDTO);
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
 

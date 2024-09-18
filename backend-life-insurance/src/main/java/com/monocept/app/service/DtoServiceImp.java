@@ -6,7 +6,6 @@ import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.CityRepository;
 import com.monocept.app.repository.StateRepository;
 import com.monocept.app.utils.DocumentType;
-import com.monocept.app.utils.GenderType;
 import com.monocept.app.utils.NomineeRelation;
 import com.monocept.app.utils.PageResult;
 import com.monocept.app.repository.RoleRepository;
@@ -25,11 +24,13 @@ public class DtoServiceImp implements DtoService {
 
     private final StateRepository stateRepository;
     private final CityRepository cityRepository;
+    private final StorageService storageService;
 
-    public DtoServiceImp(StateRepository stateRepository, CityRepository cityRepository) {
+    public DtoServiceImp(StateRepository stateRepository, CityRepository cityRepository, StorageService storageService) {
         this.stateRepository = stateRepository;
         this.cityRepository = cityRepository;
 
+        this.storageService = storageService;
     }
 
     @Override
@@ -625,6 +626,10 @@ public class DtoServiceImp implements DtoService {
         policyDTO.setProfitRatio(policy.getProfitRatio());
         policyDTO.setCreatedDate(policy.getCreatedDate());
 
+        byte [] imageData=storageService.downloadPolicyImage(policy.getPolicyId());
+        String base64Image = Base64.getEncoder().encodeToString(imageData);
+        policyDTO.setImageUrl(base64Image);
+
         if (policy.getDocumentsNeeded() != null) {
             policyDTO.setDocumentsNeeded(
                     policy.getDocumentsNeeded().stream()
@@ -926,15 +931,17 @@ public class DtoServiceImp implements DtoService {
         PolicyAccount policyAccount = new PolicyAccount();
 
         policyAccount.setPolicyAccountId(policyAccountDTO.getPolicyAccountId());
-        policyAccount.setCreatedDate(policyAccountDTO.getCreatedDate());
-        policyAccount.setMaturedDate(policyAccountDTO.getMaturedDate());
-        policyAccount.setIsActive(policyAccountDTO.getIsActive());
+//        policyAccount.setCreatedDate(policyAccountDTO.getCreatedDate());
+//        policyAccount.setMaturedDate(policyAccountDTO.getMaturedDate());
+//        policyAccount.setIsActive(policyAccountDTO.getIsActive());
         policyAccount.setPolicyTerm(policyAccountDTO.getPolicyTerm());
         policyAccount.setPaymentTimeInMonths(policyAccountDTO.getPaymentTimeInMonths());
-        policyAccount.setTimelyBalance(policyAccountDTO.getTimelyBalance());
+//        policyAccount.setTimelyBalance(policyAccountDTO.getTimelyBalance());
         policyAccount.setInvestmentAmount(policyAccountDTO.getInvestmentAmount());
-        policyAccount.setTotalAmountPaid(policyAccountDTO.getTotalAmountPaid());
-        policyAccount.setClaimAmount(policyAccountDTO.getClaimAmount());
+//        policyAccount.setTotalAmountPaid(policyAccountDTO.getTotalAmountPaid());
+//        policyAccount.setClaimAmount(policyAccountDTO.getClaimAmount());
+        policyAccount.setNomineeName(policyAccountDTO.getNomineeName());
+        policyAccount.setNomineeRelation(policyAccountDTO.getNomineeRelation());
 
         return policyAccount;
     }

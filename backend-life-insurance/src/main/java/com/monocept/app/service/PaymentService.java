@@ -85,7 +85,7 @@ public class PaymentService {
         Long agentId=transactions.getPolicyAccount().getAgent().getAgentId();
         if(agentId!=null){
             Double commission=transactions.getAgentCommission();
-            if(transactions.getPosition()==1) commission+=transactions.getPolicyAccount().getAgentCommissionForRegistration();
+            if(transactions.getSerialNo()==1) commission+=transactions.getPolicyAccount().getAgentCommissionForRegistration();
             agentRepository.updateAgentCommission(agentId,commission);
         }
         EmailDTO emailDTO=new EmailDTO();

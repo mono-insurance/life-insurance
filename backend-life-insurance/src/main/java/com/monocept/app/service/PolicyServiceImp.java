@@ -1,8 +1,12 @@
 package com.monocept.app.service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.monocept.app.dto.CustomUserDetails;
+import com.monocept.app.entity.*;
+import com.monocept.app.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -14,9 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.monocept.app.dto.PolicyDTO;
-import com.monocept.app.entity.DocumentNeeded;
-import com.monocept.app.entity.InsuranceType;
-import com.monocept.app.entity.Policy;
 import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.DocumentNeededRepository;
 import com.monocept.app.repository.InsuranceTypeRepository;
@@ -43,6 +44,8 @@ public class PolicyServiceImp implements PolicyService{
     private DocumentNeededRepository documentNeededRepository;
 	@Autowired
 	private AccessConService accessConService;
+	@Autowired
+	private CustomerRepository customerRepository;
 	
 	
 	@Override
@@ -216,6 +219,37 @@ public class PolicyServiceImp implements PolicyService{
 		List<PolicyDTO> allPoliciesDTO = dtoService.convertPolicyListEntityToDTO(allPolicies);
 		
 		return new PagedResponse<PolicyDTO>(allPoliciesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+	@Override
+	public Boolean isCustomerEligible(Long policyId) {
+		CustomUserDetails customUserDetails=accessConService.checkUserAccess();
+		Customer customer=findCustomerById(customUserDetails.getId());
+		Policy policy=findPolicyById(policyId);
+
+		return isEligible(customer,policy);
+	}
+
+	private Boolean isEligible(Customer customer, Policy policy) {
+		List<DocumentNeeded>policyDocumentsNeeded=policy.getDocumentsNeeded();
+		List<DocumentUploaded>documentUploadedList=customer.getDocuments();
+		Set<DocumentType> uploadedDocumentTypes = documentUploadedList.stream()
+				.filter(DocumentUploaded::getIsApproved)
+				.map(DocumentUploaded::getDocumentType) // Assuming DocumentUploaded has getDocumentType()
+				.collect(Collectors.toSet());
+
+		// Check if all needed documents are present in the uploaded documents
+		return policyDocumentsNeeded.stream()
+				.allMatch(neededDoc -> uploadedDocumentTypes.contains(neededDoc.getDocumentType())); // Assuming DocumentNeeded has getDocumentType()
+
+	}
+
+	private Policy findPolicyById(Long policyId) {
+		return policyRepository.findById(policyId).orElseThrow(()->new UserException("policy not found"));
+	}
+
+	private Customer findCustomerById(Long id) {
+		return customerRepository.findById(id).orElseThrow(()->new UserException("customer not found"));
 	}
 
 

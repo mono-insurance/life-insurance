@@ -1,6 +1,9 @@
 package com.monocept.app.repository;
 
+import com.monocept.app.entity.Agent;
+import com.monocept.app.entity.Customer;
 import com.monocept.app.entity.DocumentUploaded;
+import com.monocept.app.utils.DocumentType;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,4 +24,8 @@ public interface DocumentUploadedRepository extends JpaRepository<DocumentUpload
     Page<DocumentUploaded> findAllByIsApprovedFalse(Pageable pageable);
 
     Page<DocumentUploaded> findAllByIsApprovedTrue(Pageable pageable);
+
+    DocumentUploaded findByCustomerAndDocumentType(Customer customer, DocumentType documentType);
+
+    DocumentUploaded findByAgentAndDocumentType(Agent agent, DocumentType documentType);
 }

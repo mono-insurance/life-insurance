@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.monocept.app.dto.*;
 import com.monocept.app.service.*;
+import com.monocept.app.utils.PagedResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,12 +41,25 @@ public class AdminController {
     }
 
 
-    @PostMapping("/approve-agent/{aid}")
+    @PutMapping("/approve-agent/{aid}/{isApproved}")
     ResponseEntity<Boolean> approveAgent(
             @PathVariable("aid")Long agentId,
-            @RequestParam(value = "isApproved" ,defaultValue = "false")Boolean isApproved) {
+            @PathVariable("isApproved") Boolean isApproved) {
         Boolean isSuccess = agentService.approveAgent(agentId,isApproved);
         return new ResponseEntity<>(isSuccess, HttpStatus.OK);
+    }
+    @Operation(summary = "By Admin: Get All Registered Agents")
+    @GetMapping("/registered-agents")
+    public ResponseEntity<PagedResponse<AgentDTO>> getAllRegisteredAgents(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size,
+            @RequestParam(name = "sortBy", defaultValue = "agentId") String sortBy,
+            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
+
+        PagedResponse<AgentDTO> employees = adminService.getAllRegisteredAgents(page, size, sortBy, direction);
+
+        return new ResponseEntity<>(employees, HttpStatus.OK);
+
     }
 
     @Operation(summary = "By Admin: Delete Policy")
@@ -60,7 +74,7 @@ public class AdminController {
 
     @Operation(summary = "By Admin: Add Policy")
     @PostMapping(value = "/policy",consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<PolicyDTO> addPolicy( @ModelAttribute @Valid PolicyDTO policyDTO, @RequestParam("file") MultipartFile file) {
+    ResponseEntity<PolicyDTO> addPolicy( @ModelAttribute @Valid PolicyDTO policyDTO, @RequestParam("file") MultipartFile file) {
 
         System.out.println("Policy DTO: " + policyDTO);
         PolicyDTO savedPolicy = policyService.addPolicy(policyDTO,file);
