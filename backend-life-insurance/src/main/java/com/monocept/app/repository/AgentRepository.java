@@ -2,6 +2,8 @@ package com.monocept.app.repository;
 
 import com.monocept.app.entity.Agent;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,9 +16,13 @@ public interface AgentRepository extends JpaRepository<Agent,Long> {
     @Modifying
     @Query("UPDATE Agent a SET a.balance = a.balance + :agentCommission WHERE a.agentId = :agentId")
     void updateAgentCommission(@Param("agentId") Long agentId, @Param("agentCommission") Double agentCommission);
+    Long countByIsActiveTrue();
 
-	long countByIsActiveTrue();
+    Long countByIsActiveFalse();
 
-	long countByIsActiveFalse();
+    Page<Agent> findAllByIsActiveFalse(Pageable pageable);
 
+    Page<Agent> findAlByIsActiveTrue(Pageable pageable);
+
+    Page<Agent> findAllByIsApprovedFalse(Pageable pageable);
 }

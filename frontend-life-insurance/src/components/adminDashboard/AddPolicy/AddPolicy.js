@@ -10,7 +10,7 @@ import { Dropdown, DropdownButton } from 'react-bootstrap';
 
 export const AddPolicy = () => {
   const routeParams = useParams();
-  
+
   const [investmentTypes, setInvestmentTypes] = useState([]);
   const [documents, setDocuments] = useState([]);
   const [formState, setFormState] = useState({
@@ -88,7 +88,7 @@ export const AddPolicy = () => {
 
       await createNewPolicy(formState);
       successToast("Policy created successfully!");
-      
+
       setFormState({
         policyName: '',
         commissionNewRegistration: '',
@@ -123,7 +123,7 @@ export const AddPolicy = () => {
               <input type="text" name="policyName" value={formState.policyName} onChange={handleChange} className="form-input" placeholder="Enter Policy Name" required />
             </label>
 
-          
+
 
           <div className="form-row">
             <label className="form-label">

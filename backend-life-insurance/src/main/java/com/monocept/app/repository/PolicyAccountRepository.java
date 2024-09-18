@@ -32,4 +32,7 @@ public interface PolicyAccountRepository extends JpaRepository<PolicyAccount,Lon
 
     @Query("SELECT pa FROM PolicyAccount pa WHERE pa.agent IS NOT NULL")
 	List<PolicyAccount> findByAgentNotNull();
+
+    Long countByIsActiveTrue();
+
 }

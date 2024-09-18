@@ -18,7 +18,6 @@ public class DocumentUploadedDTO {
     @NotBlank(message = "Document name is mandatory")
     private String documentType;
 
-    @NotNull(message = "Approved Status is mandatory")
     private Boolean isApproved;
 
     private Long customerId;

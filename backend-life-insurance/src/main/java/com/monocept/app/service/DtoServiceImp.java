@@ -6,7 +6,6 @@ import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.CityRepository;
 import com.monocept.app.repository.StateRepository;
 import com.monocept.app.utils.DocumentType;
-import com.monocept.app.utils.GenderType;
 import com.monocept.app.utils.NomineeRelation;
 import com.monocept.app.utils.PageResult;
 import com.monocept.app.repository.RoleRepository;
@@ -25,11 +24,13 @@ public class DtoServiceImp implements DtoService {
 
     private final StateRepository stateRepository;
     private final CityRepository cityRepository;
+    private final StorageService storageService;
 
-    public DtoServiceImp(StateRepository stateRepository, CityRepository cityRepository) {
+    public DtoServiceImp(StateRepository stateRepository, CityRepository cityRepository, StorageService storageService) {
         this.stateRepository = stateRepository;
         this.cityRepository = cityRepository;
 
+        this.storageService = storageService;
     }
 
     @Override
@@ -222,7 +223,7 @@ public class DtoServiceImp implements DtoService {
         for (WithdrawalRequests withdrawalRequest : withdrawalRequests) {
             withdrawalRequestsDTOS.add(convertWithdrawalToDto(withdrawalRequest));
         }
-        return null;
+        return withdrawalRequestsDTOS;
     }
 
     @Override
@@ -617,6 +618,10 @@ public class DtoServiceImp implements DtoService {
         policyDTO.setProfitRatio(policy.getProfitRatio());
         policyDTO.setCreatedDate(policy.getCreatedDate());
 
+        byte [] imageData=storageService.downloadPolicyImage(policy.getPolicyId());
+        String base64Image = Base64.getEncoder().encodeToString(imageData);
+        policyDTO.setImageUrl(base64Image);
+
         if (policy.getDocumentsNeeded() != null) {
             policyDTO.setDocumentsNeeded(
                     policy.getDocumentsNeeded().stream()
@@ -959,6 +964,14 @@ public class DtoServiceImp implements DtoService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<DocumentUploadedDTO> convertDocumentsToDTO(List<DocumentUploaded> allDocuments) {
+        List<DocumentUploadedDTO> documentUploadedDTOS=new ArrayList<>();
+        for(DocumentUploaded documentUploaded:allDocuments){
+            documentUploadedDTOS.add(convertDocumentUploadedToDTO(documentUploaded));
+        }
+        return documentUploadedDTOS;
+    }
 	@Override
 	public AdminCreationDTO converAdminToAdminCreationDTO(Admin updatedAdmin) {
 		AdminCreationDTO adminCreationDTO = new AdminCreationDTO();

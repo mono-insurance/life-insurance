@@ -38,14 +38,6 @@ public class CustomerController {
     }
 
 
-    @PostMapping("/customer/registration")
-    ResponseEntity<Long> customerRegistration(@RequestBody @Valid RegistrationDTO registrationDTO) {
-
-        Long id = customerService.customerRegistration(registrationDTO);
-        return new ResponseEntity<>(id, HttpStatus.OK);
-    }
-
-
     @Operation(summary = "By Customer: Get the customer profile")
     @GetMapping("/customer/{cid}")
     public ResponseEntity<CustomerDTO> getCustomerProfile(@PathVariable("cid") Long customerId) {
@@ -118,13 +110,13 @@ public class CustomerController {
     @Operation(summary = "By Admin,emp: Get All policyClaims by Customer")
     @GetMapping("/policy-claims-request/{cid}")
     ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllPolicyClaimsRequest(
-            @PathVariable("cid")Long customerId,
+            @PathVariable("cid") Long customerId,
             @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sort", defaultValue = "ASC") String sort,
             @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
-        PagedResponse<WithdrawalRequestsDTO> allPolicyClaims = customerService.getAllPolicyClaimsRequest(pageNo, size, sort, sortBy, sortDirection,customerId);
+        PagedResponse<WithdrawalRequestsDTO> allPolicyClaims = customerService.getAllPolicyClaimsRequest(pageNo, size, sort, sortBy, sortDirection, customerId);
         return new ResponseEntity<>(allPolicyClaims, HttpStatus.OK);
     }
 

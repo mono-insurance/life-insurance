@@ -17,4 +17,7 @@ public interface StorageService {
     byte[] downloadPolicyImage(Long pid);
 
 	byte[] updatePolicyImage(Long pid, MultipartFile file);
+
+    byte[] downloadImage(Long policyId);
+
 }

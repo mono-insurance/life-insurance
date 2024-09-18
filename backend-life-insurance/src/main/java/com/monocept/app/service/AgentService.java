@@ -5,7 +5,7 @@ import com.monocept.app.utils.PagedResponse;
 import jakarta.validation.Valid;
 
 public interface AgentService {
-    Long agentRegisterRequest(@Valid CredentialsDTO registrationDTO);
+    Long agentRegisterRequest( RegistrationDTO registrationDTO);
 
     AgentDTO updateAgent(AgentDTO agentDTO);
 
@@ -19,7 +19,7 @@ public interface AgentService {
 
     PagedResponse<WithdrawalRequestsDTO> getAllPolicyClaims(int pageNo, int size, String sort, String sortBy, String sortDirection);
 
-    PagedResponse<CustomerDTO> getAllCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection);
+    PagedResponse<CustomerDTO> getAllCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection, Boolean isActive);
 
     Boolean withdrawalRequest(Double agentCommission);
 	PagedResponse<AgentDTO> getAllAgents(int pageNo, int size, String sort, String sortBy, String sortDirection);
@@ -29,4 +29,18 @@ public interface AgentService {
 	Boolean activateAgent(Long agentId);
 
 	Boolean approveAgent(Long agentId, Boolean isApproved);
+
+    DashBoardDTO agentDashboard();
+
+    Boolean inActivateAgent(Long agentId);
+
+    PagedResponse<AgentDTO> getAllActiveAgents(int pageNo, int size, String sort, String sortBy, String sortDirection);
+
+    PagedResponse<AgentDTO> getAllInActiveAgents(int pageNo, int size, String sort, String sortBy, String sortDirection);
+
+    PagedResponse<WithdrawalRequestsDTO> getAllApprovedCommissions(Long agentId,int pageNo, int size, String sort, String sortBy, String sortDirection);
+
+    PagedResponse<WithdrawalRequestsDTO> getAllNotApprovedCommissions(Long agentId, int pageNo, int size, String sort, String sortBy, String sortDirection);
+
+    BalanceDTO getAgentBalance();
 }

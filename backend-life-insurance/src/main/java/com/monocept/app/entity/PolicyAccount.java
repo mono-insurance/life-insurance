@@ -34,68 +34,67 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(name = "policy_account")
 public class PolicyAccount {
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "policy_account_id")
     private Long policyAccountId;
 
-	@Column(name = "created_date")
-	private LocalDate createdDate = LocalDate.now();
+    @Column(name = "created_date")
+    private LocalDate createdDate = LocalDate.now();
 
-	@NotNull
-	@Column(name = "matured_date")
-	private LocalDate maturedDate;
-	
-	@NotNull
-	@Column(name ="is_active")
-	private Boolean isActive;
-	
-	
+    @NotNull
+    @Column(name = "matured_date")
+    private LocalDate maturedDate;
+
+    @NotNull
+    @Column(name = "is_active")
+    private Boolean isActive;
+
+
     @NotNull
     @Positive
     @Column(name = "policy_term")
     private Integer policyTerm;
-    
+
+    @NotNull
+    @Column(name = "nominee_name")
+    private String nomineeName;
+
+    @NotNull
+    @Column(name = "nominee_relation")
+    @Enumerated(EnumType.STRING)
+    private NomineeRelation nomineeRelation;
+
     @NotNull
     @Positive
     @Column(name = "payment_time_in_months")
     private Integer paymentTimeInMonths;
-    
+
     @NotNull
     @Positive
     @Column(name = "timely_balance")
     private Double timelyBalance;
-    
+
     @NotNull
     @Positive
     @Column(name = "investment_amount")
     private Double investmentAmount;
-    
-    
+
+
     @NotNull
     @Column(name = "total_amount_paid")
     private Double totalAmountPaid;
-    
-    
+
+
     @NotNull
     @Positive
     @Column(name = "claim_amount")
     private Double claimAmount;
-    
+
     @Column(name = "agent_commission")
     private Double agentCommissionForRegistration;
-    
-    
-    @NotBlank
-	@Column(name ="nominee_name")
-	private String nomineeName;
-	
-	@NotNull
-	@Enumerated(EnumType.STRING)
-	@Column(name ="nominee_relation")
-	private NomineeRelation nomineeRelation;
-    
-    
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "policy_id", nullable = false)
     @JsonBackReference
@@ -106,13 +105,13 @@ public class PolicyAccount {
     @JoinColumn(name = "customer_id", nullable = false)
     @JsonBackReference
     private Customer customer;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agent_id")
     @JsonBackReference
     private Agent agent;
-    
-    
+
+
     @OneToMany(mappedBy = "policyAccount", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Transactions> transactions;
@@ -121,6 +120,5 @@ public class PolicyAccount {
     @JsonManagedReference
     private List<WithdrawalRequests> withdrawalRequests;
 
-    
 
 }

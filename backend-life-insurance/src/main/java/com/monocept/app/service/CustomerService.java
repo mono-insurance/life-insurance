@@ -45,4 +45,5 @@ public interface CustomerService {
 
 	CustomerCreationDTO updateCustomer(CustomerCreationDTO customerDTO);
 
+	PagedResponse<CustomerDTO> getAllActiveCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection);
 }

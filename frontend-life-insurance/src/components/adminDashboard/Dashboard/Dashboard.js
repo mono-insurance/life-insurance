@@ -29,7 +29,7 @@ export const Dashboard = () => {
           let formattedData =[]
           response = await getNewUsers(currentPage, itemsPerPage);
           formattedData = formatRoleForTable(response);
-          
+
           setData({
             content: formattedData,
             page: response.page,
@@ -101,7 +101,7 @@ export const Dashboard = () => {
 
     useEffect(() => {
       // const hasSearchParams = searchParams.toString() !== '';
-      
+
       // if(!hasSearchParams) {
       //   setShowFilterButton(true);
       //   setId('');
@@ -126,7 +126,7 @@ export const Dashboard = () => {
       <section className="content-area-cards">
         <Card
           colors={["#e4e8ef", "#4ce13f"]}
-          percentFillValue={(counts.totalActiveCustomers / (counts.totalCustomers || 1)) * 100} 
+          percentFillValue={(counts.totalActiveCustomers / (counts.totalCustomers || 1)) * 100}
           cardInfo={{
             title: "Active Customers",
             value: counts.totalActiveCustomers,
@@ -136,7 +136,7 @@ export const Dashboard = () => {
         <Card
           // colors={["#e4e8ef", "#475be8"]}
           colors={["#e4e8ef", "#4ce13f"]}
-          percentFillValue={(counts.totalActiveAgents / (counts.totalAgents || 1)) * 100} 
+          percentFillValue={(counts.totalActiveAgents / (counts.totalAgents || 1)) * 100}
           cardInfo={{
             title: "Active Agents",
             value: counts.totalActiveAgents,
@@ -145,7 +145,7 @@ export const Dashboard = () => {
         />
         <Card
           colors={["#e4e8ef", "#4ce13f"]}
-          percentFillValue={(counts.totalActiveEmployees / (counts.totalEmployees || 1)) * 100} 
+          percentFillValue={(counts.totalActiveEmployees / (counts.totalEmployees || 1)) * 100}
           cardInfo={{
             title: "Active Emloyees",
             value: counts.totalActiveEmployees,
@@ -154,7 +154,7 @@ export const Dashboard = () => {
         />
         <Card
           colors={["#e4e8ef", "#f29a2e"]}
-          percentFillValue={(counts.totalInactiveCustomers / (counts.totalCustomers || 1)) * 100} 
+          percentFillValue={(counts.totalInactiveCustomers / (counts.totalCustomers || 1)) * 100}
           cardInfo={{
             title: "Inactive Customers",
             value: counts.totalInactiveCustomers,
@@ -163,7 +163,7 @@ export const Dashboard = () => {
         />
         <Card
           colors={["#e4e8ef", "#f29a2e"]}
-          percentFillValue={(counts.totalInactiveAgents / (counts.totalAgents || 1)) * 100} 
+          percentFillValue={(counts.totalInactiveAgents / (counts.totalAgents || 1)) * 100}
           cardInfo={{
             title: "Inactive Agents",
             value: counts.totalInactiveAgents,
@@ -172,7 +172,7 @@ export const Dashboard = () => {
         />
         <Card
           colors={["#e4e8ef", "#f29a2e"]}
-          percentFillValue={(counts.totalInactiveEmployees / (counts.totalEmployees || 1)) * 100} 
+          percentFillValue={(counts.totalInactiveEmployees / (counts.totalEmployees || 1)) * 100}
           cardInfo={{
             title: "Inactive Employees",
             value: counts.totalInactiveEmployees,
@@ -190,7 +190,7 @@ export const Dashboard = () => {
           <div className="data-table-diagram">
             <Table
               data={data}
-              keysToBeIncluded={keysToBeIncluded} 
+              keysToBeIncluded={keysToBeIncluded}
               includeButton={false}
               handleButtonClick={null}
               currentPage={currentPage}

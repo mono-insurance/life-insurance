@@ -57,4 +57,5 @@ public class DocumentUploaded {
     @JoinColumn(name = "agent_id")
     @JsonBackReference
     private Agent agent;
+
 }

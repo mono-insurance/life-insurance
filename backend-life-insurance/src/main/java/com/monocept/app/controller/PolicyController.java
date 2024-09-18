@@ -32,27 +32,17 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/suraksha/policy")
 public class PolicyController {
-	
-	@Autowired
-	private PolicyService policyService;
-	
+
+    @Autowired
+    private PolicyService policyService;
+
     private final StorageService storageService;
 
     public PolicyController(StorageService storageService) {
         this.storageService = storageService;
     }
 
-	@GetMapping("/download/policy-image/{pid}")
-	public ResponseEntity<ByteArrayResource> downloadPolicyImage(@PathVariable("pid") Long pid) {
-		byte[] data = storageService.downloadPolicyImage(pid);
-		ByteArrayResource resource = new ByteArrayResource(data);
-		return ResponseEntity
-				.ok()
-				.contentLength(data.length)
-				.header("Content-type", "image/jpeg")
-				.header("Content-disposition", "attachment; filename=\"" + "test" + "\"")
-				.body(resource);
-	}
+
 	
 	
 	@PutMapping(value ="/update/policy-image/{pid}" ,consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
@@ -68,72 +58,75 @@ public class PolicyController {
 	}
 	
 	
-	
-//	@Operation(summary = "By Admin: Get the uploaded Files of the Customers")
-//	@GetMapping("/files/user/{userId}/{fileNumber}")
-//	public ResponseEntity<Object> getUploadedFilesOfUsers(@PathVariable(name = "userId") int customerId,@PathVariable(name = "fileNumber") int fileNumber) {
-//		List<byte[]> fileContent = adminService.getFileContent(customerId, fileNumber);
-//		
-//		byte[] content = fileContent.get(fileNumber-1);
-//		System.out.println("image returned");
-//		return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.valueOf("image/png")).body(content);
-//	}
-	
-	
-	
 
-	@Operation(summary = "By Admin: Get All Policies")
-	@GetMapping("/policy")
-	public ResponseEntity<PagedResponse<PolicyDTO>> getAllPolicies(
-	        @RequestParam(name = "page", defaultValue = "0") int page,
-			@RequestParam(name = "size", defaultValue = "5") int size,
-			@RequestParam(name = "sortBy", defaultValue = "policyId") String sortBy,
-			@RequestParam(name = "direction", defaultValue = "asc") String direction) {
-	
-	    PagedResponse<PolicyDTO> policies = policyService.getAllPolicies(page, size, sortBy, direction);
-	
-	    return new ResponseEntity<PagedResponse<PolicyDTO>>(policies, HttpStatus.OK);
-	}
-	
-	
-	@Operation(summary = "By Admin: Get All Active Policies")
-	@GetMapping("/policy/active")
-	public ResponseEntity<PagedResponse<PolicyDTO>> getAllActivePolicies(
-	        @RequestParam(name = "page", defaultValue = "0") int page,
-			@RequestParam(name = "size", defaultValue = "5") int size,
-			@RequestParam(name = "sortBy", defaultValue = "policyId") String sortBy,
-			@RequestParam(name = "direction", defaultValue = "asc") String direction) {
-	
-	    PagedResponse<PolicyDTO> policies = policyService.getAllActivePolicies(page, size, sortBy, direction);
-	
-	    return new ResponseEntity<PagedResponse<PolicyDTO>>(policies, HttpStatus.OK);
-	}
-	
-	
-	
-	@Operation(summary = "By Admin: Get All Inactive Policies")
-	@GetMapping("/policy/inactive")
-	public ResponseEntity<PagedResponse<PolicyDTO>> getAllInactivePolicies(
-	        @RequestParam(name = "page", defaultValue = "0") int page,
-			@RequestParam(name = "size", defaultValue = "5") int size,
-			@RequestParam(name = "sortBy", defaultValue = "policyId") String sortBy,
-			@RequestParam(name = "direction", defaultValue = "asc") String direction) {
-	
-	    PagedResponse<PolicyDTO> policies = policyService.getAllInactivePolicies(page, size, sortBy, direction);
-	
-	    return new ResponseEntity<PagedResponse<PolicyDTO>>(policies, HttpStatus.OK);
-	}
+    @GetMapping("/download/policy-image/{pid}")
+    public ResponseEntity<ByteArrayResource> downloadPolicyImage(@PathVariable("pid") Long pid) {
+        byte[] data = storageService.downloadPolicyImage(pid);
+        ByteArrayResource resource = new ByteArrayResource(data);
+        return ResponseEntity
+                .ok()
+                .contentLength(data.length)
+                .header("Content-type", "application/octet-stream")
+                .header("Content-disposition", "attachment; filename=\"" + "test" + "\"")
+                .body(resource);
+    }
 
-	@Operation(summary = "By Admin: Get  policy by id")
-	@GetMapping("/policy/{pid}")
-	public ResponseEntity<PolicyDTO> getPolicyById(@PathVariable("pid")Long policyId) {
+    @PostMapping("/eligible-check/{pid}")
+    ResponseEntity<Boolean>isCustomerEligible(@PathVariable("pid")Long policyId){
+        Boolean isEligible=policyService.isCustomerEligible(policyId);
+        return new ResponseEntity<>(isEligible,HttpStatus.OK);
 
-		PolicyDTO policies = policyService.getPolicyById(policyId);
+    }
 
-		return new ResponseEntity<>(policies, HttpStatus.OK);
-	}
-	
-	
-	
+    @Operation(summary = "By Admin: Get All Policies")
+    @GetMapping
+    public ResponseEntity<PagedResponse<PolicyDTO>> getAllPolicies(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size,
+            @RequestParam(name = "sortBy", defaultValue = "policyId") String sortBy,
+            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
+
+        PagedResponse<PolicyDTO> policies = policyService.getAllPolicies(page, size, sortBy, direction);
+
+        return new ResponseEntity<PagedResponse<PolicyDTO>>(policies, HttpStatus.OK);
+    }
+
+
+    @Operation(summary = "By Admin: Get All Active Policies")
+    @GetMapping("/active")
+    public ResponseEntity<PagedResponse<PolicyDTO>> getAllActivePolicies(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size,
+            @RequestParam(name = "sortBy", defaultValue = "policyId") String sortBy,
+            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
+
+        PagedResponse<PolicyDTO> policies = policyService.getAllActivePolicies(page, size, sortBy, direction);
+
+        return new ResponseEntity<PagedResponse<PolicyDTO>>(policies, HttpStatus.OK);
+    }
+
+
+    @Operation(summary = "By Admin: Get All Inactive Policies")
+    @GetMapping("/policy/inactive")
+    public ResponseEntity<PagedResponse<PolicyDTO>> getAllInactivePolicies(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size,
+            @RequestParam(name = "sortBy", defaultValue = "policyId") String sortBy,
+            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
+
+        PagedResponse<PolicyDTO> policies = policyService.getAllInactivePolicies(page, size, sortBy, direction);
+
+        return new ResponseEntity<PagedResponse<PolicyDTO>>(policies, HttpStatus.OK);
+    }
+
+    @Operation(summary = "By Admin: Get  policy by id")
+    @GetMapping("/{pid}")
+    public ResponseEntity<PolicyDTO> getPolicyById(@PathVariable("pid") Long policyId) {
+
+        PolicyDTO policies = policyService.getPolicyById(policyId);
+
+        return new ResponseEntity<>(policies, HttpStatus.OK);
+    }
+
 
 }

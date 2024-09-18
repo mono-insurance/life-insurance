@@ -127,7 +127,9 @@ public interface DtoService {
 	List<WithdrawalRequestsDTO> convertWithdrawalRequestsListEntityToDTO(
 			List<WithdrawalRequests> allWithdrawalRequests);
 
+    List<DocumentUploadedDTO> convertDocumentsToDTO(List<DocumentUploaded> allDocuments);
 	AdminCreationDTO converAdminToAdminCreationDTO(Admin updatedAdmin);
+
 
 	EmployeeCreationDTO convertEmployeeToEmployeeCreationDTO(Employee existingEmployee);
 
@@ -144,5 +146,4 @@ public interface DtoService {
 	List<CommissionDTO> convertTransactionListEntityToCommissionDTO(List<Transactions> allTransactions);
 
 	CommissionDTO convertTransactionEntityToCommissionDTO(Transactions transactions);
-
 }
