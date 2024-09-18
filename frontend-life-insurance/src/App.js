@@ -113,12 +113,12 @@ function App() {
         {/* </Routes> */}
         <Route element={<AdminDashboard />}>
 
-            <Route path='/admin/policy/:id/view/:policyId' element={<ViewPolicy />}></Route>
-            <Route path='/admin/policy/:id/edit/:policyId' element={<UpdatePolicy />}></Route>
-            <Route path='/admin/policy/:id/delete/:policyId' element={<DeletePolicy />}></Route>
-            <Route path='/admin/employee/:id/edit/:employeeId' element={<UpdateEmployee />}></Route>
-            <Route path='/admin/employee/:id/delete/:employeeId' element={<DeleteEmployee />}></Route>
-            <Route path='/admin/request/:id/view/:requestsId' element={<ViewOrUpdateRequests />}></Route>
+          <Route path='/admin/policy/:id/view/:policyId' element={<ViewPolicy />}></Route>
+          <Route path='/admin/policy/:id/edit/:policyId' element={<UpdatePolicy />}></Route>
+          <Route path='/admin/policy/:id/delete/:policyId' element={<DeletePolicy />}></Route>
+          <Route path='/admin/employee/:id/edit/:employeeId' element={<UpdateEmployee />}></Route>
+          <Route path='/admin/employee/:id/delete/:employeeId' element={<DeleteEmployee />}></Route>
+          <Route path='/admin/request/:id/view/:requestsId' element={<ViewOrUpdateRequests />}></Route>
 
           <Route path='/admin/dashboard/:id' element={<Dashboard />}></Route>
           <Route path='/admin/add-admin/:id' element={<AddAdmin />}></Route>
@@ -138,7 +138,7 @@ function App() {
           <Route path='/admin/get-policy/:id' element={<GetPolicy />}></Route>
           <Route path='/admin/commission/:id' element={<Commission />}></Route>
           <Route path='/admin/claim/:id' element={<Claim />}></Route>
-          <Route path='/admin/cancel/:id' element={<Cancel />}></Route>
+          {/* <Route path='/admin/cancel/:id' element={<Cancel />}></Route> */}
           <Route path='/admin/requests/:id' element={<Requests />}></Route>
           <Route path='/admin/transactions/:id' element={<Transactions />}></Route>
           <Route path='/admin/feedback/:id' element={<Feedback />}></Route>
@@ -181,26 +181,17 @@ function App() {
         </Route>
 
         <Route element={<CustomerDashboard />}>
-
-          <Route path='/user/transactions/:id' element={<MakeTransactions />}></Route>
-          <Route path='/user/passbook/:id' element={<Passbook />}></Route>
-          <Route path='/user/accounts/:id' element={<Accounts />}></Route>
-          <Route path='/user/settings/:id' element={<CustomerSettings />}></Route>
-          <Route path='/user/documents/upload' element={<DocumentUpload />}></Route>
-          <Route path='/user/dashboard/:id' element={<DocumentUpload />}></Route>
-
-                      <Route path='/customer/policy-account/:id' element={<PolicyAccount />}></Route>
-                      <Route path='/customer/insurance/:id/type/:insuranceId' element={<InsurancePolicy />}></Route>
-                      <Route path='/customer/feedback/:id' element={<AddFeedback />}></Route>
-                      <Route path='/customer/add-query/:id' element={<AddQuery />}></Route>
-                      <Route path='/customer/query/:id' element={<GetQuery />}></Route>
-                      <Route path='/customer/query/:id/edit/:queryId' element={<UpdateCustomerQuery />}></Route>
-                      <Route path='/customer/query/:id/delete/:queryId' element={<DeleteCustomerQuery />}></Route>
-                      <Route path='/customer/requests/:id' element={<GetRequests />}></Route>
-                      <Route path='/customer/settings/:id' element={<CustomerSettings />}></Route>
-                      <Route path='/customer/policy-account/:id/view/:policyAccountId' element={<ViewPolicyAccount />}></Route>
-
-                    </Route>
+          <Route path='/customer/documents/upload' element={<DocumentUpload />}></Route>
+          <Route path='/customer/policy-account/:id' element={<PolicyAccount />}></Route>
+          <Route path='/customer/insurance/:id/type/:insuranceId' element={<InsurancePolicy />}></Route>
+          <Route path='/customer/feedback/:id' element={<AddFeedback />}></Route>
+          <Route path='/customer/add-query/:id' element={<AddQuery />}></Route>
+          <Route path='/customer/query/:id' element={<GetQuery />}></Route>
+          <Route path='/customer/query/:id/edit/:queryId' element={<UpdateCustomerQuery />}></Route>
+          <Route path='/customer/query/:id/delete/:queryId' element={<DeleteCustomerQuery />}></Route>
+          <Route path='/customer/requests/:id' element={<GetRequests />}></Route>
+          <Route path='/customer/settings/:id' element={<CustomerSettings />}></Route>
+          <Route path='/customer/policy-account/:id/view/:policyAccountId' element={<ViewPolicyAccount />}></Route>
 
         </Route>
 

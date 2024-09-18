@@ -294,21 +294,6 @@ export const fetchCustomerAccounts = async () => {
 
 }
 
-export const customerProfileUpdate = async (formState) => {
-    const token = localStorage.getItem('auth');
-    try {
-        const response = await axios.put('http://localhost:8080/api/customer', formState, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        }).catch((error) => { throw new AxiosError(error.response.data.message) });
-
-        return response.data;
-    }
-    catch (error) {
-        throw error;
-    }
-
-}
-
 
 
 export const getPassbook = async (currentPage, itemsPerPage) => {
