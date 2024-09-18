@@ -147,7 +147,7 @@ export const Login = () => {
                             href="/change-password"
                             className="text-blue-500 hover:underline"
                         >
-                            Register here
+                            Click me
                         </a>
                     </div>
                 </div>

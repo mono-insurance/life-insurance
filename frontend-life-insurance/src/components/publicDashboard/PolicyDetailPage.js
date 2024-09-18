@@ -9,12 +9,17 @@ const PoliciesPage = () => {
     const [policy, setPolicy] = useState(null);
     const [isEligible, setIsEligible] = useState(false);
     const { id } = useParams();
+    const [error, setError] = useState(null)
 
     const handleBuyPolicy = async (policyId) => {
         const token = localStorage.getItem('auth');
         if (!token) navigate('/login');
         const response = await IsEligible(policyId);
-        setIsEligible(response.data);
+        if (response.status != 200) {
+            setError(response.data.message)
+            setIsEligible(false)
+        }
+        else setIsEligible(response.data);
     };
 
     useEffect(() => {
@@ -103,11 +108,13 @@ const PoliciesPage = () => {
                         Buy Policy
                     </button>
                 </div>
+
             ) : (
                 <div className="mt-8">
                     <PolicyPurchase policy={policy} />
                 </div>
             )}
+            {error && <div className="text-red-500">{error}</div>}
         </div>
     );
 };
