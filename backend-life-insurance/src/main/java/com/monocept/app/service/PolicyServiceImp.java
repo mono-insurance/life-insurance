@@ -1,5 +1,6 @@
 package com.monocept.app.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -231,6 +232,21 @@ public class PolicyServiceImp implements PolicyService{
 	}
 
 	private Boolean isEligible(Customer customer, Policy policy) {
+
+		if (!policy.getIsActive()) {
+			throw new UserException("The policy is not active");
+		}
+		// Validate the customer's age
+		int age = LocalDate.now().getYear() - customer.getDateOfBirth().getYear();
+		if (age < policy.getMinAge() || age > policy.getMaxAge()) {
+			throw new UserException("Customer's age is not within the allowed range for this policy");
+		}
+
+		// Validate the customer's gender
+		if (!policy.getEligibleGender().equalsIgnoreCase("BOTH") &&
+				!policy.getEligibleGender().equalsIgnoreCase(customer.getGender().toString())) {
+			throw new UserException("Customer's gender is not eligible for this policy");
+		}
 		List<DocumentNeeded>policyDocumentsNeeded=policy.getDocumentsNeeded();
 		List<DocumentUploaded>documentUploadedList=customer.getDocuments();
 		Set<DocumentType> uploadedDocumentTypes = documentUploadedList.stream()
