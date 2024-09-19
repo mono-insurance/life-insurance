@@ -208,7 +208,7 @@ public class StorageServiceImp implements StorageService {
             emailDTO.setBody("Congrats!! your document " + documentUploaded.getDocumentType() + " has been uploaded.\n");
             emailService.sendAccountCreationEmail(emailDTO);
         } else {
-            if (!customUserDetails.getId().equals(documentUploadedDTO.getCustomerId()) && role.equals("ROLE_CUSTOMER")) {
+            if (!customUserDetails.getId().equals(documentUploadedDTO.getCustomerId()) && role.equals("CUSTOMER")) {
                 throw new UserException("You can only upload your own documents");
             }
             Customer customer = findCustomer(documentUploadedDTO.getCustomerId());

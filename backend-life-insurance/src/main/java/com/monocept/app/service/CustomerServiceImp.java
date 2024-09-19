@@ -17,6 +17,7 @@ import com.monocept.app.entity.Settings;
 import com.monocept.app.entity.State;
 import com.monocept.app.entity.Transactions;
 import com.monocept.app.entity.WithdrawalRequests;
+import com.monocept.app.exception.RoleAccessException;
 import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.AddressRepository;
 import com.monocept.app.repository.AgentRepository;
@@ -632,6 +633,32 @@ public class CustomerServiceImp implements CustomerService {
     }
 
     @Override
+    public PagedResponse<CustomerDTO> getAllCustomersStartswith(int pageNo, int size, String sort, String firstName, String sortDirection) {
+        accessConService.checkEmployeeAccess();
+        Sort sorting = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sort).ascending()
+                : Sort.by(sort).descending();
+        Pageable pageable = PageRequest.of(pageNo, size, sorting);
+        Page<Customer> customerPage = customerRepository.findAllByFirstName(pageable,firstName);
+        List<Customer> customers = customerPage.getContent();
+        List<CustomerDTO> customerDTOS = dtoService.convertCustomersToDto(customers);
+        return new PagedResponse<>(customerDTOS, customerPage.getNumber(),
+                customerPage.getSize(), customerPage.getTotalElements(), customerPage.getTotalPages(),
+                customerPage.isLast());
+    }
+
+    @Override
+    public CustomerCreationDTO getCustomerOnlyProfile() {
+        CustomUserDetails customUserDetails=accessConService.checkUserAccess();
+        String role=accessConService.getUserRole();
+        if(!role.equals("CUSTOMER")){
+           throw new RoleAccessException("Only customer can access this api");
+        }
+        Customer customer=findCustomerById(customUserDetails.getId());
+        return dtoService.convertCustomerToCustomerCreationDTO(customer);
+    }
+
+    @Override
     public PagedResponse<CustomerDTO> getAllInActiveCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection) {
         accessConService.checkEmployeeAccess();
         Sort sorting = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name())
@@ -648,8 +675,8 @@ public class CustomerServiceImp implements CustomerService {
 
 	@Override
 	public CustomerCreationDTO getCustomerFullProfile(Long customerId) {
+        accessConService.checkCustomerAccess(customerId);
 		Customer customer = findCustomerById(customerId);
-		
 		return dtoService.convertCustomerToCustomerCreationDTO(customer);
 	}
 

@@ -18,8 +18,8 @@ public class EmailDTO {
     private String title;
     @NotBlank(message = "body could not be null")
     private String body;
-    @NotNull(message = "policyId could not be null")
+
     private Long policyId;
-    @NotNull(message = "agentId could not be null")
+
     private Long agentId;
 }
