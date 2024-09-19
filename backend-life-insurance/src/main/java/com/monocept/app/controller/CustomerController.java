@@ -39,11 +39,16 @@ public class CustomerController {
 
 
     @Operation(summary = "By Customer: Get the customer profile")
-    @GetMapping("/customer/{cid}")
+    @GetMapping("/{cid}")
     public ResponseEntity<CustomerDTO> getCustomerProfile(@PathVariable("cid") Long customerId) {
-
         CustomerDTO customer = customerService.getCustomerProfile(customerId);
         return new ResponseEntity<CustomerDTO>(customer, HttpStatus.OK);
+    }
+    @Operation(summary = "By Customer: Get the customer profile")
+    @GetMapping
+    public ResponseEntity<CustomerCreationDTO> getCustomerOnlyProfile() {
+        CustomerCreationDTO customer = customerService.getCustomerOnlyProfile();
+        return new ResponseEntity<CustomerCreationDTO>(customer, HttpStatus.OK);
     }
 
 
@@ -107,6 +112,7 @@ public class CustomerController {
     }
 
 
+
     @Operation(summary = "By Admin,emp: Get All policyClaims by Customer")
     @GetMapping("/policy-claims-request/{cid}")
     ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllPolicyClaimsRequest(
@@ -135,7 +141,7 @@ public class CustomerController {
     
     
     @Operation(summary = "By Customer: Get the customer profile")
-    @GetMapping("/customer/profile/{cid}")
+    @GetMapping("/profile/{cid}")
     public ResponseEntity<CustomerCreationDTO> getCustomerFullProfile(@PathVariable("cid") Long customerId) {
 
     	CustomerCreationDTO customer = customerService.getCustomerFullProfile(customerId);

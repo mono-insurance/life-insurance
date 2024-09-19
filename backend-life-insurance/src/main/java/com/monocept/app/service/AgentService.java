@@ -43,4 +43,6 @@ public interface AgentService {
     PagedResponse<WithdrawalRequestsDTO> getAllNotApprovedCommissions(Long agentId, int pageNo, int size, String sort, String sortBy, String sortDirection);
 
     BalanceDTO getAgentBalance();
+
+    PagedResponse<TransactionsDTO> getAllTransactions(int pageNo, int size, String sort, String sortBy, String sortDirection);
 }

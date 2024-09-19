@@ -107,6 +107,18 @@ public class AgentController {
                 getAllCustomers(pageNo,size,sort,sortBy,sortDirection,isActive);
         return new ResponseEntity<>(customerDTOPagedResponse, HttpStatus.OK);
     }
+    @GetMapping("/transactions")
+    ResponseEntity<PagedResponse<TransactionsDTO>> getAllTransactions(
+            @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sort", defaultValue = "ASC") String sort,
+            @RequestParam(name = "sortBy", defaultValue = "serialNo") String sortBy,
+            @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection
+    ) {
+        PagedResponse<TransactionsDTO> customerDTOPagedResponse = agentService.
+                getAllTransactions(pageNo,size,sort,sortBy,sortDirection);
+        return new ResponseEntity<>(customerDTOPagedResponse, HttpStatus.OK);
+    }
 
     @GetMapping("/view-commissions")
     ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAgentCommission(

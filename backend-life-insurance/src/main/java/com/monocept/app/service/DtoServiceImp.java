@@ -3,10 +3,10 @@ package com.monocept.app.service;
 import com.monocept.app.dto.*;
 import com.monocept.app.entity.*;
 import com.monocept.app.exception.UserException;
+import com.monocept.app.repository.AddressRepository;
 import com.monocept.app.repository.CityRepository;
 import com.monocept.app.repository.StateRepository;
 import com.monocept.app.utils.DocumentType;
-import com.monocept.app.utils.NomineeRelation;
 import com.monocept.app.utils.PageResult;
 import com.monocept.app.repository.RoleRepository;
 import com.monocept.app.utils.GlobalSettings;
@@ -25,12 +25,14 @@ public class DtoServiceImp implements DtoService {
     private final StateRepository stateRepository;
     private final CityRepository cityRepository;
     private final StorageService storageService;
+    private final AddressRepository addressRepository;
 
-    public DtoServiceImp(StateRepository stateRepository, CityRepository cityRepository, StorageService storageService) {
+    public DtoServiceImp(StateRepository stateRepository, CityRepository cityRepository, StorageService storageService, AddressRepository addressRepository) {
         this.stateRepository = stateRepository;
         this.cityRepository = cityRepository;
 
         this.storageService = storageService;
+        this.addressRepository = addressRepository;
     }
 
     @Override
@@ -91,7 +93,9 @@ public class DtoServiceImp implements DtoService {
 
     @Override
     public Address convertDtoToAddress(AddressDTO addressDTO) {
-        Address address = new Address();
+        Long addressId=addressDTO.getAddressId();
+        if(addressId==null) addressId=0L;
+        Address address  = addressRepository.findById(addressId).orElse(new Address());
         address.setPincode(addressDTO.getPincode());
         address.setFirstStreet(addressDTO.getFirstStreet());
         address.setLastStreet(addressDTO.getLastStreet());
@@ -101,20 +105,29 @@ public class DtoServiceImp implements DtoService {
 
     @Override
     public void updateCityAndState(Address agentAddress, AddressDTO address) {
-        if (!agentAddress.getState().getStateName().equals(address.getState())) {
+        if(agentAddress.getState()==null){
+            State state=stateRepository.findByStateName(address.getState()).orElseThrow(()->new UserException("state not found"));
+            agentAddress.setState(state);
+        }
+        else if (!agentAddress.getState().getStateName().equals(address.getState())) {
             Optional<State> statecheck = stateRepository.findByStateName(address.getState());
             if (statecheck.isEmpty()) throw new UserException("state not found");
             State state = statecheck.get();
             agentAddress.setState(state);
         }
-        City cityInState = agentAddress.getState().getCities().stream()
-                .filter(city -> city.getCityName().equals(address.getCity()))
-                .findFirst()
-                .orElse(null);
-        if (cityInState == null) {
-            throw new UserException("city not found");
+        if(agentAddress.getCity()==null){
+            City city=cityRepository.findByCityName(address.getCity()).orElseThrow(()->new UserException("city not found"));
+            agentAddress.setCity(city);
+        }else{
+            City cityInState = agentAddress.getState().getCities().stream()
+                    .filter(city -> city.getCityName().equals(address.getCity()))
+                    .findFirst()
+                    .orElse(null);
+            if (cityInState == null) {
+                throw new UserException("city not found");
+            }
+            agentAddress.setCity(cityInState);
         }
-        agentAddress.setCity(cityInState);
     }
 
     @Override
@@ -225,6 +238,37 @@ public class DtoServiceImp implements DtoService {
         }
         return withdrawalRequestsDTOS;
     }
+    @Override
+    public PageResult convertTransactionsToPage(List<Transactions> customerList, int pageNo, String sort, String sortBy, String sortDirection, int size) {
+        Comparator<Transactions> comparator;
+
+        switch (sortBy.toLowerCase()) {
+            case "serialNo":
+                comparator = Comparator.comparing(Transactions::getSerialNo); // Assuming account number is a String
+                break;
+            case "amount":
+                comparator = Comparator.comparing(Transactions::getAmount); // Assuming balance is a BigDecimal
+                break;
+            case "transactionDate":
+                comparator = Comparator.comparing(Transactions::getTransactionDate); // Assuming created date is a LocalDateTime
+                break;
+            default:
+                comparator = Comparator.comparing(Transactions::getSerialNo); // Default sort by ID or any default field
+                break;
+        }
+
+        // If descending order is required, reverse the comparator
+        if (sortDirection.equalsIgnoreCase("desc")) {
+            comparator = comparator.reversed();
+        }
+
+        // Step 3: Implement pagination using subList method
+        int start = pageNo * size;
+        int end = Math.min((start + size), customerList.size());
+        List<Transactions> result = customerList.subList(start, end);
+        return new PageResult(result, end);
+    }
+
 
     @Override
     public PageResult convertCustomersToPage(List<Customer> customerList, int pageNo, String sort, String sortBy, String sortDirection, int size) {
@@ -1006,6 +1050,7 @@ public class DtoServiceImp implements DtoService {
 	@Override
 	public CustomerCreationDTO convertCustomerToCustomerCreationDTO(Customer customer) {
 		CustomerCreationDTO customerCreationDTO = new CustomerCreationDTO();
+        customerCreationDTO.setCustomerId(customer.getCustomerId());
 		
 		customerCreationDTO.setFirstName(customer.getFirstName());
 		customerCreationDTO.setLastName(customer.getLastName());

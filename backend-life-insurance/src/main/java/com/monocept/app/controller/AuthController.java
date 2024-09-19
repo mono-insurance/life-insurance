@@ -5,18 +5,14 @@ import com.monocept.app.dto.JWTAuthResponse;
 import com.monocept.app.dto.LoginDTO;
 import com.monocept.app.dto.LoginResponseDTO;
 import com.monocept.app.dto.RegistrationDTO;
-import com.monocept.app.service.AgentService;
-import com.monocept.app.service.AuthService;
-import com.monocept.app.service.CustomerService;
+import com.monocept.app.service.*;
 
-import com.monocept.app.service.StateService;
 import com.monocept.app.utils.PagedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,13 +25,16 @@ public class AuthController {
     private final AgentService agentService;
     private final CustomerService customerService;
     private final StateService stateService;
+    private final EmailService emailService;
 
 
-    public AuthController(AuthService authService, AgentService agentService, CustomerService customerService, StateService stateService) {
+    public AuthController(AuthService authService, AgentService agentService, CustomerService customerService,
+                          StateService stateService, EmailService emailService) {
         this.authService = authService;
         this.agentService = agentService;
         this.customerService = customerService;
         this.stateService = stateService;
+        this.emailService = emailService;
     }
 
 
@@ -65,12 +64,19 @@ public class AuthController {
         Long id = customerService.customerRegistration(registrationDTO);
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
+    @PostMapping("/contact-us")
+    ResponseEntity<HttpStatus> ContactUs(@RequestBody @Valid EmailDTO emailDTO) {
+
+        emailService.sendAccountCreationEmail(emailDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
     @PostMapping("/change-password-request/{userId}")
     ResponseEntity<HttpStatus> changePasswordRequest(@PathVariable("userId")String userId) {
 
         authService.changePasswordRequest(userId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+    
     @PostMapping("/otp-confirmation/{userId}/{otp}")
     ResponseEntity<Boolean> otpConfirmation(@PathVariable("userId")String userId,@PathVariable("otp")String otp) {
 
