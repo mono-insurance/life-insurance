@@ -28,14 +28,14 @@ public class PaypalController {
             Payment payment = paymentService.createPayment(transactionId, paymentOrder);
             for (Links link : payment.getLinks()) {
                 if (link.getRel().equals("approval_url")) {
-                    return new ResponseEntity<>("redirect:" + link.getHref(), HttpStatus.OK);
+                    return new ResponseEntity<>( link.getHref(), HttpStatus.OK);
                 }
             }
 
         } catch (PayPalRESTException e) {
             e.printStackTrace();
         }
-        return new ResponseEntity<>("redirect:", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("http://localhost:3000/", HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("status-failed/{tid}")

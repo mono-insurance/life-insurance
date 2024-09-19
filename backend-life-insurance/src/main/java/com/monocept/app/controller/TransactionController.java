@@ -87,6 +87,13 @@ public class TransactionController {
         PagedResponse<WithdrawalRequestsDTO> allCommissions = transactionService.getAllCommissions(pageNo, size, sortBy, sortDirection);
         return new ResponseEntity<>(allCommissions, HttpStatus.OK);
     }
+    @Operation(summary = "By Admin,emp: Get All Commissions of all agents")
+    @GetMapping("/{tid}")
+    ResponseEntity<TransactionsDTO> getTransactionById(
+           @PathVariable("tid")Long transactionId) {
+        TransactionsDTO transaction = transactionService.getTransactionById(transactionId);
+        return new ResponseEntity<>(transaction, HttpStatus.OK);
+    }
     
     
     

@@ -59,6 +59,7 @@ public interface DtoService {
 	List<QueryDTO> convertQueryListEntityToDTO(List<Query> allQueries);
 
 	List<TransactionsDTO> convertTransactionListEntityToDTO(List<Transactions> allTransactions);
+	TransactionsDTO convertTransactionEntityToDTO(Transactions transaction);
 
 	CustomerDTO convertCustomerToCustomerResponseDTO(Customer customer);
 

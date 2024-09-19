@@ -225,4 +225,10 @@ public class TransactionServiceImp implements TransactionService {
         return new PagedResponse<TransactionsDTO>(allTransactionsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
 	}
 
+    @Override
+    public TransactionsDTO getTransactionById(Long transactionId) {
+        Transactions transactions=transactionsRepository.findById(transactionId).orElseThrow(()->new UserException("transaction not found"));
+        return dtoService.convertTransactionEntityToDTO(transactions);
+    }
+
 }
