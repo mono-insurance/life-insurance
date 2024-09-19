@@ -824,7 +824,7 @@ public class DtoServiceImp implements DtoService {
                 .map(this::convertTransactionEntityToDTO)
                 .collect(Collectors.toList());
     }
-
+    @Override
     public TransactionsDTO convertTransactionEntityToDTO(Transactions transaction) {
         TransactionsDTO transactionsDTO = new TransactionsDTO();
         transactionsDTO.setTransactionId(transaction.getTransactionId());
