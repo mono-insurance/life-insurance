@@ -18,7 +18,42 @@ export const fetchCustomer = async (customerId) => {
     catch (error) {
         throw error;
     }
+}
+export const transactionById = async (transactionId) => {
+    const token = localStorage.getItem('auth');
 
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/transaction/${transactionId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
+
+
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+export const initiateTransaction = async (formData, transactionId) => {
+    const token = localStorage.getItem('auth');
+
+    try {
+        const response = await axios.post(`http://localhost:8080/suraksha/payment/transaction/${transactionId}/pay`,
+            formData,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }).catch((error) => { throw new AxiosError(error.response.data.message) });
+
+
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
 }
 
 

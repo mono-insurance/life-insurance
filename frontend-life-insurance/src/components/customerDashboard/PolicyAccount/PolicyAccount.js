@@ -52,8 +52,7 @@ export const PolicyAccount = () => {
   };
 
   const actions = (policyAccountId) => [
-    { name: 'View', url: `/customer/policy-account/${adminId}/view/${policyAccountId}` },
-    { name: 'Perform', url: `/customer/perform-transaction/${adminId}/view/${policyAccountId}` }
+    { name: 'View', url: `/customer/policy-account/${adminId}/view/${policyAccountId}` }
   ];
 
   const policyAccountsTable = async () => {
