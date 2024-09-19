@@ -21,7 +21,7 @@ const AgentEmails = () => {
     // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const agentId = routeParams.id
+        const agentId = routeParams.aid
 
         const emailData = {
             emailId: email,

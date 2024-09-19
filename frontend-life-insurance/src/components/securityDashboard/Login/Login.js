@@ -43,6 +43,8 @@ export const Login = () => {
             const response = await login(email, password);
             const token = response.headers['authorization'];
             localStorage.setItem("auth", token);
+            localStorage.setItem("role", response.data.role)
+            localStorage.setItem("id", response.data.id)
 
             resetSidebar();
             successToast("Login successful!");
@@ -57,14 +59,13 @@ export const Login = () => {
                 navigate(`/employee/dashboard/${response.data.id}`)
             }
             if (response.data.role === "Customer") {
-                navigate(`/user/dashboard/${response.data.id}`)
+                navigate(`/`)
             }
         }
         catch (error) {
             if (error.specificMessage === "Your account is inactive. Please contact Admin to make it active.") {
                 errorToast(error.specificMessage);
                 setModalMessage("Your Account is inactive. Please fill the form below to make the request to activate your account.");
-                setShowModal(true);
             } else {
                 if (error.response?.data?.message || error.specificMessage) {
                     errorToast(error.response?.data?.message || error.specificMessage);

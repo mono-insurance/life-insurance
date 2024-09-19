@@ -37,7 +37,7 @@ export const AllCustomers = () => {
     const [showFilterButton, setShowFilterButton] = useState(true);
 
     const filterOptions = [
-        { label: 'Search by Employee Id', value: 'id' },
+        { label: 'Search by customerId Id', value: 'id' },
         { label: 'Search by Active', value: 'active' },
         { label: 'Search by Inactive', value: 'inactive' }
     ];
@@ -84,10 +84,13 @@ export const AllCustomers = () => {
             }
         }
     }
+    const handleDeleteCustomer = async (customerId) => {
+        console.log("in handleDeleteCustomer")
+        await deleteCustomer(customerId)
+        customerTable()
+    }
     const actions = (customerId) => [
-        { name: "View", url: `/employee/view/${customerId}` },
-        { name: "Edit", url: `/employee/edit/${customerId}` },
-        { name: "Delete", url: `/employee/delete/${customerId}` }
+        { name: "View", url: `/employee/${routeParams.id}/customer/settings/${customerId}` }
     ]
     const handleSearch = () => {
         resetPagination();
@@ -159,7 +162,7 @@ export const AllCustomers = () => {
     return (
         <>
             <div className='content-area-employees'>
-                <AreaTop pageTitle={"All Customers"} pagePath={"Customers"} pageLink={`/admin/dashboard/${routeParams.id}`} />
+                <AreaTop pageTitle={"All Customers"} pagePath={"Customers"} pageLink={`/employee/dashboard/${routeParams.id}`} />
                 <section className="content-area-table-employees">
                     <div className="admin-form">
                         <div className='activate-form'>
@@ -204,38 +207,5 @@ export const AllCustomers = () => {
             </div>
             <ToastContainer position="bottom-right" />
         </>
-        // <div className='content-area'>
-        //     <AreaTop pageTitle={"Activate Customers"} pagePath={"Activate-Customers"} pageLink={`/employee/dashboard/${routeParams.id}`} />
-        //     <section className='content-area-form'>
-        //         <div className="admin-form">
-
-
-        //             {newlyActivated && (
-
-        //                 <div className="deactivate-success">
-        //                     {activatedData}
-        //                 </div>
-        //             )}
-        //         </div>
-        //     </section>
-
-        //     {(showActiveCustomers || showInactiveCustomers) && (
-        //         <section className="content-area-table">
-        //             <div className="data-table-info">
-        //                 <h3 className="data-table-title">{showActiveCustomers ? 'Active Customers' : 'Inactive Customers'}</h3>
-        //             </div>
-        //             <div className="data-table-diagram">
-        //                 <Table
-        //                     data={data}
-        //                     keysToBeIncluded={keysToBeIncluded}
-        //                     includeButton={true}
-        //                     handleButtonClick={handleCustomerClicked}
-        //                     showPagination={showPagination}
-        //                 />
-        //             </div>
-        //         </section>
-        //     )}
-        //     <ToastContainer position="bottom-right" />
-        // </div>
     )
 }

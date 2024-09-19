@@ -13,34 +13,34 @@ export const AdminDashboard = () => {
 
   useEffect(() => {
     const checkAdmin = async () => {
-      try{
-          const adminStatus = await verifyAdmin({adminId : routeParams.id});
-          setIsAdmin(adminStatus);
-          if (!adminStatus) {
-            navigate('/auth/login');
-          }
-        }catch(error){
-          if (error.response?.data?.message || error.specificMessage) {
-            errorToast(error.response?.data?.message || error.specificMessage);
-          } else {
-            errorToast("An error occurred while Activating account.");
-          }
+      try {
+        const adminStatus = await verifyAdmin({ adminId: routeParams.id });
+        setIsAdmin(adminStatus);
+        if (!adminStatus) {
+          navigate('/login');
         }
+      } catch (error) {
+        if (error.response?.data?.message || error.specificMessage) {
+          errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+          errorToast("An error occurred while Activating account.");
+        }
+      }
     };
     checkAdmin();
   }, [routeParams.id, navigate]);
 
   return (
     <>
-    {isAdmin && (
+      {isAdmin && (
         <main className="page-wrapper">
-        <Sidebar />
-            <div className="content-wrapper">
-                <Outlet />
-            </div>
+          <Sidebar />
+          <div className="content-wrapper">
+            <Outlet />
+          </div>
         </main>)
-    }
-    <ToastContainer position="bottom-right" />
+      }
+      <ToastContainer position="bottom-right" />
     </>
   )
 }

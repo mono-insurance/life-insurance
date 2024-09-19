@@ -30,8 +30,8 @@ export const AllTransactions = () => {
                 sort: 'ASC',
             }
             const response = await getAllTransactions(formData);
-            console.log("in active customer click", response?.data.content ?? [])
-            setData(response?.data ?? []);
+            console.log("in active customer click", response?.content ?? [])
+            setData(response ?? []);
             console.log("data in response", data)
 
             setKeysToBeIncluded(["transactionId", "amount", "transactionDate", "status", "policyAccountId"]);
@@ -42,8 +42,6 @@ export const AllTransactions = () => {
             setData([]);
             if (error.response?.data?.message || error.specificMessage) {
                 errorToast(error.response?.data?.message || error.specificMessage);
-            } else {
-                errorToast("An error occurred while Activating customers.");
             }
         }
     }

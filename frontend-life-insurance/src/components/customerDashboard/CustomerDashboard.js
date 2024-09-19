@@ -5,16 +5,18 @@ import { verifyCustomer } from '../../services/AuthServices';
 import './customerDashboard.scss';
 import { Sidebar } from './Sidebar/Sidebar';
 import { errorToast } from '../../utils/helper/toast';
+import Navbar from '../CustomerPage/Navbar';
 
 export const CustomerDashboard = () => {
   const [isCustomer, setIsCustomer] = useState(false);
   const navigate = useNavigate();
   const routeParams = useParams();
+  const userId = localStorage.getItem("id")
 
   useEffect(() => {
     const checkCustomer = async () => {
       try {
-        const customerStatus = await verifyCustomer({ customerId: routeParams.id });
+        const customerStatus = await verifyCustomer({ customerId: userId });
         setIsCustomer(customerStatus);
         if (!customerStatus) {
           navigate('/login');
@@ -34,7 +36,7 @@ export const CustomerDashboard = () => {
     <>
       {isCustomer && (
         <main className="page-wrapper">
-          <Sidebar />
+          <Navbar />
           <div className="content-wrapper">
             <Outlet />
           </div>

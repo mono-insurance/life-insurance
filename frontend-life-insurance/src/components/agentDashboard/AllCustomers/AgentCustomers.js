@@ -37,20 +37,20 @@ export const AgentCustomers = () => {
                 isActive: true
             }
             const response = await getAllCustomers(formData);
-            console.log("in active customer click", response?.data.content ?? [])
-            setData(response?.data ?? []);
-            console.log("data in response", data)
+            console.log("fetchInactiveCustomers ", response)
+            setData(response ?? []);
+            console.log("fetchInactiveCustomers is in data", data)
 
-            setKeysToBeIncluded(["customerId", "firstName", "dateOfBirth", "nomineeName", "nomineeRelation"]);
+            setKeysToBeIncluded(["customerId", "firstName", "dateOfBirth", "nomineeName", "nomineeRelation", "Edit"]);
+            setShowInactiveCustomers(true);
             setShowActiveCustomers(true);
-            setShowInactiveCustomers(false);
         }
         catch (error) {
             setData([]);
             if (error.response?.data?.message || error.specificMessage) {
                 errorToast(error.response?.data?.message || error.specificMessage);
             } else {
-                errorToast("An error occurred while Activating customers.");
+                errorToast("An error  while getting inactive customers.");
             }
         }
     }
@@ -65,7 +65,7 @@ export const AgentCustomers = () => {
             }
             const response = await getAllCustomers(formData);
             console.log("fetchInactiveCustomers ", response)
-            setData(response?.data ?? []);
+            setData(response ?? []);
             console.log("fetchInactiveCustomers is in data", data)
 
             setKeysToBeIncluded(["customerId", "firstName", "dateOfBirth", "nomineeName", "nomineeRelation", "Edit"]);
@@ -77,7 +77,7 @@ export const AgentCustomers = () => {
             if (error.response?.data?.message || error.specificMessage) {
                 errorToast(error.response?.data?.message || error.specificMessage);
             } else {
-                errorToast("An error occurred while Activating customers.");
+                errorToast("An error  while getting inactive customers.");
             }
         }
     }
@@ -104,7 +104,7 @@ export const AgentCustomers = () => {
 
     return (
         <div className='content-area'>
-            <AreaTop pageTitle={"Agent Customers"} pagePath={"mycustomers"} pageLink={`/agent/dashboard/${routeParams.id}`} />
+            <AreaTop pageTitle={"Agent Customers"} pagePath={"mycustomers"} pageLink={`/agent/dashboard/${routeParams.aid}`} />
             <section className='content-area-form'>
                 <div className="admin-form">
                     <div className="data-info">

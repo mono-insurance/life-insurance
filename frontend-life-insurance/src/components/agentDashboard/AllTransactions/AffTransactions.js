@@ -6,10 +6,11 @@ import { PaginationContext } from '../../../context/PaginationContext';
 import { Table } from '../../../sharedComponents/Table/Table';
 import './AffTransactions.scss'
 import { useParams } from 'react-router-dom';
-import { getAllTransactions, getAllTransactionsByAccountNumber, getAllTransactionsByDate } from '../../../services/EmployeeServices';
+import { getAllTransactionsByAccountNumber, getAllTransactionsByDate } from '../../../services/EmployeeServices';
 import { validateCustomerId } from '../../../utils/validations/Validations';
 import { Toast } from 'react-bootstrap';
 import { ToastContainer } from 'react-toastify';
+import { getAllTransactions } from '../../../services/AgentService';
 
 export const AffTransactions = () => {
     const [newlyActivated, setNewlyActivated] = useState(false);
@@ -42,8 +43,6 @@ export const AffTransactions = () => {
             setData([]);
             if (error.response?.data?.message || error.specificMessage) {
                 errorToast(error.response?.data?.message || error.specificMessage);
-            } else {
-                errorToast("An error occurred while Activating customers.");
             }
         }
     }
@@ -52,7 +51,7 @@ export const AffTransactions = () => {
     }, [currentPage, itemsPerPage]);
     return (
         <div className='content-area'>
-            <AreaTop pageTitle={"All Transactions"} pagePath={"customer-transactions"} pageLink={`/agent/dashboard/${routeParams.id}`} />
+            <AreaTop pageTitle={"All Transactions"} pagePath={"customer-transactions"} pageLink={`/agent/dashboard/${routeParams.aid}`} />
             <section className='content-area-form'>
                 <div className="admin-form">
                     <div className="data-info">
