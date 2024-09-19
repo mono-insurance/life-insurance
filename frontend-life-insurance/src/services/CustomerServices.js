@@ -1,14 +1,16 @@
 import axios from 'axios';
 import { AxiosError } from '../utils/errors/APIError';
+import { errorToast, successToast } from '../utils/helper/toast';
 
 export const fetchCustomer = async (customerId) => {
     const token = localStorage.getItem('auth');
 
     try {
-        const response = await axios.get(`http://localhost:8080/suraksha/customer/customer/profile/${customerId}`, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }}).catch((error) => {throw new AxiosError(error.response.data.message)});
+        const response = await axios.get(`http://localhost:8080/suraksha/customer/profile/${customerId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
 
         return response.data;
@@ -24,12 +26,12 @@ export const getListOfActiveCitiesByState = async (stateName) => {
     const token = localStorage.getItem('auth');
     try {
         const response = await axios.get(`http://localhost:8080/suraksha/city/all/active/state`, {
-              headers: { 'Authorization': `Bearer ${token}` },
-              params: { stateName }
-          }).catch((error) => {throw new AxiosError(error.response.data.message)});
+            headers: { 'Authorization': `Bearer ${token}` },
+            params: { stateName }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
         return response.data;
-    } 
+    }
     catch (error) {
         throw error;
     }
@@ -42,10 +44,10 @@ export const customerProfileUpdate = async (formState) => {
     try {
         const response = await axios.put('http://localhost:8080/suraksha/customer', formState, {
             headers: { 'Authorization': `Bearer ${token}` }
-        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
         return response.data;
-    } 
+    }
     catch (error) {
         throw error;
     }
@@ -58,10 +60,10 @@ export const updateCustomerAddress = async (formState) => {
     try {
         const response = await axios.put('http://localhost:8080/suraksha/address/address', formState, {
             headers: { 'Authorization': `Bearer ${token}` }
-        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
         return response.data;
-    } 
+    }
     catch (error) {
         throw error;
     }
@@ -74,11 +76,11 @@ export const addFeedbackByCustomer = async (formState) => {
     const token = localStorage.getItem('auth');
     try {
         const response = await axios.post('http://localhost:8080/suraksha/feedback/feedback', formState, {
-          headers: { 'Authorization': `Bearer ${token}` }
-      }).catch((error) => {throw new AxiosError(error.response.data.message)});
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
         return response.data;
-    } 
+    }
     catch (error) {
         throw error;
     }
@@ -91,11 +93,11 @@ export const addQueryByCustomer = async (formState) => {
     const token = localStorage.getItem('auth');
     try {
         const response = await axios.post('http://localhost:8080/suraksha/query/query', formState, {
-          headers: { 'Authorization': `Bearer ${token}` }
-      }).catch((error) => {throw new AxiosError(error.response.data.message)});
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
         return response.data;
-    } 
+    }
     catch (error) {
         throw error;
     }
@@ -108,12 +110,12 @@ export const getAllResolvedQueriesByCustomer = async (currentPage, itemsPerPage,
     const token = localStorage.getItem('auth');
     try {
         const response = await axios.get(`http://localhost:8080/suraksha/query/queries/customer/${id}/resolved`, {
-          params: { page: currentPage - 1, size: itemsPerPage },
-          headers: { 'Authorization': `Bearer ${token}` }
-        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+            params: { page: currentPage - 1, size: itemsPerPage },
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
         return response.data;
-    } 
+    }
     catch (error) {
         throw error;
     }
@@ -126,12 +128,12 @@ export const getAllUnresolvedQueriesByCustomer = async (currentPage, itemsPerPag
     const token = localStorage.getItem('auth');
     try {
         const response = await axios.get(`http://localhost:8080/suraksha/query/queries/customer/${id}/unresolved`, {
-          params: { page: currentPage - 1, size: itemsPerPage },
-          headers: { 'Authorization': `Bearer ${token}` }
-        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+            params: { page: currentPage - 1, size: itemsPerPage },
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
         return response.data;
-    } 
+    }
     catch (error) {
         throw error;
     }
@@ -144,10 +146,10 @@ export const updateQueryByCustomerEnd = async (id, formState) => {
     try {
         const response = await axios.put(`http://localhost:8080/suraksha/query/query/unresolved/${id}`, formState, {
             headers: { 'Authorization': `Bearer ${token}` }
-        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
         return response.data;
-    } 
+    }
     catch (error) {
         throw error;
     }
@@ -162,10 +164,10 @@ export const deleteQueryByCustomer = async (id) => {
     try {
         const response = await axios.delete(`http://localhost:8080/suraksha/query/query/unresolved/${id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
-        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
         return response.data;
-    } 
+    }
     catch (error) {
         throw error;
     }
@@ -178,12 +180,12 @@ export const getAllPolicyAccounts = async (currentPage, itemsPerPage) => {
     const token = localStorage.getItem('auth');
     try {
         const response = await axios.get('http://localhost:8080/suraksha/customer/policy-accounts', {
-              params: { page: currentPage - 1, size: itemsPerPage },
-              headers: { 'Authorization': `Bearer ${token}` }
-          }).catch((error) => {throw new AxiosError(error.response.data.message)});
+            params: { page: currentPage - 1, size: itemsPerPage },
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
         return response.data;
-    } 
+    }
     catch (error) {
         throw error;
     }
@@ -196,11 +198,11 @@ export const getPolicyAccountById = async (id) => {
     const token = localStorage.getItem('auth');
     try {
         const response = await axios.get(`http://localhost:8080/suraksha/customer/policy-accounts/${id}`, {
-              headers: { 'Authorization': `Bearer ${token}` }
-          }).catch((error) => {throw new AxiosError(error.response.data.message)});
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
         return response.data;
-    } 
+    }
     catch (error) {
         throw error;
     }
@@ -212,11 +214,11 @@ export const getWithdrawalRequestsByPolicyAccountId = async (id, customerId) => 
     const token = localStorage.getItem('auth');
     try {
         const response = await axios.get(`http://localhost:8080/suraksha/withdrawal-request/policy-account/${id}/customer/${customerId}`, {
-              headers: { 'Authorization': `Bearer ${token}` }
-          }).catch((error) => {throw new AxiosError(error.response.data.message)});
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
         return response.data;
-    } 
+    }
     catch (error) {
         throw error;
     }
@@ -230,11 +232,11 @@ export const fetchingTransactionsByPolicyAccountId = async (id) => {
     const token = localStorage.getItem('auth');
     try {
         const response = await axios.get(`http://localhost:8080/suraksha/transaction/transactions/policy-account/${id}`, {
-              headers: { 'Authorization': `Bearer ${token}` }
-          }).catch((error) => {throw new AxiosError(error.response.data.message)});
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
         return response.data;
-    } 
+    }
     catch (error) {
         throw error;
     }
@@ -246,11 +248,11 @@ export const requestForWithdrawalByCustomer = async (formState) => {
     const token = localStorage.getItem('auth');
     try {
         const response = await axios.post('http://localhost:8080/suraksha/withdrawal-request/customer', formState, {
-          headers: { 'Authorization': `Bearer ${token}` }
-      }).catch((error) => {throw new AxiosError(error.response.data.message)});
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
         return response.data;
-    } 
+    }
     catch (error) {
         throw error;
     }
@@ -264,11 +266,11 @@ export const getAllApprovedRequestsByCustomer = async (currentPage, itemsPerPage
     try {
         const response = await axios.get(`http://localhost:8080/suraksha/withdrawal-request/customer/${id}/approved`, {
             params: { page: currentPage - 1, size: itemsPerPage },
-              headers: { 'Authorization': `Bearer ${token}` }
-          }).catch((error) => {throw new AxiosError(error.response.data.message)});
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
         return response.data;
-    } 
+    }
     catch (error) {
         throw error;
     }
@@ -374,13 +376,19 @@ export const PurchasePolicy = async (formData) => {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
-        }).catch((error) => { throw new AxiosError(error.response.data.message) });
+        }).catch((error) => { errorToast(error.response.data.message) });
 
 
         return response;
     }
     catch (error) {
-        throw error;
+        let errorMessage;
+        if (error.response && error.response.data) {
+            errorMessage = error.response.data.message;
+        } else {
+            errorMessage = 'An error occurred while purchasing the policy.';
+        }
+        errorToast(errorMessage)
     }
 }
 

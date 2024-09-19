@@ -20,6 +20,7 @@ import { AddCustomers } from './components/adminDashboard/AddCustomers/AddCustom
 import { GetCustomers } from './components/adminDashboard/GetCustomers/GetCustomers';
 import { AddState } from './components/adminDashboard/AddState/AddState';
 import { GetState } from './components/adminDashboard/GetState/GetState';
+import { GetEmpState } from './components/employeeDashboard/GetEmpState/GetEmpState';
 import { AddCity } from './components/adminDashboard/AddCity/AddCity';
 import { GetCity } from './components/adminDashboard/GetCity/GetCity';
 import { AddInsurance } from './components/adminDashboard/AddInsurance/AddInsurance';
@@ -84,7 +85,10 @@ import PolicyDetailPage from './components/publicDashboard/PolicyDetailPage';
 import UploadDocument from './components/customerDashboard/Documents/DocumentUpload';
 import DocumentUpload from './components/customerDashboard/Documents/DocumentUpload';
 import PasswordReset from './components/securityDashboard/PasswordChange/PasswordReset';
-
+import { CustomerProfile } from './components/employeeDashboard/CustomerProfile/CustomerProfile';
+import { GetEmpCity } from './components/employeeDashboard/GetEmpCity/GetCity';
+import { EmpQuery } from './components/employeeDashboard/Query/Query';
+import Home from './pages/Home';
 function App() {
 
   const { theme, toggleTheme } = useContext(ThemeContext);
@@ -103,7 +107,11 @@ function App() {
       <Routes>
 
         {/* <Routes> */}
-        <Route path='/' element={<PoliciesPage />}></Route>
+        <Route
+          path="/"
+          element={<Home />}
+        />
+        <Route path='/policies' element={<PoliciesPage />}></Route>
         <Route path="/policy/:id" element={<PolicyDetailPage />} />
 
         <Route path='/login' element={<Login />}></Route>
@@ -157,14 +165,14 @@ function App() {
 
         </Route>
         <Route element={<Agent />}>
-          <Route path='/agent/dashboard/:id' element={< AgentDashboard />}></Route>
-          <Route path='/agent/customers/:id' element={<AgentCustomers />}></Route>
-          <Route path='/agent/transactions/:id' element={<AffTransactions />}></Route>
-          <Route path='/agent/accounts/:id' element={<AgentAccounts />}></Route>
-          <Route path='/agent/commissions/:id' element={<AgentCommissions />}></Route>
-          <Route path='/agent/balance/:id' element={<AgentBalance />}></Route>
-          <Route path='/agent/email/:id' element={<AgentEmails />}></Route>
-          <Route path='/agent/profile/:id' element={<AgentProfile />}></Route>
+          <Route path='/agent/dashboard/:aid' element={< AgentDashboard />}></Route>
+          <Route path='/agent/customers/:aid' element={<AgentCustomers />}></Route>
+          <Route path='/agent/transactions/:aid' element={<AffTransactions />}></Route>
+          <Route path='/agent/accounts/:aid' element={<AgentAccounts />}></Route>
+          <Route path='/agent/commissions/:aid' element={<AgentCommissions />}></Route>
+          <Route path='/agent/balance/:aid' element={<AgentBalance />}></Route>
+          <Route path='/agent/email/:aid' element={<AgentEmails />}></Route>
+          <Route path='/agent/profile/:aid' element={<AgentProfile />}></Route>
 
         </Route>
         <Route element={<Employee />}>
@@ -177,6 +185,16 @@ function App() {
           <Route path='/employee/all-documents/:id' element={<AllDocuments />}></Route>
           <Route path='/employee/commissions/:id' element={<AllCommissions />}></Route>
           <Route path='/employee/transactions/:id' element={<AllTransactions />}></Route>
+          <Route path='/employee/:id/customer/settings/:eid' element={<CustomerProfile />}></Route>
+          <Route path='/employee/:id/agent/profile/:aid' element={<AgentProfile />}></Route>
+          <Route path='/employee/get-state/:id' element={<GetEmpState />}></Route>
+          <Route path='/employee/get-city/:id' element={<GetEmpCity />}></Route>
+          <Route path='/employee/state/:id/edit/:stateId' element={<UpdateState />}></Route>
+          <Route path='/employee/city/:id/edit/:cityId' element={<UpdateCity />}></Route>
+          <Route path='/employee/query/:id/edit/:queryId' element={<UpdateQuery />}></Route>
+          <Route path='/employee/query/:id/delete/:queryId' element={<DeleteQuery />}></Route>
+          <Route path='/employee/feedback/:id' element={<Feedback />}></Route>
+          <Route path='/employee/queries/:id' element={<EmpQuery />}></Route>
 
         </Route>
 

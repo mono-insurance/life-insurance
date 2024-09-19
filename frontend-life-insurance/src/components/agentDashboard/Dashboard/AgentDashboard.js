@@ -98,8 +98,6 @@ export const AgentDashboard = () => {
       setData([]);
       if (error.response?.data?.message || error.specificMessage) {
         errorToast(error.response?.data?.message || error.specificMessage);
-      } else {
-        errorToast("An unexpected error occurred. Please try again later.");
       }
     }
   };
@@ -256,7 +254,7 @@ export const AgentDashboard = () => {
           colors={["#e4e8ef", "#f29a2e"]}
           percentFillValue={(counts.allCommissions / (counts.allCommissions || 1)) * 100}
           cardInfo={{
-            title: "allCommissions",
+            title: "all Commissions",
             value: counts.allCommissions,
             text: "allCommissions",
           }}
@@ -265,7 +263,7 @@ export const AgentDashboard = () => {
           colors={["#e4e8ef", "#f29a2e"]}
           percentFillValue={(counts.approvedCommissions / (counts.allCommissions || 1)) * 100}
           cardInfo={{
-            title: "approvedCommissions",
+            title: "approved Commissions",
             value: counts.notApprovedWithdrawals,
             text: "approvedCommissions",
           }}
@@ -274,7 +272,7 @@ export const AgentDashboard = () => {
           colors={["#e4e8ef", "#f29a2e"]}
           percentFillValue={(counts.notApprovedCommissions / (counts.allCommissions || 1)) * 100}
           cardInfo={{
-            title: "notApprovedCommissions",
+            title: "not Approved Commissions",
             value: counts.notApprovedCommissions,
             text: "notApprovedCommissions",
           }}
@@ -292,7 +290,7 @@ export const AgentDashboard = () => {
           colors={["#e4e8ef", "#f29a2e"]}
           percentFillValue={(counts.activeCustomers / (counts.customers || 1)) * 100}
           cardInfo={{
-            title: "activeCustomers",
+            title: "active Customers",
             value: counts.activeCustomers,
             text: "activeCustomers",
           }}
@@ -301,7 +299,7 @@ export const AgentDashboard = () => {
           colors={["#e4e8ef", "#f29a2e"]}
           percentFillValue={(counts.inactiveCustomers / (counts.customers || 1)) * 100}
           cardInfo={{
-            title: "inactiveCustomers",
+            title: "inactive Customers",
             value: counts.inactiveCustomers,
             text: "inactiveCustomers",
           }}

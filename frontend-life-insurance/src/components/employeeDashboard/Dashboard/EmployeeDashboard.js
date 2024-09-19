@@ -16,7 +16,7 @@ import { validateFirstName, validateUserId } from '../../../utils/validations/Va
 export const EmployeeDashboard = () => {
     const [counts, setCounts] = useState({});
     const { currentPage, itemsPerPage, resetPagination, handlePageChange, handleItemsPerPageChange } = useContext(PaginationContext);
-    const [data, setData] = useState({});
+    const [data, setData] = useState([]);
     const [keysToBeIncluded, setKeysToBeIncluded] = useState([]);
     const [showFilterButton, setShowFilterButton] = useState(true);
     const [filterType, setFilterType] = useState('');
@@ -67,32 +67,28 @@ export const EmployeeDashboard = () => {
     const userTable = async () => {
         try {
             let response = {};
-            let formattedData = [];
             if (filterType === 'firstName') {
                 validateFirstName(firstName);
                 response = await getAllCustomersByCharacters(currentPage, itemsPerPage, firstName);
-                formattedData = formatRoleForTable(response);
             }
             else if (filterType === 'id') {
                 validateUserId(id);
                 const data = await getCustomerById(id);
                 response = covertIdDataIntoTable(data);
-                formattedData = formatRoleForTable(response);
             }
             else {
-                response = await getAllCustomers(currentPage, itemsPerPage);
-                formattedData = formatRoleForTable(response);
+                const formData = {
+                    currentPage: currentPage,
+                    itemsPerPage: itemsPerPage
+                }
+                response = await getAllCustomers(formData);
             }
+            console.log("data in emp dash", data)
+            setData(
+                response
+            );
 
-            setData({
-                content: formattedData,
-                page: response.page,
-                size: response.size,
-                totalElements: response.totalElements,
-                totalPages: response.totalPages,
-                last: response.last
-            });
-            setKeysToBeIncluded(["id", "firstName", "lastName", "username", "email", "role"]);
+            setKeysToBeIncluded(["customerId", "firstName", "lastName", "isActive", "isApproved", "dateOfBirth"]);
 
         } catch (error) {
             setData([]);

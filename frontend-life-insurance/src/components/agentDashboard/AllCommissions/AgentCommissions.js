@@ -32,7 +32,7 @@ export const AgentCommissions = () => {
     const fetchApprovedCommissions = async () => {
         console.log("in fetchApprovedCommissions")
         try {
-            const agentId = routeParams.id
+            const agentId = routeParams.aid
             const formData = {
                 pageNo: 0,
                 size: 10,
@@ -45,7 +45,7 @@ export const AgentCommissions = () => {
             setData(response?.data ?? []);
             console.log("data in response", data)
             console.log("data in response", data)
-            setKeysToBeIncluded(["withdrawalRequestsId", "requestType", "amount"]);
+            setKeysToBeIncluded(["withdrawalRequestsId", "isApproved", "requestType", "amount"]);
             setShowApprovedWithdrawals(true);
             setShowNotApprovedWithdrawals(false);
         }
@@ -61,7 +61,7 @@ export const AgentCommissions = () => {
 
     const fetchNotApprovedCommissions = async () => {
         try {
-            const agentId = routeParams.id
+            const agentId = routeParams.aid
             const formData = {
                 pageNo: 0,
                 size: 10,

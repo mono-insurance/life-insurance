@@ -51,7 +51,8 @@ export const Sidebar = () => {
     useEffect(() => {
         const fetchEmployeeData = async () => {
             try {
-                const agentData = await fetchEmployee();
+                console.log("id inemployee is ", routeParams.id)
+                const agentData = await fetchEmployee(routeParams.id);
                 if (agentData) {
                     setName(agentData.firstName + " " + agentData.lastName);
                 }
@@ -234,6 +235,22 @@ export const Sidebar = () => {
                                 <span className="menu-link-text">Transactions</span>
                             </NavLink>
                         </li>
+                        <li className={`menu-item ${activeMenu === 'feedback' ? 'active' : ''}`}>
+                            <NavLink to={`/employee/feedback/${routeParams.id}`} className="menu-link" onClick={() => handleMenuClick('feedback')}>
+                                <span className="menu-link-icon">
+                                    <MdOutlineCurrencyExchange size={18} />
+                                </span>
+                                <span className="menu-link-text">Feedbacks</span>
+                            </NavLink>
+                        </li>
+                        <li className={`menu-item ${activeMenu === 'Query' ? 'active' : ''}`}>
+                            <NavLink to={`/employee/queries/${routeParams.id}`} className="menu-link" onClick={() => handleMenuClick('Query')}>
+                                <span className="menu-link-icon">
+                                    <MdOutlineCurrencyExchange size={18} />
+                                </span>
+                                <span className="menu-link-text">Queries</span>
+                            </NavLink>
+                        </li>
 
 
                     </ul>
@@ -242,14 +259,6 @@ export const Sidebar = () => {
 
                 <div className="sidebar-menu sidebar-menu2">
                     <ul className="menu-list">
-                        <li className="menu-item">
-                            <NavLink to={`/employee/profile/${routeParams.id}`} className="menu-link" activeClassName="active">
-                                <span className="menu-link-icon">
-                                    <MdOutlineSettings size={20} />
-                                </span>
-                                <span className="menu-link-text">Profile</span>
-                            </NavLink>
-                        </li>
                         <li className="menu-item">
                             <NavLink to="/auth/login" className="menu-link" activeClassName="active" onClick={handleLogout}>
                                 <span className="menu-link-icon">

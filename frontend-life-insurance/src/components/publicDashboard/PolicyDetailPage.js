@@ -3,6 +3,7 @@ import { SinglePolicy, IsEligible } from '../../services/PublicService';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import PolicyPurchase from '../customerDashboard/PolicyPurchase/PolicyPurchase';
+import { errorToast } from '../../utils/helper/toast';
 
 const PoliciesPage = () => {
     const navigate = useNavigate();
@@ -14,12 +15,21 @@ const PoliciesPage = () => {
     const handleBuyPolicy = async (policyId) => {
         const token = localStorage.getItem('auth');
         if (!token) navigate('/login');
-        const response = await IsEligible(policyId);
-        if (response.status != 200) {
-            setError(response.data.message)
-            setIsEligible(false)
+        try {
+            const response = await IsEligible(policyId);
+            if (response.status != 200) {
+                setError(response.data.message)
+                setIsEligible(false)
+            }
+            else {
+                setIsEligible(true)
+            }
         }
-        else setIsEligible(response.data);
+        catch (err) {
+            setError("you are not eligible")
+            errorToast("you are not eligible")
+        }
+
     };
 
     useEffect(() => {
@@ -105,7 +115,7 @@ const PoliciesPage = () => {
                         onClick={() => handleBuyPolicy(policy.policyId)}
                         className="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out"
                     >
-                        Buy Policy
+                        Check Eligiblity
                     </button>
                 </div>
 

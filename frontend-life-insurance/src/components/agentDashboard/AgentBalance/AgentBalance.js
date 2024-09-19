@@ -4,25 +4,32 @@ import { requestWithdrawal, getAgentBalance } from '../../../services/AgentServi
 
 const AgentBalance = () => {
     const [balance, setBalance] = useState(0);
-    const [totalwithdrawal, setTotalwithdrawals] = useState(0)   // Current balance
+    const [totalwithdrawal, setTotalwithdrawals] = useState(0);   // Total withdrawals
     const [withdrawalAmount, setWithdrawalAmount] = useState(''); // Withdrawal amount
-    const [message, setMessage] = useState('');   // To display messages
+    const [message, setMessage] = useState('');                   // To display messages
 
-    // Mock fetching current balance (could be replaced with a real API call)
+    // Fetching current balance (real API call)
     useEffect(() => {
         const fetchBalance = async () => {
             try {
-                // Replace with real API call
-                const response = await getAgentBalance()
-                setBalance(response.currentBalance);
-                setTotalwithdrawals(response.withdrawalAmount)
+                // Log before fetching to debug
+                console.log('Fetching agent balance...');
+
+                const response = await getAgentBalance();
+
+                // Ensure response is structured correctly
+                console.log('Response from getAgentBalance:', response);
+
+                setBalance(response.currentBalance || 0);
+                setTotalwithdrawals(response.withdrawalAmount || 0);
             } catch (error) {
+                console.error('Error fetching balance:', error);
                 setMessage('Failed to fetch balance');
             }
         };
 
         fetchBalance();
-    }, []);
+    }, []);  // Empty dependency array means this runs only once
 
     const handleWithdraw = async () => {
         if (!withdrawalAmount || withdrawalAmount < 0 || withdrawalAmount > balance) {
@@ -31,10 +38,15 @@ const AgentBalance = () => {
         }
 
         try {
-            const response = await requestWithdrawal(withdrawalAmount)
+            console.log('Sending withdrawal request for amount:', withdrawalAmount);
+            const response = await requestWithdrawal(withdrawalAmount);
+
+            // Log response to debug
+            console.log('Response from requestWithdrawal:', response);
 
             setMessage(response.data.message || 'Withdrawal request sent');
         } catch (error) {
+            console.error('Error sending withdrawal request:', error);
             setMessage('Failed to send withdrawal request');
         }
     };
@@ -48,7 +60,7 @@ const AgentBalance = () => {
                     <p className="text-3xl font-bold text-green-500">Rs. {balance}</p>
                 </div>
                 <div className="text-center">
-                    <p className="text-lg font-semibold text-gray-600">total withdrawals</p>
+                    <p className="text-lg font-semibold text-gray-600">Total Withdrawals</p>
                     <p className="text-3xl font-bold text-green-500">Rs. {totalwithdrawal}</p>
                 </div>
 

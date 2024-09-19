@@ -14,7 +14,7 @@ export const Agent = () => {
   useEffect(() => {
     const checkAgent = async () => {
       try {
-        const agentStatus = await verifyAgent({ agentId: routeParams.id });
+        const agentStatus = await verifyAgent({ agentId: routeParams.aid });
         setIsAgent(agentStatus);
         if (!agentStatus) {
           navigate('/login');

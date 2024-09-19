@@ -17,7 +17,7 @@ export const Employee = () => {
                 const agentStatus = await verifyEmployee({ empId: routeParams.id });
                 setIsAgent(agentStatus);
                 if (!agentStatus) {
-                    navigate('/auth/login');
+                    navigate('/login');
                 }
             } catch (error) {
                 if (error.response?.data?.message || error.specificMessage) {
