@@ -12,6 +12,7 @@ export const ViewPolicyAccount = () => {
   const [withdrawalStatus, setWithdrawalStatus] = useState(null);
   const [data, setData] = useState({});
   const [keysToBeIncluded, setKeysToBeIncluded] = useState([]);
+  const userId = localStorage.getItem("id")
   const [formState, setFormState] = useState({
     policyAccountId: '',
     createdDate: '',
@@ -50,7 +51,7 @@ export const ViewPolicyAccount = () => {
 
         const withdrawalRequests = await getWithdrawalRequestsByPolicyAccountId(policyAccountId, id);
         if (withdrawalRequests.length > 0) {
-          
+
           const request = withdrawalRequests;
           if (request.isWithdraw) {
             setWithdrawalStatus('Already withdrawn');
@@ -60,7 +61,7 @@ export const ViewPolicyAccount = () => {
         }
         const transactionsResponse = await fetchingTransactionsByPolicyAccountId(policyAccountId);
         setData(transactionsResponse);
-        setKeysToBeIncluded(["serialNo", "transactionDate", "amount", "status"]);
+        setKeysToBeIncluded(["transactionId", "transactionDate", "amount", "status"]);
       } catch (error) {
         errorToast('Error fetching policy account details.');
       }
@@ -72,52 +73,55 @@ export const ViewPolicyAccount = () => {
   const [form, setForm] = useState({
     policyAccountId: policyAccountId,
     requestType: '',
-  }); 
+  });
 
   const isMatured = new Date(formState.maturedDate) < new Date();
 
   const handleRequestCancellation = async (event) => {
     event.preventDefault();
-      try{
-        const updatedForm = {
-          ...form,
-          requestType: isMatured ? 'ClaimMaturedPolicy' : 'CancelPolicy',
-        };
-        
-          await requestForWithdrawalByCustomer(updatedForm);
+    try {
+      const updatedForm = {
+        ...form,
+        requestType: isMatured ? 'ClaimMaturedPolicy' : 'CancelPolicy',
+      };
 
-        successToast("Request sent successfully");
-      }catch(error){
-        if (error.response?.data?.message || error.specificMessage) {
-            errorToast(error.response?.data?.message || error.specificMessage);
-        } else {
-            errorToast("An unexpected error occurred. Please try again later.");
-        }
+      await requestForWithdrawalByCustomer(updatedForm);
+
+      successToast("Request sent successfully");
+    } catch (error) {
+      if (error.response?.data?.message || error.specificMessage) {
+        errorToast(error.response?.data?.message || error.specificMessage);
+      } else {
+        errorToast("An unexpected error occurred. Please try again later.");
       }
+    }
 
   };
+  const actions = (transactionId) => [
+    { name: 'View', url: `/customer/${userId}/perform-transaction/${transactionId}` }
+  ]
 
 
-  
+
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={`View Policy Account ${formState.policyAccountId}`} pagePath={"View-Policy-Account"} pageLink={`/customer/policy-account/${id}`}/>
+      <AreaTop pageTitle={`View Policy Account ${formState.policyAccountId}`} pagePath={"View-Policy-Account"} pageLink={`/customer/policy-account/${id}`} />
       <section className="content-area-form">
         <form className="policy-account-form">
           <label className="form-label">
             Policy Account ID:
-            <input type="text" name="policyAccountId" value={formState.policyAccountId} className="form-input" readOnly disabled/>
+            <input type="text" name="policyAccountId" value={formState.policyAccountId} className="form-input" readOnly disabled />
           </label>
 
           <div className="form-row">
             <label className="form-label">
               Created Date:
-              <input type="date" name="createdDate" value={formState.createdDate} className="form-input" readOnly disabled/>
+              <input type="date" name="createdDate" value={formState.createdDate} className="form-input" readOnly disabled />
             </label>
             <label className="form-label">
               Matured Date:
-              <input type="date" name="maturedDate" value={formState.maturedDate} className="form-input" readOnly disabled/>
+              <input type="date" name="maturedDate" value={formState.maturedDate} className="form-input" readOnly disabled />
             </label>
           </div>
 
@@ -125,37 +129,37 @@ export const ViewPolicyAccount = () => {
           <div className="form-row">
             <label className="form-label">
               Investment Amount:
-              <input type="number" name="investmentAmount" value={formState.investmentAmount} className="form-input" readOnly disabled/>
+              <input type="number" name="investmentAmount" value={formState.investmentAmount} className="form-input" readOnly disabled />
             </label>
-            
+
             <label className="form-label">
               Claim Amount:
-              <input type="number" name="claimAmount" value={formState.claimAmount} className="form-input" readOnly disabled/>
+              <input type="number" name="claimAmount" value={formState.claimAmount} className="form-input" readOnly disabled />
             </label>
           </div>
 
           <div className="form-row">
             <label className="form-label">
               Policy Term:
-              <input type="number" name="policyTerm" value={formState.policyTerm} className="form-input" readOnly disabled/>
+              <input type="number" name="policyTerm" value={formState.policyTerm} className="form-input" readOnly disabled />
             </label>
 
             <label className="form-label">
               Payment Time in Months:
-              <input type="number" name="paymentTimeInMonths" value={formState.paymentTimeInMonths} className="form-input" readOnly disabled/>
+              <input type="number" name="paymentTimeInMonths" value={formState.paymentTimeInMonths} className="form-input" readOnly disabled />
             </label>
           </div>
 
-          
+
 
           <label className="form-label">
             Policy ID:
-            <input type="text" name="policyId" value={formState.policyId} className="form-input" readOnly disabled/>
+            <input type="text" name="policyId" value={formState.policyId} className="form-input" readOnly disabled />
           </label>
 
           <label className="form-label">
-              Total Amount Paid:
-              <input type="number" name="totalAmountPaid" value={formState.totalAmountPaid} className="form-input" readOnly disabled/>
+            Total Amount Paid:
+            <input type="number" name="totalAmountPaid" value={formState.totalAmountPaid} className="form-input" readOnly disabled />
           </label>
 
 
@@ -170,12 +174,12 @@ export const ViewPolicyAccount = () => {
           <div className="form-row">
             <label className="form-label">
               Nominee Name:
-              <input type="text" name="nomineeName" value={formState.nomineeName} className="form-input" readOnly disabled/>
+              <input type="text" name="nomineeName" value={formState.nomineeName} className="form-input" readOnly disabled />
             </label>
 
             <label className="form-label">
               Nominee Relation:
-              <input type="text" name="nomineeRelation" value={formState.nomineeRelation} className="form-input" readOnly disabled/>
+              <input type="text" name="nomineeRelation" value={formState.nomineeRelation} className="form-input" readOnly disabled />
             </label>
           </div>
 
@@ -199,15 +203,15 @@ export const ViewPolicyAccount = () => {
         </form>
       </section>
       <section className="content-area-form">
-      <div className="data-table-information">
-        <h3 className="data-table-title">Transactions</h3>
+        <div className="data-table-information">
+          <h3 className="data-table-title">Transactions</h3>
           <div className="data-table-diagram">
-              <Table
-                data={data}
-                keysToBeIncluded={keysToBeIncluded} 
-                includeButton={false}
-                handleButtonClick={null}
-              />
+            <Table
+              data={data}
+              keysToBeIncluded={keysToBeIncluded}
+              includeButton={true}
+              handleButtonClick={actions}
+            />
           </div>
         </div>
       </section>

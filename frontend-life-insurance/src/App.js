@@ -89,6 +89,8 @@ import { CustomerProfile } from './components/employeeDashboard/CustomerProfile/
 import { GetEmpCity } from './components/employeeDashboard/GetEmpCity/GetCity';
 import { EmpQuery } from './components/employeeDashboard/Query/Query';
 import Home from './pages/Home';
+import PerformTransaction from './components/customerDashboard/PerformTransaction/PerformTransaction';
+import FailedTransaction from './components/customerDashboard/PerformTransaction/FailedTransaction';
 function App() {
 
   const { theme, toggleTheme } = useContext(ThemeContext);
@@ -201,7 +203,8 @@ function App() {
         <Route element={<CustomerDashboard />}>
           <Route path='/customer/documents/upload' element={<DocumentUpload />}></Route>
           <Route path='/customer/policy-account/:id' element={<PolicyAccount />}></Route>
-          <Route path='/customer/insurance/:id/type/:insuranceId' element={<InsurancePolicy />}></Route>
+          <Route path='/customer/documents/upload' element={<DocumentUpload />}></Route>
+          <Route path='/customer/:id/perform-transaction/:tid' element={<PerformTransaction />}></Route>
           <Route path='/customer/feedback/:id' element={<AddFeedback />}></Route>
           <Route path='/customer/add-query/:id' element={<AddQuery />}></Route>
           <Route path='/customer/query/:id' element={<GetQuery />}></Route>
@@ -210,7 +213,7 @@ function App() {
           <Route path='/customer/requests/:id' element={<GetRequests />}></Route>
           <Route path='/customer/settings/:id' element={<CustomerSettings />}></Route>
           <Route path='/customer/policy-account/:id/view/:policyAccountId' element={<ViewPolicyAccount />}></Route>
-
+          <Route path='/customer/:id/perform-transaction/:tid/failed' element={<FailedTransaction />}></Route>
         </Route>
 
       </Routes>
