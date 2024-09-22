@@ -22,6 +22,9 @@ const PolicyPurchase = ({ policy }) => {
     const [totalAmount, setTotalAmount] = useState(0);
     const [interestAmount, setInterestAmount] = useState(0);
     const [installmentAmount, setInstallmentAmount] = useState(0);
+    const queryParams = new URLSearchParams(location.search);
+    const [agentId, setAgentId] = useState(queryParams.get('agentId'))
+
 
     const handleChange = (e) => {
         setFormData({
@@ -29,7 +32,6 @@ const PolicyPurchase = ({ policy }) => {
             [e.target.name]: e.target.value,
         });
     };
-
     const calculateAmounts = () => {
         // Assuming the formula for calculation is provided
         const investmentAmount = parseFloat(formData.investmentAmount);
@@ -39,17 +41,29 @@ const PolicyPurchase = ({ policy }) => {
         // Example calculations
         const interestAmount = (investmentAmount * profitRatio * policyTerm) / 100;
         const totalAmount = investmentAmount + interestAmount;
-        const installmentAmount = totalAmount / parseInt(formData.paymentTimeInMonths);
+        const transactionMonths = (parseInt(formData.policyTerm) * 12) / parseInt(formData.paymentTimeInMonths);
+        const installmentAmount = (parseInt(formData.investmentAmount)) / parseInt(transactionMonths);
 
         setTotalAmount(totalAmount);
         setInterestAmount(interestAmount);
         setInstallmentAmount(installmentAmount);
     };
 
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
         setSuccess(null);
+
+        console.log("agent id is ", queryParams.get('agentId'))
+        if (agentId) {
+            setFormData((prevData) => ({
+                ...prevData,
+                agentId,
+            }));
+        }
+        console.log("formdata before purchase policy", formData)
 
         if (formData.policyTerm < policy.minPolicyTerm || formData.policyTerm > policy.maxPolicyTerm ||
             formData.investmentAmount < policy.minInvestmentAmount || formData.investmentAmount > policy.maxInvestmentAmount) {
@@ -63,12 +77,13 @@ const PolicyPurchase = ({ policy }) => {
                     ...formData,
                     policyId: id,
                 };
+                console.log("updated formdata before purchase policy", updatedFormData)
 
                 const response = await PurchasePolicy(updatedFormData);
 
 
                 if (response) {
-                    navigate(`/employee/accounts/${response.data.policyAccountId}`);
+                    navigate(`/customer/policy-account/${localStorage.getItem("id")}/view/${response.data.policyAccountId}`);
                     setSuccess("Policy data successfully submitted!");
                 }
                 else setError(response.data.message);
@@ -81,18 +96,6 @@ const PolicyPurchase = ({ policy }) => {
             setShowConfirmation(true);
         }
     };
-
-    useEffect(() => {
-        const searchParams = new URLSearchParams(location.search);
-        const agentId = searchParams.get('agentId');
-        if (agentId) {
-            setFormData((prevData) => ({
-                ...prevData,
-                agentId,
-            }));
-        }
-    }, [location.search]);
-
     return (
         <div className="flex justify-center items-center min-h-screen bg-gray-100">
             <div className="w-full max-w-lg bg-white p-8 rounded-lg shadow-lg">
@@ -185,12 +188,14 @@ const PolicyPurchase = ({ policy }) => {
                             <p>Total Amount: Rs.{totalAmount.toFixed(2)}</p>
                             <p>Interest Amount: Rs.{interestAmount.toFixed(2)}</p>
                             <p>Installment Amount: Rs.{installmentAmount.toFixed(2)}</p>
-                            <button
-                                type="submit"
-                                className="w-full bg-indigo-500 text-white py-2 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring focus:ring-indigo-200"
-                            >
-                                Confirm Purchase
-                            </button>
+                            <div className="mt-4">  {/* Add a div with a margin-top */}
+                                <button
+                                    type="submit"
+                                    className="w-full bg-indigo-500 text-white py-2 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring focus:ring-indigo-200"
+                                >
+                                    Confirm Purchase
+                                </button>
+                            </div>
                         </div>
                     )}
 

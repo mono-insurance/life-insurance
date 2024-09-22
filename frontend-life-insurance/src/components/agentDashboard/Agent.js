@@ -14,6 +14,10 @@ export const Agent = () => {
   useEffect(() => {
     const checkAgent = async () => {
       try {
+        const token = localStorage.getItem('auth')
+        if (!token) {
+          navigate('/login')
+        }
         const agentStatus = await verifyAgent({ agentId: routeParams.aid });
         setIsAgent(agentStatus);
         if (!agentStatus) {
@@ -23,7 +27,7 @@ export const Agent = () => {
         if (error.response?.data?.message || error.specificMessage) {
           errorToast(error.response?.data?.message || error.specificMessage);
         } else {
-          errorToast("An error occurred while Activating account.");
+          errorToast("An error occurred while checking role.");
         }
       }
     };

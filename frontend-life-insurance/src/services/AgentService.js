@@ -67,7 +67,33 @@ export const getAllTransactions = async (formData) => {
     catch (error) {
         throw error;
     }
+}
+export const getAllAccounts = async (formData) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/agent/policy-accounts`, {
+            params: formData,
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+export const fetchCustomer = async (id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/customer/${id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
+
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
 }
 
 

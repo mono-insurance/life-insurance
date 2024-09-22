@@ -1,139 +1,140 @@
+
 import React, { useContext, useEffect, useState } from 'react'
-import { AreaTop } from '../../../sharedComponents/Title/Title'
-import { errorToast, successToast } from '../../../utils/helper/toast';
-import { NotFoundError } from '../../../utils/errors/APIError';
-import { PaginationContext } from '../../../context/PaginationContext';
+import { AreaTop } from '../../../sharedComponents/Title/Title';
 import { Table } from '../../../sharedComponents/Table/Table';
-import './AgentCommissions.scss'
-import { useParams } from 'react-router-dom';
-import { getAllApprovedCommissions, getAllNotApprovedCommissions, reviewCommissionWithdrawalRequest, deleteAgent } from '../../../services/EmployeeServices';
-import { validatewithdrawalId } from '../../../utils/validations/Validations';
-import { Toast } from 'react-bootstrap';
+import { PaginationContext } from '../../../context/PaginationContext';
+import './getCustomers.scss';
 import { ToastContainer } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { errorToast, successToast } from '../../../utils/helper/toast';
+import { FilterButton } from '../../../sharedComponents/FilterButton/FilterButton';
+import { covertIdDataIntoTable } from '../../../services/SharedServices';
+import { validateCustomerId, validateFirstName } from '../../../utils/validations/Validations';
+import { getAllApprovedCommissions, getAllNotApprovedCommissions } from '../../../services/EmployeeServices';
+
 
 export const AgentCommissions = () => {
-    const navigate = useNavigate()
-    const [newlyActivated, setNewlyActivated] = useState(false);
-    const [activatedData, setActivatedData] = useState('');
-    const [data, setData] = useState([]);
-    const [showApprovedWithdrawals, setShowApprovedWithdrawals] = useState(true);
-    const [showNotApprovedWithdrawals, setShowNotApprovedWithdrawals] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [data, setData] = useState({});
     const [keysToBeIncluded, setKeysToBeIncluded] = useState([]);
-    const { currentPage, itemsPerPage, resetPagination } = useContext(PaginationContext);
-    const [withdrawalId, setWithdrawalId] = useState('');
     const routeParams = useParams();
+    const [showFilterButton, setShowFilterButton] = useState(true);
+    const [filterType, setFilterType] = useState('');
+    const [filter, setFilter] = useState(false);
+    const [id, setId] = useState('');
+    const [active, setActive] = useState('');
+    const [showPagination, setShowPagination] = useState(true);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [customerId, setCustomerId] = useState(null)
+    const filterOptions = [
+        { label: 'Approved', value: 'active' },
+        { label: 'Not approved ', value: 'inactive' }
+    ];
 
 
-    const handleAgentClicked = (agent) => {
-        navigate(`/agent/${agent.withdrawalId}`)
+    const resetPagination = () => {
+        setCurrentPage(1);
+        setItemsPerPage(10);
+    };
+
+    const handleSearch = () => {
+        resetPagination();
+        if (filterType === 'id') {
+            setSearchParams({ filterType, id });
+            setShowPagination(false);
+        }
+        if (filterType === 'active') {
+            setSearchParams({ filterType, active, currentPage, itemsPerPage });
+            setShowPagination(true);
+        }
+        if (filterType === 'inactive') {
+            setSearchParams({ filterType, active, currentPage, itemsPerPage });
+            setShowPagination(true);
+        }
+        if (filter === false) {
+            setFilter(true);
+        }
+        else {
+            customerTable();
+        }
     }
 
-    const fetchApprovedCommissions = async () => {
-        console.log("in fetchApprovedCommissions")
-        try {
-            const agentId = routeParams.aid
-            const formData = {
-                pageNo: 0,
-                size: 10,
-                sort: 'ASC',
-            }
+    const handleReset = () => {
+        setFilterType('');
+        setId('');
+        setActive('');
+        setShowFilterButton(true);
+        resetPagination();
+        setFilter(false);
+        setShowPagination(true);
+        setSearchParams({});
+    };
 
-            const response = await getAllApprovedCommissions(agentId, formData);
-            console.log("in fetchApprovedCommissions after response", response)
-            console.log("in active customer click", response?.data ?? [])
-            setData(response?.data ?? []);
-            console.log("data in response", data)
-            console.log("data in response", data)
-            setKeysToBeIncluded(["withdrawalRequestsId", "isApproved", "requestType", "amount"]);
-            setShowApprovedWithdrawals(true);
-            setShowNotApprovedWithdrawals(false);
-        }
-        catch (error) {
+
+
+    const customerTable = async () => {
+        try {
+            let response = {};
+            const formData = {
+                page: currentPage - 1,
+                size: itemsPerPage
+            }
+            const agentId = routeParams.aid;
+
+            if (filterType === 'active') {
+
+                response = await getAllApprovedCommissions(agentId, formData);
+            }
+            else if (filterType === 'inactive') {
+                response = await getAllNotApprovedCommissions(agentId, formData);
+            }
+            else {
+                response = await getAllApprovedCommissions(agentId, formData);
+            }
+            setData(response);
+            setKeysToBeIncluded(["withdrawalRequestsId", "isApproved", "isWithdraw", "requestType", "amount"]);
+        } catch (error) {
             setData([]);
             if (error.response?.data?.message || error.specificMessage) {
                 errorToast(error.response?.data?.message || error.specificMessage);
             } else {
-                errorToast("An error occurred while Activating customers.");
+                errorToast("An unexpected error occurred. Please try again later.");
             }
         }
-    }
-
-    const fetchNotApprovedCommissions = async () => {
-        try {
-            const agentId = routeParams.aid
-            const formData = {
-                pageNo: 0,
-                size: 10,
-                sort: 'ASC',
-            }
-            const response = await getAllNotApprovedCommissions(agentId, formData);
-            console.log("fetchNotApprovedCommissions ", response)
-            setData(response?.data ?? []);
-            console.log("fetchNotApprovedCommissions is in data", data)
-
-            setKeysToBeIncluded(["withdrawalRequestsId", "requestType", "amount"]);
-            setShowNotApprovedWithdrawals(true);
-            setShowApprovedWithdrawals(false);
-        }
-        catch (error) {
-            setData([]);
-            if (error.response?.data?.message || error.specificMessage) {
-                errorToast(error.response?.data?.message || error.specificMessage);
-            } else {
-                errorToast("An error occurred while Activating customers.");
-            }
-        }
-    }
+    };
 
 
     useEffect(() => {
-        if (showApprovedWithdrawals) {
-            fetchApprovedCommissions();
-        }
-        if (showNotApprovedWithdrawals) {
-            fetchNotApprovedCommissions();
-        }
-        console.log("data in checking is", data)
-    }, [currentPage, itemsPerPage]);
+        customerTable();
 
-
-    useEffect(() => {
-        resetPagination();
-    }, []);
-
-    useEffect(() => {
-        resetPagination();
-    }, [showApprovedWithdrawals, showNotApprovedWithdrawals]);
+    }, [filter, currentPage, itemsPerPage, searchParams]);
 
     return (
-        <div className='content-area'>
-            <AreaTop pageTitle={"My commissions"} pagePath={"agent-commissions"} pageLink={`/agent/dashboard/${routeParams.id}`} />
-            <section className='content-area-form'>
-                <div className="admin-form">
-                    <div className="data-info">
-                        <h3 className="data-table-title">withdrawal requests</h3>
-                        <div className="buttons-container">
-                            <button type="submit" className="form-submit" onClick={fetchApprovedCommissions}>Get Approved withdrawals</button>
-                            <button type="submit" className="form-submit" onClick={fetchNotApprovedCommissions}>Get Not Approved withdrawals</button>
-                        </div>
-                    </div>
+        <>
+            <div className='content-area-customers'>
+                <AreaTop pageTitle={"Get All Commissions"} pagePath={"Commissions"} pageLink={`/agent/dashboard/${routeParams.aid}`} />
+                <section className="content-area-table-customers">
 
 
-
-                    {newlyActivated && (
-                        <div className="deactivate-success">
-                            {activatedData}
-                        </div>
-                    )}
-
-                </div>
-            </section>
-
-            {(showApprovedWithdrawals || showNotApprovedWithdrawals) && (
-                <section className="content-area-table">
-                    <div className="data-table-info">
-                        <h3 className="data-table-title">{showApprovedWithdrawals ? 'Approved withdrawals' : 'Not Approved withdrawals'}</h3>
+                    <div className="data-table-information">
+                        <h3 className="data-table-title">withdrawals</h3>
+                        {showFilterButton && (
+                            <FilterButton setShowFilterButton={setShowFilterButton} showFilterButton={showFilterButton} filterOptions={filterOptions} setFilterType={setFilterType} />
+                        )}
+                        {(filterType === 'active' || filterType === 'inactive' || filterType === 'id') && (
+                            <div className="filter-container">
+                                {filterType === 'id' && (
+                                    <div className="filter">
+                                        <input type="number" placeholder="Enter withdrawal id" className="form-input" name={id} value={id} onChange={(e) => setId(e.target.value)} />
+                                    </div>
+                                )}
+                                <div className="filter-buttons">
+                                    <button className="form-submit-b" onClick={handleSearch}>Search</button>
+                                    <button className="form-submit-b" onClick={handleReset}>Clear</button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <div className="data-table-diagram">
                         <Table
@@ -141,12 +142,18 @@ export const AgentCommissions = () => {
                             keysToBeIncluded={keysToBeIncluded}
                             includeButton={false}
                             handleButtonClick={null}
-                            handleRowClicked={handleAgentClicked}
+                            showPagination={showPagination}
+                            currentPage={currentPage}
+                            pageSize={itemsPerPage}
+                            setPage={setCurrentPage}
+                            setPageSize={setItemsPerPage}
                         />
                     </div>
                 </section>
-            )}
+
+            </div>
             <ToastContainer position="bottom-right" />
-        </div>
+        </>
+
     )
 }

@@ -12,6 +12,7 @@ import { covertIdDataIntoTable, formatRoleForTable } from '../../../services/Sha
 import { getAllCustomers, getAllCustomersByCharacters, fetchEmployeeDashboard, getCustomerById } from '../../../services/EmployeeServices';
 import { FilterButton } from '../../../sharedComponents/FilterButton/FilterButton';
 import { validateFirstName, validateUserId } from '../../../utils/validations/Validations';
+import { AllCustomers } from '../AllCustomers/AllCustomers';
 
 export const EmployeeDashboard = () => {
     const [counts, setCounts] = useState({});
@@ -44,9 +45,6 @@ export const EmployeeDashboard = () => {
         }
         if (filter === false) {
             setFilter(true);
-        }
-        else {
-            userTable();
         }
     }
 
@@ -251,7 +249,6 @@ export const EmployeeDashboard = () => {
             resetPagination();
         }
         const timeoutId = setTimeout(() => {
-            userTable();
         }, hasSearchParams ? 0 : 0);
         return () => clearTimeout(timeoutId);
 
@@ -394,39 +391,7 @@ export const EmployeeDashboard = () => {
                 <ProgressBar data={generateData()} />
             </section>
             <section className="content-area-table">
-                <div className="data-table-infor">
-                    <h3 className="data-table-title">All Users</h3>
-                    {showFilterButton && (
-                        <FilterButton setShowFilterButton={setShowFilterButton} showFilterButton={showFilterButton} filterOptions={filterOptions} setFilterType={setFilterType} />
-                    )}
-                    {(filterType === 'firstName' || filterType === 'id') && (
-                        <div className="filter-container">
-                            {filterType === 'firstName' && (
-                                <div className="filter">
-                                    <input type="text" placeholder="Enter Characters" className="form-input" name={firstName} value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-                                </div>
-                            )}
-                            {filterType === 'id' && (
-                                <div className="filter">
-                                    <input type="number" placeholder="Enter User Id" className="form-input" name={id} value={id} onChange={(e) => setId(e.target.value)} />
-                                </div>
-                            )}
-                            <div className="filter-buttons">
-                                <button className="form-submit-b" onClick={handleSearch}>Search</button>
-                                <button className="form-submit-b" onClick={handleReset}>Clear</button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-                <div className="data-table-diagram">
-                    <Table
-                        data={data}
-                        keysToBeIncluded={keysToBeIncluded}
-                        includeButton={false}
-                        handleButtonClick={null}
-                        showPagination={showPagination}
-                    />
-                </div>
+                <AllCustomers />
             </section>
             <ToastContainer position="bottom-right" />
         </>
