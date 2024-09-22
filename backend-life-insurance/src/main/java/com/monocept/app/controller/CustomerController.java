@@ -132,12 +132,12 @@ public class CustomerController {
     @GetMapping("/policy-claims-request/{cid}")
     ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllPolicyClaimsRequest(
             @PathVariable("cid") Long customerId,
-            @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
+            @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sort", defaultValue = "ASC") String sort,
             @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
-        PagedResponse<WithdrawalRequestsDTO> allPolicyClaims = customerService.getAllPolicyClaimsRequest(pageNo, size, sort, sortBy, sortDirection, customerId);
+        PagedResponse<WithdrawalRequestsDTO> allPolicyClaims = customerService.getAllPolicyClaimsRequest(page, size, sort, sortBy, sortDirection, customerId);
         return new ResponseEntity<>(allPolicyClaims, HttpStatus.OK);
     }
 
@@ -145,12 +145,12 @@ public class CustomerController {
     @Operation(summary = "By Admin,Emp: Get All PolicyClaims that are approved")
     @GetMapping("/policy-claims-approved")
     ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllPolicyClaimsApproved(
-            @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
+            @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sort", defaultValue = "ASC") String sort,
             @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
-        PagedResponse<WithdrawalRequestsDTO> allPolicyClaims = customerService.getAllPolicyClaimsApproved(pageNo, size, sort, sortBy, sortDirection);
+        PagedResponse<WithdrawalRequestsDTO> allPolicyClaims = customerService.getAllPolicyClaimsApproved(page, size, sort, sortBy, sortDirection);
         return new ResponseEntity<>(allPolicyClaims, HttpStatus.OK);
     }
     

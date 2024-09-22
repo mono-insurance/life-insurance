@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -262,6 +263,41 @@ public class EmployeeServiceImp implements EmployeeService {
         List<DocumentUploadedDTO> allDocumentDTO = dtoService.convertDocumentsToDTO(allDocuments);
         return new PagedResponse<>(allDocumentDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
 
+    }
+
+    @Override
+    public PagedResponse<DocumentUploadedDTO> getAllDocuments(int page, int size, String sortBy, String direction) {
+        Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+
+        Page<DocumentUploaded> pages = documentUploadedRepository.findAll(pageable);
+        List<DocumentUploaded> allDocuments = pages.getContent();
+        List<DocumentUploadedDTO> allDocumentDTO = dtoService.convertDocumentsToDTO(allDocuments);
+        return new PagedResponse<>(allDocumentDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+
+    }
+
+    @Override
+    public PagedResponse<DocumentUploadedDTO> getDocumentById(Long documentId) {
+        DocumentUploaded documentUploaded=documentUploadedRepository.findById(documentId).
+                orElseThrow(()->new UserException("document not found"));
+        DocumentUploadedDTO documentUploadedDTO=dtoService.convertDocumentUploadedToDTO(documentUploaded);
+        List<DocumentUploadedDTO> documentUploadedDTOS=new ArrayList<>();
+        documentUploadedDTOS.add(documentUploadedDTO);
+        return new PagedResponse<>(documentUploadedDTOS,1,1,1,1,true);
+    }
+
+    @Override
+    public Boolean deletePolicyAccount(Long policyAccount) {
+        int count=policyAccountRepository.deletePolicyAccount(policyAccount);
+        return count==1;
+    }
+
+    @Override
+    public Boolean activatePolicyAccount(Long policyAccountId) {
+        int count=policyAccountRepository.activatePolicyAccount(policyAccountId);
+        return count==1;
     }
 
 

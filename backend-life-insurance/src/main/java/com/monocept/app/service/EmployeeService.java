@@ -65,4 +65,12 @@ public interface EmployeeService {
     PagedResponse<DocumentUploadedDTO> getAllNotApprovedDocuments(int page, int size, String sortBy, String direction);
 
     PagedResponse<DocumentUploadedDTO> getAllApprovedDocuments(int page, int size, String sortBy, String direction);
+
+    PagedResponse<DocumentUploadedDTO> getAllDocuments(int page, int size, String sortBy, String direction);
+
+    PagedResponse<DocumentUploadedDTO> getDocumentById(Long documentId);
+
+    Boolean deletePolicyAccount(Long policyAccount);
+
+    Boolean activatePolicyAccount(Long policyAccountId);
 }

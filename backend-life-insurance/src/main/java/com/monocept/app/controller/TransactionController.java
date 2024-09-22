@@ -30,7 +30,7 @@ public class TransactionController {
     private TransactionService transactionService;
 
     @Operation(summary = "By All: Get All Transactions by Customer Policy Account")
-    @GetMapping("/transactions/policy-account/{id}")
+    @GetMapping("/policy-account/{id}")
     public ResponseEntity<PagedResponse<TransactionsDTO>> getAllTransactionsByPolicyAccount(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "5") int size,
@@ -38,7 +38,8 @@ public class TransactionController {
             @RequestParam(name = "direction", defaultValue = "asc") String direction,
             @PathVariable(name = "id") Long id) {
 
-        PagedResponse<TransactionsDTO> transactions = transactionService.getAllTransactionsByPolicyAccount(page, size, sortBy, direction, id);
+        PagedResponse<TransactionsDTO> transactions = transactionService.getAllTransactionsByPolicyAccount
+                (page, size, sortBy, direction, id);
 
         return new ResponseEntity<PagedResponse<TransactionsDTO>>(transactions, HttpStatus.OK);
 
@@ -80,11 +81,11 @@ public class TransactionController {
     @Operation(summary = "By Admin,emp: Get All Commissions of all agents")
     @GetMapping("/commissions")
     ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllCommissions(
-            @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
+            @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sortBy", defaultValue = "withdrawalRequestsId") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
-        PagedResponse<WithdrawalRequestsDTO> allCommissions = transactionService.getAllCommissions(pageNo, size, sortBy, sortDirection);
+        PagedResponse<WithdrawalRequestsDTO> allCommissions = transactionService.getAllCommissions(page, size, sortBy, sortDirection);
         return new ResponseEntity<>(allCommissions, HttpStatus.OK);
     }
     @Operation(summary = "By Admin,emp: Get All Commissions of all agents")
@@ -100,11 +101,11 @@ public class TransactionController {
     @Operation(summary = "By Admin,emp: Get All Commissions of all agents")
     @GetMapping("/commissions/registration")
     ResponseEntity<BalancePagedResponse<CommissionDTO>> getAllRegistrationCommissionsByAgent(
-            @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
+            @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sortBy", defaultValue = "policyAccountId") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "desc") String sortDirection) {
-    	BalancePagedResponse<CommissionDTO> allCommissions = transactionService.getAllRegistrationCommissionsByAgent(pageNo, size, sortBy, sortDirection);
+    	BalancePagedResponse<CommissionDTO> allCommissions = transactionService.getAllRegistrationCommissionsByAgent(page, size, sortBy, sortDirection);
         return new ResponseEntity<>(allCommissions, HttpStatus.OK);
     }
     
@@ -112,11 +113,11 @@ public class TransactionController {
     @Operation(summary = "By Admin,emp: Get All Commissions of all agents")
     @GetMapping("/commissions/installment")
     ResponseEntity<BalancePagedResponse<CommissionDTO>> getAllInstallmentCommissionsByAgent(
-            @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
+            @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sortBy", defaultValue = "transactionId") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "desc") String sortDirection) {
-    	BalancePagedResponse<CommissionDTO> allCommissions = transactionService.getAllInstallmentCommissionsByAgent(pageNo, size, sortBy, sortDirection);
+    	BalancePagedResponse<CommissionDTO> allCommissions = transactionService.getAllInstallmentCommissionsByAgent(page, size, sortBy, sortDirection);
         return new ResponseEntity<>(allCommissions, HttpStatus.OK);
     }
 

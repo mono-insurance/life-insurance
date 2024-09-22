@@ -48,7 +48,11 @@ public class PaymentService {
     public Payment createPayment(Long transactionId, PaymentOrder order) throws PayPalRESTException {
         Amount amount = new Amount();
         amount.setCurrency("USD");
-        Double total = order.getPrice();
+        Transactions transactions1=findTransaction(transactionId);
+        if(transactions1.getStatus().equals("Done")){
+            throw new UserException("your transaction is already completed");
+        }
+        Double total = transactions1.getAmount();
         total = new BigDecimal(total).setScale(2, RoundingMode.HALF_UP).doubleValue();
         amount.setTotal(String.format("%.2f", total));
 

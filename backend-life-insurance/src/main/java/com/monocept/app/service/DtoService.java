@@ -150,6 +150,6 @@ public interface DtoService {
 
 	PageResult convertTransactionsToPage(List<Transactions> transactions, int pageNo, String sort, String sortBy, String sortDirection, int size);
 
+	DocumentUploadedDTO convertDocumentUploadedToDTO(DocumentUploaded documentUploaded);
 	List<DocumentUploadedDTO> convertDocumentUploadedListToDTO(List<DocumentUploaded> documents);
-
 }

@@ -186,16 +186,25 @@ public class DtoServiceImp implements DtoService {
         PolicyAccountDTO policyAccountDTO = new PolicyAccountDTO();
         policyAccountDTO.setPolicyAccountId(policyAccount.getPolicyAccountId());
         policyAccountDTO.setIsActive(policyAccount.getIsActive());
-        policyAccountDTO.setPolicyTerm(policyAccountDTO.getPolicyTerm());
+        policyAccountDTO.setPolicyTerm(policyAccount.getPolicyTerm());
         policyAccountDTO.setCreatedDate(policyAccount.getCreatedDate());
-        policyAccountDTO.setClaimAmount(policyAccountDTO.getClaimAmount());
-        policyAccountDTO.setCustomerId(policyAccountDTO.getCustomerId());
+        policyAccountDTO.setClaimAmount(policyAccount.getClaimAmount());
+        policyAccountDTO.setCustomerId(policyAccount.getCustomer().getCustomerId());
         policyAccountDTO.setMaturedDate(policyAccount.getMaturedDate());
-        policyAccountDTO.setAgentId(policyAccountDTO.getAgentId());
-        policyAccountDTO.setPaymentTimeInMonths(policyAccountDTO.getPaymentTimeInMonths());
+        if(policyAccount.getAgent()!=null){
+            policyAccountDTO.setAgentId(policyAccount.getAgent().getAgentId());
+            policyAccountDTO.setAgentName(policyAccount.getAgent().getFirstName()+" "+policyAccount.getAgent().getLastName());
+        }
+        if(policyAccount.getCustomer()!=null){
+            policyAccountDTO.setCustomerId(policyAccount.getCustomer().getCustomerId());
+            policyAccountDTO.setCustomerName(policyAccount.getCustomer().getFirstName()+" "+policyAccount.getCustomer().getLastName());
+        }
+        policyAccountDTO.setPaymentTimeInMonths(policyAccount.getPaymentTimeInMonths());
         policyAccountDTO.setTotalAmountPaid(policyAccount.getTotalAmountPaid());
-        policyAccountDTO.setPolicyId(policyAccountDTO.getPolicyId());
-        policyAccountDTO.setTimelyBalance(policyAccountDTO.getTimelyBalance());
+        policyAccountDTO.setPolicyId(policyAccount.getPolicy().getPolicyId());
+        policyAccountDTO.setTimelyBalance(policyAccount.getTimelyBalance());
+        policyAccountDTO.setNomineeName(policyAccount.getNomineeName());
+        policyAccountDTO.setNomineeRelation(policyAccount.getNomineeRelation());
         return policyAccountDTO;
 
     }
@@ -361,6 +370,16 @@ public class DtoServiceImp implements DtoService {
         withdrawalRequestsDTO.setRequestType(withdrawalRequest.getRequestType());
         withdrawalRequestsDTO.setIsApproved(withdrawalRequest.getIsApproved());
         withdrawalRequestsDTO.setWithdrawalRequestsId(withdrawalRequest.getWithdrawalRequestsId());
+        if(withdrawalRequest.getAgent()!=null){
+            withdrawalRequestsDTO.setAgentId(withdrawalRequest.getAgent().getAgentId());
+            withdrawalRequestsDTO.setAgentName(withdrawalRequest.getAgent().getFirstName()+" "+withdrawalRequest.getAgent().getLastName());
+        }
+        else{
+            withdrawalRequestsDTO.setCustomerId(withdrawalRequest.getCustomer().getCustomerId());
+            withdrawalRequestsDTO.setCustomerName(withdrawalRequest.getCustomer().getFirstName()+" "+withdrawalRequest.getCustomer().getLastName());
+        }
+
+
         return withdrawalRequestsDTO;
     }
 
@@ -736,6 +755,7 @@ public class DtoServiceImp implements DtoService {
     }
 
     // Convert DocumentUploaded entity to DocumentUploadedDTO
+    @Override
     public DocumentUploadedDTO convertDocumentUploadedToDTO(DocumentUploaded documentUploaded) {
         DocumentUploadedDTO documentUploadedDTO = new DocumentUploadedDTO();
         documentUploadedDTO.setDocumentId(documentUploaded.getDocumentId());
@@ -976,10 +996,13 @@ public class DtoServiceImp implements DtoService {
 
         if (policyAccount.getCustomer() != null) {
             policyAccountDTO.setCustomerId(policyAccount.getCustomer().getCustomerId());
+            policyAccountDTO.setCustomerName(policyAccount.getCustomer().getFirstName()+" "+policyAccount.getCustomer().getLastName());
+
         }
 
         if (policyAccount.getAgent() != null) {
             policyAccountDTO.setAgentId(policyAccount.getAgent().getAgentId());
+            policyAccountDTO.setAgentName(policyAccount.getAgent().getFirstName()+" "+policyAccount.getAgent().getLastName());
         }
 
         return policyAccountDTO;
