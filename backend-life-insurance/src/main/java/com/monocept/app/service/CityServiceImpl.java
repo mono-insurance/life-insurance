@@ -201,4 +201,21 @@ public class CityServiceImpl implements CityService{
 		
 		return dtoService.convertCityListEntityToDTO(cities);
 	}
+
+
+	@Override
+	public List<CityDTO> getListOfAllActiveCitiesByStateId(Long id) {
+		State state = stateRepository.findById(id).orElseThrow(()->new UserException("State not found"));
+		
+		if(!state.getIsActive()) {
+			throw new UserException("State is not active");
+		}
+		
+		List<City> cities = cityRepository.findByIsActiveTrueAndState(state);
+		
+		return dtoService.convertCityListEntityToDTO(cities);
+	}
+	
+	
+	
 }

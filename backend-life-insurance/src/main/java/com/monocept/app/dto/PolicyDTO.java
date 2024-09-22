@@ -82,4 +82,7 @@ public class PolicyDTO {
     private Long insuranceTypeId;
 
     private String imageUrl;
+    
+    
+    private String imageBase64;
 }

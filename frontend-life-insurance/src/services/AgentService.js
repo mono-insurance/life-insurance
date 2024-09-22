@@ -13,12 +13,13 @@ export const fetchAgent = async (aid) => {
             }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
-        return response;
+        return response.data;
     }
     catch (error) {
         throw error;
     }
 }
+
 export const updateAgent = async (agentId, editAgent) => {
     const token = localStorage.getItem('auth');
     try {
@@ -53,11 +54,25 @@ export const fetchAgentDashboard = async () => {
 
 
 
-export const getAllTransactions = async (currentPage, itemsPerPage) => {
+export const getAllTransactions = async (formData) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get(`http://localhost:8080/api/admin/transaction`, {
-            params: { page: currentPage - 1, size: itemsPerPage },
+        const response = await axios.get(`http://localhost:8080/suraksha/agent/transactions`, {
+            params: formData,
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
+
+        return response;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+export const getAllAccounts = async (formData) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/agent/policy-accounts`, {
+            params: formData,
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
@@ -66,7 +81,19 @@ export const getAllTransactions = async (currentPage, itemsPerPage) => {
     catch (error) {
         throw error;
     }
+}
+export const fetchCustomer = async (id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/customer/${id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
 }
 
 

@@ -58,4 +58,9 @@ public class PolicyAccountDTO {
 
     private String agentName;
 
+    private String transactionId;
+    
+    
+    private Double paymentMade;
+
 }

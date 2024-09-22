@@ -1,5 +1,7 @@
 package com.monocept.app.service;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.monocept.app.dto.*;
 import com.monocept.app.utils.PagedResponse;
 
@@ -29,6 +31,7 @@ public interface AgentService {
 
 	Boolean approveAgent(Long agentId, Boolean isApproved);
 
+
     DashBoardDTO agentDashboard();
 
     Boolean inActivateAgent(Long agentId);
@@ -50,4 +53,5 @@ public interface AgentService {
     PagedResponse<PolicyAccountDTO> getAllCustomerActiveAccounts(int page, int size, String sort, String sortBy, String sortDirection);
 
     PagedResponse<PolicyAccountDTO> getAllCustomerInActiveAccounts(int page, int size, String sort, String sortBy, String sortDirection);
+	String agentRegistration(RegistrationDTO registrationDTO, MultipartFile file1, MultipartFile file2);
 }

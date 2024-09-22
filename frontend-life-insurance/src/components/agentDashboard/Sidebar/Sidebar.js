@@ -33,8 +33,10 @@ export const Sidebar = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('auth');
+        localStorage.removeItem('role')
+        localStorage.removeItem('id')
         resetSidebar();
-        window.location.href = '/auth/login';
+        window.location.href = '/login';
     };
 
     // closing the navbar when clicked outside the sidebar area
@@ -51,7 +53,7 @@ export const Sidebar = () => {
     useEffect(() => {
         const fetchAgentData = async () => {
             try {
-                const agentData = await fetchAgent();
+                const agentData = await fetchAgent(routeParams.aid);
                 if (agentData) {
                     setName(agentData.firstName + " " + agentData.lastName);
                 }
@@ -96,7 +98,7 @@ export const Sidebar = () => {
                 <div className="sidebar-menu">
                     <ul className="menu-list">
                         <li className={`menu-item ${activeMenu === 'dashboard' ? 'active' : ''}`}>
-                            <NavLink to={`/agent/dashboard/${routeParams.id}`} className="menu-link" onClick={() => handleMenuClick('dashboard')}>
+                            <NavLink to={`/agent/dashboard/${routeParams.aid}`} className="menu-link" onClick={() => handleMenuClick('dashboard')}>
                                 <span className="menu-link-icon">
                                     <MdOutlineGridView size={18} />
                                 </span>
@@ -104,15 +106,23 @@ export const Sidebar = () => {
                             </NavLink>
                         </li>
                         <li className={`menu-item ${activeMenu === 'customers' ? 'active' : ''}`}>
-                            <NavLink to={`/agent/customers/${routeParams.id}`} className="menu-link" onClick={() => handleMenuClick('customers')}>
+                            <NavLink to={`/agent/customers/${routeParams.aid}`} className="menu-link" onClick={() => handleMenuClick('customers')}>
                                 <span className="menu-link-icon">
                                     <MdOutlineCurrencyExchange size={18} />
                                 </span>
                                 <span className="menu-link-text">customers</span>
                             </NavLink>
                         </li>
+                        <li className={`menu-item ${activeMenu === 'accounts' ? 'active' : ''}`}>
+                            <NavLink to={`/agent/accounts/${routeParams.aid}`} className="menu-link" onClick={() => handleMenuClick('accounts')}>
+                                <span className="menu-link-icon">
+                                    <MdOutlineCurrencyExchange size={18} />
+                                </span>
+                                <span className="menu-link-text">policy accounts</span>
+                            </NavLink>
+                        </li>
                         <li className={`menu-item ${activeMenu === 'commissions' ? 'active' : ''}`}>
-                            <NavLink to={`/agent/commissions/${routeParams.id}`} className="menu-link" onClick={() => handleMenuClick('commissions')}>
+                            <NavLink to={`/agent/commissions/${routeParams.aid}`} className="menu-link" onClick={() => handleMenuClick('commissions')}>
                                 <span className="menu-link-icon">
                                     <MdOutlineCurrencyExchange size={18} />
                                 </span>
@@ -120,29 +130,30 @@ export const Sidebar = () => {
                             </NavLink>
                         </li>
                         <li className={`menu-item ${activeMenu === 'transactions' ? 'active' : ''}`}>
-                            <NavLink to={`/agent/transactions/${routeParams.id}`} className="menu-link" onClick={() => handleMenuClick('transactions')}>
+                            <NavLink to={`/agent/transactions/${routeParams.aid}`} className="menu-link" onClick={() => handleMenuClick('transactions')}>
                                 <span className="menu-link-icon">
                                     <MdOutlineCurrencyExchange size={18} />
                                 </span>
                                 <span className="menu-link-text">Transactions</span>
                             </NavLink>
                         </li>
-                        <li className={`menu-item ${activeMenu === 'email' ? 'active' : ''}`}>
-                            <NavLink to={`/agent/email/${routeParams.id}`} className="menu-link" onClick={() => handleMenuClick('email')}>
-                                <span className="menu-link-icon">
-                                    <MdOutlineCurrencyExchange size={18} />
-                                </span>
-                                <span className="menu-link-text">Send Emails</span>
-                            </NavLink>
-                        </li>
                         <li className={`menu-item ${activeMenu === 'balance' ? 'active' : ''}`}>
-                            <NavLink to={`/agent/balance/${routeParams.id}`} className="menu-link" onClick={() => handleMenuClick('balance')}>
+                            <NavLink to={`/agent/balance/${routeParams.aid}`} className="menu-link" onClick={() => handleMenuClick('balance')}>
                                 <span className="menu-link-icon">
                                     <MdOutlineCurrencyExchange size={18} />
                                 </span>
                                 <span className="menu-link-text">My Balance</span>
                             </NavLink>
                         </li>
+                        <li className={`menu-item ${activeMenu === 'email' ? 'active' : ''}`}>
+                            <NavLink to={`/agent/email/${routeParams.aid}`} className="menu-link" onClick={() => handleMenuClick('email')}>
+                                <span className="menu-link-icon">
+                                    <MdOutlineCurrencyExchange size={18} />
+                                </span>
+                                <span className="menu-link-text">Send Emails</span>
+                            </NavLink>
+                        </li>
+
 
 
                     </ul>
@@ -152,7 +163,7 @@ export const Sidebar = () => {
                 <div className="sidebar-menu sidebar-menu2">
                     <ul className="menu-list">
                         <li className="menu-item">
-                            <NavLink to={`/agent/profile/${routeParams.id}`} className="menu-link" activeClassName="active">
+                            <NavLink to={`/agent/profile/${routeParams.aid}`} className="menu-link" activeClassName="active">
                                 <span className="menu-link-icon">
                                     <MdOutlineSettings size={20} />
                                 </span>

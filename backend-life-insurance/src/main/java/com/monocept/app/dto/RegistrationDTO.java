@@ -28,8 +28,9 @@ public class RegistrationDTO {
     @Past(message = "Date of birth must be in the past")
     private LocalDate dateOfBirth;
 
-    @NotNull(message = "Gender is mandatory")
     private String gender;
+    
+    private String qualification;
 
     @NotBlank(message = "Nominee name is mandatory")
     @Size(max = 50, message = "Nominee name can be at most 50 characters long")
@@ -43,7 +44,6 @@ public class RegistrationDTO {
     private String firstStreet;
 
     private String lastStreet;
-    private String qualification;
 
     @NotBlank(message = "Pincode is mandatory")
     @Pattern(regexp = "\\d{6}", message = "Pincode must be exactly 6 digits")

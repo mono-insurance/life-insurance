@@ -7,6 +7,7 @@ import com.monocept.app.utils.DocumentType;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -28,4 +29,12 @@ public interface DocumentUploadedRepository extends JpaRepository<DocumentUpload
     DocumentUploaded findByCustomerAndDocumentType(Customer customer, DocumentType documentType);
 
     DocumentUploaded findByAgentAndDocumentType(Agent agent, DocumentType documentType);
+
+	List<DocumentUploaded> findByCustomer(Customer customer);
+
+	DocumentUploaded findByDocumentTypeAndCustomer(DocumentType documentType, Customer customer);
+
+	List<DocumentUploaded> findByCustomerAndIsApprovedTrue(Customer customer);
+
+	List<DocumentUploaded> findByAgent(Agent agent);
 }

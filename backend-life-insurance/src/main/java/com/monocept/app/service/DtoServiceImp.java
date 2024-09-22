@@ -7,6 +7,7 @@ import com.monocept.app.repository.AddressRepository;
 import com.monocept.app.repository.CityRepository;
 import com.monocept.app.repository.StateRepository;
 import com.monocept.app.utils.DocumentType;
+import com.monocept.app.utils.NomineeRelation;
 import com.monocept.app.utils.PageResult;
 import com.monocept.app.repository.RoleRepository;
 import com.monocept.app.utils.GlobalSettings;
@@ -24,9 +25,9 @@ public class DtoServiceImp implements DtoService {
 
     private final StateRepository stateRepository;
     private final CityRepository cityRepository;
+
     private final StorageService storageService;
     private final AddressRepository addressRepository;
-
     public DtoServiceImp(StateRepository stateRepository, CityRepository cityRepository, StorageService storageService, AddressRepository addressRepository) {
         this.stateRepository = stateRepository;
         this.cityRepository = cityRepository;
@@ -695,6 +696,15 @@ public class DtoServiceImp implements DtoService {
         if (policy.getInsuranceType() != null) {
             policyDTO.setInsuranceTypeId(policy.getInsuranceType().getTypeId());
         }
+        
+        
+        Image image = policy.getImage();
+        if (image != null) {
+            imageData  = storageService.downloadPolicyImage(policy.getPolicyId());
+            
+            String imageBase64 = Base64.getEncoder().encodeToString(imageData);
+            policyDTO.setImageBase64(imageBase64);
+        }
 
         return policyDTO;
     }
@@ -764,6 +774,12 @@ public class DtoServiceImp implements DtoService {
         if (documentUploaded.getAgent() != null) {
             documentUploadedDTO.setAgentId(documentUploaded.getAgent().getAgentId());
         }
+        
+        byte[] imageData = storageService.downloadFile(documentUploaded.getDocumentId());
+        
+        String imageBase64 = Base64.getEncoder().encodeToString(imageData);
+        documentUploadedDTO.setImageBase64(imageBase64);
+        
         return documentUploadedDTO;
     }
 
@@ -853,6 +869,10 @@ public class DtoServiceImp implements DtoService {
         transactionsDTO.setStatus(transaction.getStatus());
         transactionsDTO.setSerialNo(transaction.getSerialNo());
         transactionsDTO.setPolicyAccountId(transaction.getPolicyAccount().getPolicyAccountId());
+        transactionsDTO.setTransactionIdentification(transaction.getTransactionIdentification());
+        transactionsDTO.setTotalAmountPaid(transaction.getTotalAmountPaid());
+        transactionsDTO.setLateCharges(transaction.getLateCharges());
+        transactionsDTO.setTransactionPaidDate(transaction.getTransactionPaidDate());
         return transactionsDTO;
     }
 
@@ -997,7 +1017,8 @@ public class DtoServiceImp implements DtoService {
         policyAccount.setPaymentTimeInMonths(policyAccountDTO.getPaymentTimeInMonths());
         policyAccount.setInvestmentAmount(policyAccountDTO.getInvestmentAmount());
         policyAccount.setNomineeName(policyAccountDTO.getNomineeName());
-        policyAccount.setNomineeRelation(policyAccountDTO.getNomineeRelation());
+        NomineeRelation relation = (policyAccountDTO.getNomineeRelation());
+        policyAccount.setNomineeRelation(relation);
 
         return policyAccount;
     }
@@ -1075,6 +1096,7 @@ public class DtoServiceImp implements DtoService {
 		CustomerCreationDTO customerCreationDTO = new CustomerCreationDTO();
         customerCreationDTO.setCustomerId(customer.getCustomerId());
 		
+		customerCreationDTO.setCustomerId(customer.getCustomerId());
 		customerCreationDTO.setFirstName(customer.getFirstName());
 		customerCreationDTO.setLastName(customer.getLastName());
 		customerCreationDTO.setDateOfBirth(customer.getDateOfBirth());
@@ -1182,6 +1204,13 @@ public class DtoServiceImp implements DtoService {
 		commissionDTO.setAmount(transactions.getAgentCommission());
 		commissionDTO.setPolicyAccountId(transactions.getPolicyAccount().getPolicyAccountId());
 		return commissionDTO;
+	}
+
+	@Override
+	public List<DocumentUploadedDTO> convertDocumentUploadedListToDTO(List<DocumentUploaded> documents) {
+		return documents.stream()
+                .map(this::convertDocumentUploadedToDTO)
+                .collect(Collectors.toList());
 	}
 	
 }

@@ -43,4 +43,6 @@ public interface WithdrawalRequestsService {
 
 	WithdrawalRequestsDTO getWithdrawalRequestsById(Long id);
 
+	WithdrawalRequestsDTO updateWithdrawalRequestForCustomer(Long id);
+
 }

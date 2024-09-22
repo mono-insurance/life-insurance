@@ -25,6 +25,18 @@ export const SinglePolicy = async (policyId) => {
         throw error;
     }
 }
+export const SendEmail = async (formData) => {
+    try {
+        const response = await axios.post(`http://localhost:8080/public/api/auth/contact-us`, formData, {
+
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
+
+        return response;
+    }
+    catch (error) {
+        throw error;
+    }
+}
 export const DocumentOptions = async () => {
     const token = localStorage.getItem('auth')
     try {
@@ -33,7 +45,7 @@ export const DocumentOptions = async () => {
                 'Authorization': `Bearer ${token}`
             }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
-        if (response.data==false){
+        if (response.data == false) {
             throw new AxiosError('you can not purchase this policy, please contact your agent!')
         }
         return response;
@@ -55,6 +67,12 @@ export const IsEligible = async (policyId) => {
         return response;
     }
     catch (error) {
-        throw error;
+        let errorMessage;
+        if (error.response && error.response.data) {
+            errorMessage = error.response.data.message;
+        } else {
+            errorMessage = 'An error occurred while checking eligibility.';
+        }
+        errorToast(errorMessage)
     }
 }

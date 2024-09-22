@@ -1,178 +1,195 @@
+
 import React, { useContext, useEffect, useState } from 'react'
-import { AreaTop } from '../../../sharedComponents/Title/Title'
-import { PaginationContext } from '../../../context/PaginationContext';
+import { AreaTop } from '../../../sharedComponents/Title/Title';
 import { Table } from '../../../sharedComponents/Table/Table';
-import { errorToast, successToast } from '../../../utils/helper/toast';
-import { useParams } from 'react-router-dom';
-import { activateParticularAccount, getAllActiveAccounts, getAllInactiveAccounts, makeAllRequestsAccountActivate } from '../../../services/EmployeeServices';
-import { validateAccountNumber } from '../../../utils/validations/Validations';
+import { PaginationContext } from '../../../context/PaginationContext';
+import './getCustomers.scss';
 import { ToastContainer } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { errorToast, successToast } from '../../../utils/helper/toast';
+import { FilterButton } from '../../../sharedComponents/FilterButton/FilterButton';
+import { covertIdDataIntoTable } from '../../../services/SharedServices';
+import { validateCustomerId, validateFirstName } from '../../../utils/validations/Validations';
+import { activateParticularAccount, getAllActiveAccounts, getAllAccounts, getAllInactiveAccounts, deleteAccount, getAccountById } from '../../../services/EmployeeServices';
+
+
 export const AllAccounts = () => {
-    const navigate = useNavigate()
-    const [newlyActivated, setNewlyActivated] = useState(false);
-    const [activatedData, setActivatedData] = useState('');
-    const [data, setData] = useState([]);
-    const [showActiveAccounts, setShowActiveAccounts] = useState(false);
-    const [showInactiveAccounts, setShowInactiveAccounts] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [data, setData] = useState({});
     const [keysToBeIncluded, setKeysToBeIncluded] = useState([]);
-    const { currentPage, itemsPerPage, resetPagination } = useContext(PaginationContext);
-    const [accountNumber, setAccountNumber] = useState('');
     const routeParams = useParams();
+    const [showFilterButton, setShowFilterButton] = useState(true);
+    const [filterType, setFilterType] = useState('');
+    const [filter, setFilter] = useState(false);
+    const [id, setId] = useState('');
+    const [active, setActive] = useState('');
+    const [showPagination, setShowPagination] = useState(true);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [customerId, setCustomerId] = useState(null)
+    const filterOptions = [
+        { label: 'Account number', value: 'id' },
+        { label: 'Search by Active', value: 'active' },
+        { label: 'Search by Inactive', value: 'inactive' }
+    ];
 
 
+    const resetPagination = () => {
+        setCurrentPage(1);
+        setItemsPerPage(10);
+    };
 
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            validateAccountNumber(accountNumber);
-
-            await activateParticularAccount(accountNumber);
-
-            successToast("Account has been activated successfully!");
-            setAccountNumber('');
+    const handleSearch = () => {
+        resetPagination();
+        if (filterType === 'id') {
+            setSearchParams({ filterType, id });
+            setShowPagination(false);
         }
-        catch (error) {
-            if (error.response?.data?.message || error.specificMessage) {
-                errorToast(error.response?.data?.message || error.specificMessage);
-            } else {
-                errorToast("An error occurred while Activating account.");
+        if (filterType === 'active') {
+            setSearchParams({ filterType, active, currentPage, itemsPerPage });
+            setShowPagination(true);
+        }
+        if (filterType === 'inactive') {
+            setSearchParams({ filterType, active, currentPage, itemsPerPage });
+            setShowPagination(true);
+        }
+        if (filter === false) {
+            setFilter(true);
+        }
+        else {
+            customerTable();
+        }
+    }
+
+    const handleReset = () => {
+        setFilterType('');
+        setId('');
+        setActive('');
+        setShowFilterButton(true);
+        resetPagination();
+        setFilter(false);
+        setShowPagination(true);
+        setSearchParams({});
+    };
+
+    const actions = (policyAccountId) => [
+        { name: "View", url: `/employee/policy-account/${routeParams.id}/view/${policyAccountId}` }
+    ]
+
+
+
+    const customerTable = async () => {
+        try {
+            let response = {};
+
+            if (filterType === 'active') {
+
+                response = await getAllActiveAccounts(currentPage, itemsPerPage);
             }
-        }
-    }
-    const handleAccountClicked = async (account) => {
-        navigate(`/account/${account.accountNumber}`)
-    }
-
-    const handleActivateAccounts = async (e) => {
-        e.preventDefault();
-        try {
-
-            const response = await makeAllRequestsAccountActivate();
-
-            console.log(response);
-            setActivatedData(response);
-            setNewlyActivated(true);
-
-        }
-        catch (error) {
+            else if (filterType === 'inactive') {
+                response = await getAllInactiveAccounts(currentPage, itemsPerPage);
+            }
+            else if (filterType === 'id') {
+                validateCustomerId(id);
+                const data = await getAccountById(id);
+                response = covertIdDataIntoTable(data);
+            }
+            else {
+                response = await getAllAccounts(currentPage, itemsPerPage);
+            }
+            setData(response);
+            setKeysToBeIncluded(["policyAccountId", "customerName", "nomineeName", "agentName"]);
+        } catch (error) {
+            setData([]);
             if (error.response?.data?.message || error.specificMessage) {
                 errorToast(error.response?.data?.message || error.specificMessage);
             } else {
-                errorToast("An error occurred while deactivating accounts.");
+                errorToast("An unexpected error occurred. Please try again later.");
             }
         }
     };
 
 
-    const fetchActiveAccounts = async () => {
-        try {
-            const response = await getAllActiveAccounts(currentPage, itemsPerPage);
+    useEffect(() => {
+        customerTable();
 
-            setData(response);
-            setKeysToBeIncluded(["accountNumber", "accountType", "balance", "active"]);
-            setShowActiveAccounts(true);
-            setShowInactiveAccounts(false);
-        }
-        catch (error) {
-            setData([]);
-            if (error.response?.data?.message || error.specificMessage) {
-                errorToast(error.response?.data?.message || error.specificMessage);
-            } else {
-                errorToast("An error occurred while deactivating accounts.");
-            }
-        }
+    }, [filter, currentPage, itemsPerPage, searchParams]);
+
+    const handleDeleteCustomer = async (e) => {
+        e.preventDefault()
+        console.log("in handleDeleteCustomer")
+        console.log("custeomr id s", customerId)
+        await deleteAccount(customerId)
+        setCustomerId('')
+        customerTable()
+    }
+    const handleActivateCustomer = async (e) => {
+        e.preventDefault()
+        console.log("in handleDeleteCustomer")
+        console.log("custeomr id s", customerId)
+        await activateParticularAccount(customerId)
+        setCustomerId('')
+        customerTable()
     }
 
-    const fetchInactiveAccounts = async () => {
-        try {
-            const response = await getAllInactiveAccounts(currentPage, itemsPerPage);
-            setData(response);
-            setKeysToBeIncluded(["accountNumber", "accountType", "balance", "active"]);
-            setShowInactiveAccounts(true);
-            setShowActiveAccounts(false);
-        }
-        catch (error) {
-            setData([]);
-            if (error.response?.data?.message || error.specificMessage) {
-                errorToast(error.response?.data?.message || error.specificMessage);
-            } else {
-                errorToast("An error occurred while deactivating accounts.");
-            }
-        }
-    }
-
-
-    useEffect(() => {
-        if (showActiveAccounts) {
-            fetchActiveAccounts();
-        }
-        if (showInactiveAccounts) {
-            fetchInactiveAccounts();
-        }
-    }, [currentPage, itemsPerPage]);
-
-
-    useEffect(() => {
-        resetPagination();
-    }, []);
-
-    useEffect(() => {
-        resetPagination();
-    }, [showActiveAccounts, showInactiveAccounts]);
 
     return (
-        <div className='content-area'>
-            <AreaTop pageTitle={"Activate Accounts"} pagePath={"Activate-accounts"} pageLink={`/admin/dashboard/${routeParams.id}`} />
-            <section className='content-area-form'>
-                <div className="admin-form">
-                    <div className="data-info">
-                        <h3 className="data-table-title">Make Activate</h3>
+        <>
+            <div className='content-area-customers'>
+                <AreaTop pageTitle={"Get All Account"} pagePath={"Account"} pageLink={`/employee/dashboard/${routeParams.id}`} />
+                <section className="content-area-table-customers">
 
-                        <div className="buttons-container">
-                            <button type="submit" className="form-submit" onClick={fetchActiveAccounts}>Get All Active Accounts</button>
-                            <button type="submit" className="form-submit" onClick={fetchInactiveAccounts}>Get All Inactive Accounts</button>
+                    <div className="admin-form">
+                        <div className='activate-form' hidden={filterType == ''}>
+                            <form>
+                                <input type="number" name="customerId" value={customerId} onChange={(e) => setCustomerId(e.target.value)} className="form-input-form" placeholder='Enter account number' required />
+                                {
+                                    filterType == 'active' ?
+                                        <button type="submit" className="form-submit-form" onClick={(event) => handleDeleteCustomer(event)}>Delete Account</button>
+                                        :
+                                        <button type="submit" className="form-submit-form" onClick={(event) => handleActivateCustomer(event)}>Activate Account </button>
+                                }
+                            </form>
                         </div>
                     </div>
-                    <div className='activate-form'>
-                        <form>
-                            <input type="number" name="accountNumber" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} className="form-input-form" placeholder='Enter Account Number' required />
-                            <button type="submit" className="form-submit-form" onClick={handleFormSubmit}>Make Particular Account Activate</button>
-                        </form>
-                        <h3 className='or-divider'>OR</h3>
-                    </div>
-                    <div className="deactivate-button-container">
-                        <button type="submit" className="form-submit-deactivation" onClick={handleActivateAccounts}>
-                            Activate All the Activate who have made the requests
-                        </button>
-                    </div>
 
-                    {newlyActivated && (
-                        <div className="deactivate-success">
-                            {activatedData}
-                        </div>
-                    )}
-
-                </div>
-            </section>
-
-            {(showActiveAccounts || showInactiveAccounts) && (
-                <section className="content-area-table">
-                    <div className="data-table-info">
-                        <h3 className="data-table-title">{showActiveAccounts ? 'Active Accounts' : 'Inactive Accounts'}</h3>
+                    <div className="data-table-information">
+                        <h3 className="data-table-title">Account</h3>
+                        {showFilterButton && (
+                            <FilterButton setShowFilterButton={setShowFilterButton} showFilterButton={showFilterButton} filterOptions={filterOptions} setFilterType={setFilterType} />
+                        )}
+                        {(filterType === 'active' || filterType === 'inactive' || filterType === 'id') && (
+                            <div className="filter-container">
+                                {filterType === 'id' && (
+                                    <div className="filter">
+                                        <input type="number" placeholder="Enter Account number" className="form-input" name={id} value={id} onChange={(e) => setId(e.target.value)} />
+                                    </div>
+                                )}
+                                <div className="filter-buttons">
+                                    <button className="form-submit-b" onClick={handleSearch}>Search</button>
+                                    <button className="form-submit-b" onClick={handleReset}>Clear</button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <div className="data-table-diagram">
                         <Table
                             data={data}
                             keysToBeIncluded={keysToBeIncluded}
-                            handleRowClicked={handleAccountClicked}
-                            includeButton={false}
-                            handleButtonClick={null}
+                            includeButton={true}
+                            handleButtonClick={actions}
+                            showPagination={showPagination}
+                            currentPage={currentPage}
+                            pageSize={itemsPerPage}
+                            setPage={setCurrentPage}
+                            setPageSize={setItemsPerPage}
                         />
                     </div>
                 </section>
-            )}
+
+            </div>
             <ToastContainer position="bottom-right" />
-        </div>
+        </>
+
     )
 }

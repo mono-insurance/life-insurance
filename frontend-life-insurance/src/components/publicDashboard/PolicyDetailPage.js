@@ -3,18 +3,34 @@ import { SinglePolicy, IsEligible } from '../../services/PublicService';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import PolicyPurchase from '../customerDashboard/PolicyPurchase/PolicyPurchase';
+import { errorToast } from '../../utils/helper/toast';
 
 const PoliciesPage = () => {
     const navigate = useNavigate();
     const [policy, setPolicy] = useState(null);
     const [isEligible, setIsEligible] = useState(false);
     const { id } = useParams();
+    const [error, setError] = useState(null)
 
     const handleBuyPolicy = async (policyId) => {
-        const token = localStorage.getItem('auth');
-        if (!token) navigate('/login');
-        const response = await IsEligible(policyId);
-        setIsEligible(response.data);
+        setIsEligible(true)
+        // const token = localStorage.getItem('auth');
+        // if (!token) navigate('/login');
+        // try {
+        //     const response = await IsEligible(policyId);
+        //     if (response.status != 200) {
+        //         setError(response.data.message)
+        //         setIsEligible(false)
+        //     }
+        //     else {
+        //         setIsEligible(true)
+        //     }
+        // }
+        // catch (err) {
+        //     setError("you are not eligible")
+        //     errorToast("you are not eligible")
+        // }
+
     };
 
     useEffect(() => {
@@ -86,7 +102,7 @@ const PoliciesPage = () => {
                             <h3 className="text-lg font-semibold mb-2 text-gray-800">Documents Needed</h3>
                             <ul className="list-disc list-inside text-gray-700">
                                 {policy.documentsNeeded.map(doc => (
-                                    <li key={doc.documentId}>{doc.documentType}</li>
+                                    <li>{doc}</li>
                                 ))}
                             </ul>
                         </div>
@@ -100,14 +116,16 @@ const PoliciesPage = () => {
                         onClick={() => handleBuyPolicy(policy.policyId)}
                         className="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out"
                     >
-                        Buy Policy
+                        Start Purchase
                     </button>
                 </div>
+
             ) : (
                 <div className="mt-8">
                     <PolicyPurchase policy={policy} />
                 </div>
             )}
+            {error && <div className="text-red-500">{error}</div>}
         </div>
     );
 };

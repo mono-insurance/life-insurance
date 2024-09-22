@@ -186,7 +186,7 @@ export const getAllActiveAgents = async (formData) => {
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
-        return response;
+        return response.data;
     }
     catch (error) {
         throw error;
@@ -201,7 +201,7 @@ export const getAllInActiveAgents = async (formData) => {
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
-        return response;
+        return response.data;
     }
     catch (error) {
         throw error;
@@ -210,11 +210,24 @@ export const getAllInActiveAgents = async (formData) => {
 export const getAllActiveCustomers = async (formData) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get('http://localhost:8080/suraksha/employee/active-customers', {
+        const response = await axios.get('http://localhost:8080/suraksha/agent/active-customers', {
             params: formData,
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+export const getAgentById = async (agentId, formData) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/agent/${agentId}`, {
+            params: formData,
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
         return response.data;
     }
     catch (error) {
@@ -229,7 +242,7 @@ export const getAllApprovedDocuments = async (formData) => {
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
-        return response;
+        return response.data;
     }
     catch (error) {
         throw error;
@@ -243,7 +256,34 @@ export const getAllNotApprovedDocuments = async (formData) => {
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
-        return response;
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+export const getAllDocuments = async (formData) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get('http://localhost:8080/suraksha/employee/document/all', {
+            params: formData,
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
+
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+export const getDocumentById = async (documentId) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/employee/document/${documentId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
+
+        return response.data;
     }
     catch (error) {
         throw error;
@@ -257,28 +297,12 @@ export const allRegisteredCustomers = async (formData) => {
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
-        return response;
-    }
-    catch (error) {
-        throw error;
-    }
-}
-
-export const getAllInactiveActiveCustomers = async (formData) => {
-    const token = localStorage.getItem('auth');
-    try {
-        const response = await axios.get(`http://localhost:8080/suraksha/employee/inactive-customers`, {
-            params: formData,
-            headers: { 'Authorization': `Bearer ${token}` }
-        }).catch((error) => { throw new AxiosError(error.response.data.message) });
-
         return response.data;
     }
     catch (error) {
         throw error;
     }
 }
-
 export const reviewCommissionWithdrawalRequest = async (withdrawalId, isApproved) => {
     const token = localStorage.getItem('auth');
     try {
@@ -314,7 +338,7 @@ export const approveCustomerProfile = async (customerId, isApproved) => {
 export const getAllTransactions = async (formData) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get(`http://localhost:8080/suraksha/employee/transactions`,
+        const response = await axios.get(`http://localhost:8080/suraksha/agent/transactions`,
             {
                 params: formData,
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -336,7 +360,7 @@ export const getAllApprovedCommissions = async (agentId, formData) => {
                 headers: { 'Authorization': `Bearer ${token}` }
             }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
-        return response;
+        return response.data;
     }
     catch (error) {
         throw error;
@@ -351,7 +375,7 @@ export const getAllNotApprovedCommissions = async (agentId, formData) => {
                 headers: { 'Authorization': `Bearer ${token}` }
             }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
-        return response;
+        return response.data;
     }
     catch (error) {
         throw error;
@@ -359,11 +383,11 @@ export const getAllNotApprovedCommissions = async (agentId, formData) => {
 }
 
 
-export const getAllTransactionsByAccountNumber = async (currentPage, itemsPerPage, accountNumber) => {
+export const getAllTransactionsByAccountNumber = async (accountNumber, formData) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get(`http://localhost:8080/suraksha/employee/employee/transaction/account/${accountNumber}`, {
-            params: { page: currentPage - 1, size: itemsPerPage },
+        const response = await axios.get(`http://localhost:8080/suraksha/transaction/policy-account/${accountNumber}`, {
+            params: formData,
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
@@ -379,7 +403,7 @@ export const getAllTransactionsByAccountNumber = async (currentPage, itemsPerPag
 export const getAllTransactionsByDate = async (currentPage, itemsPerPage, startDate, endDate) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get(`http://localhost:8080/suraksha/employee/employee/transaction/date`, {
+        const response = await axios.get(`http://localhost:8080/suraksha/employee/transactions/date`, {
             params: { page: currentPage - 1, size: itemsPerPage, startDate: startDate, endDate: endDate },
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
@@ -442,7 +466,7 @@ export const updateCity = async (cid, formState) => {
 export const getAllInactiveCustomers = async (formData) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get('http://localhost:8080/suraksha/employee/inactive-customers', {
+        const response = await axios.get('http://localhost:8080/suraksha/agent/inactive-customers', {
             params: formData,
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
@@ -455,7 +479,7 @@ export const getAllInactiveCustomers = async (formData) => {
 export const getAllStates = async (formData) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get('http://localhost:8080/suraksha/employee/employee/state', {
+        const response = await axios.get('http://localhost:8080/suraksha/employee/state', {
             params: formData,
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
@@ -468,7 +492,7 @@ export const getAllStates = async (formData) => {
 export const getAllCities = async (formData) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get('http://localhost:8080/suraksha/employee/employee/city', {
+        const response = await axios.get('http://localhost:8080/suraksha/employee/city', {
             params: formData,
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
@@ -532,14 +556,10 @@ export const getAllQueriesByCustomer = async (cid, formData) => {
 }
 
 
-
-
-
-
 export const getAllActiveAccounts = async (currentPage, itemsPerPage) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get('http://localhost:8080/suraksha/employee/employee/accounts/active', {
+        const response = await axios.get('http://localhost:8080/suraksha/agent/policy-accounts/active', {
             params: { page: currentPage - 1, size: itemsPerPage },
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
@@ -551,12 +571,10 @@ export const getAllActiveAccounts = async (currentPage, itemsPerPage) => {
     }
 
 }
-
-
-export const getAllInactiveAccounts = async (currentPage, itemsPerPage) => {
+export const getAllAccounts = async (currentPage, itemsPerPage) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get('http://localhost:8080/suraksha/employee/employee/accounts/inactive', {
+        const response = await axios.get('http://localhost:8080/suraksha/customer/policy-accounts', {
             params: { page: currentPage - 1, size: itemsPerPage },
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
@@ -566,7 +584,48 @@ export const getAllInactiveAccounts = async (currentPage, itemsPerPage) => {
     catch (error) {
         throw error;
     }
+}
 
+
+export const getAllInactiveAccounts = async (currentPage, itemsPerPage) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get('http://localhost:8080/suraksha/agent/policy-accounts/inactive', {
+            params: { page: currentPage - 1, size: itemsPerPage },
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
+
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+export const getAccountById = async (accountNumber) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/customer/policy-accounts/${accountNumber}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
+
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+export const deleteAccount = async (accountNumber) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.delete(`http://localhost:8080/suraksha/employee/policy-account/${accountNumber}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => { throw new AxiosError(error.response.data.message) });
+
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
 }
 
 
@@ -626,7 +685,7 @@ export const getCustomerDocument = async (did) => {
 export const makeCustomerAccount = async (customerId, updatedFormState) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.post(`http://localhost:8080/suraksha/employee/employee/user/${customerId}`,
+        const response = await axios.post(`http://localhost:8080/suraksha/employee/user/${customerId}`,
             updatedFormState,
             {
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -644,7 +703,7 @@ export const makeCustomerAccount = async (customerId, updatedFormState) => {
 export const makeAllRequestsCustomerActivate = async () => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.put('http://localhost:8080/suraksha/employee/employee/activate/requests/customer', {}, {
+        const response = await axios.put('http://localhost:8080/suraksha/employee/activate/requests/customer', {}, {
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
@@ -677,7 +736,7 @@ export const activateParticularCustomer = async (customerId) => {
 export const makeAllRequestsAccountActivate = async () => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.put('http://localhost:8080/suraksha/employee/employee/activate/requests/account', {}, {
+        const response = await axios.put('http://localhost:8080/suraksha/employee/activate/requests/account', {}, {
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
@@ -693,7 +752,7 @@ export const makeAllRequestsAccountActivate = async () => {
 export const activateParticularAccount = async (accountNumber) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.put(`http://localhost:8080/suraksha/employee/employee/accounts/${accountNumber}/activate`, {}, {
+        const response = await axios.put(`http://localhost:8080/suraksha/employee/activate-policy-account/${accountNumber}`, {}, {
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
@@ -710,7 +769,7 @@ export const activateParticularAccount = async (accountNumber) => {
 export const getAllCustomersByCharacters = async (currentPage, itemsPerPage, firstName) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get('http://localhost:8080/suraksha/employee/employee/customers/starts-with', {
+        const response = await axios.get('http://localhost:8080/suraksha/employee/customers/starts-with', {
             params: { page: currentPage - 1, size: itemsPerPage, startsWith: firstName },
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
@@ -743,7 +802,7 @@ export const getCustomerById = async (id) => {
 export const getAllUsersByCharacters = async (currentPage, itemsPerPage, firstName) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get('http://localhost:8080/suraksha/employee/employee/users/starts-with', {
+        const response = await axios.get('http://localhost:8080/suraksha/employee/users/starts-with', {
             params: { page: currentPage - 1, size: itemsPerPage, startsWith: firstName },
             headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => { throw new AxiosError(error.response.data.message) });
