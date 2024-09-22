@@ -8,7 +8,7 @@ import { Table } from '../../../sharedComponents/Table/Table';
 import { PaginationContext } from '../../../context/PaginationContext';
 import { ProgressBar } from '../../../sharedComponents/ProgressBar/ProgresBar';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { covertIdDataIntoTable, formatRoleForTable } from '../../../services/SharedServices';
+import { covertIdDataIntoTable, formatRoleForTable } from '../../../utils/helper/helperFunctions';
 import { getAllUsers, getAllUsersByCharacters, getNewUsers, getSystemStats, getUserById } from '../../../services/AdminServices';
 import { FilterButton } from '../../../sharedComponents/FilterButton/FilterButton';
 import { validateFirstName, validateUserId } from '../../../utils/validations/Validations';

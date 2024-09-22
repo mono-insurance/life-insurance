@@ -26,11 +26,31 @@ export const verifyCustomer = async ({customerId}) => {
     const token = localStorage.getItem('auth');
 
     if (!token) {
-        throw new NotFoundError('Unauthorized access. You are not an admin.');
+        throw new NotFoundError('Unauthorized access. You are not an customer.');
     }
 
     try {
         const response = await axios.get(`http://localhost:8080/public/api/auth/verify/customer/${customerId}`, {
+        headers: {
+            'Authorization': `${token}`
+        }});
+
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+export const validateCustomer = async () => {
+    const token = localStorage.getItem('auth');
+
+    if (!token) {
+        return null;
+    }
+
+    try {
+        const response = await axios.get(`http://localhost:8080/public/api/auth/verify/customer`, {
         headers: {
             'Authorization': `${token}`
         }});
@@ -56,6 +76,59 @@ export const login = async (usernameOrEmail, password) => {
         throw error;
     }
 }
+
+
+
+export const agentRegistration = async (formData) => {
+    try {
+        console.log(formData);
+        const response = await axios.post('http://localhost:8080/suraksha/agent/agent/registration', formData, {
+            headers: { 'Content-Type': 'multipart/form-data', }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+
+    } 
+    catch (error) {
+        throw error;
+    }
+}
+
+
+
+
+export const customerRegistration = async (formData) => {
+    try {
+        const response = await axios.post('http://localhost:8080/suraksha/customer/customer/registration', formData, {
+
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+
+    } 
+    catch (error) {
+        throw error;
+    }
+}
+
+
+
+
+export const profilePasswordUpdate = async (formData) => {
+    try {
+        const response = await axios.post('http://localhost:8080/public/api/auth/update-password', formData, {
+
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+
+    } 
+    catch (error) {
+        throw error;
+    }
+}
+
+
 
 
 export const customerRequestActivation = async (usernameOrEmail, password, customerId) => {

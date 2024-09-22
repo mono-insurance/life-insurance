@@ -3,17 +3,28 @@ import { AreaTop } from '../../../sharedComponents/Title/Title';
 import './addFeedback.scss'; 
 import { errorToast, successToast } from '../../../utils/helper/toast';
 import { ToastContainer } from 'react-toastify';
-import { useParams } from 'react-router-dom';
 import { addFeedbackByCustomer } from '../../../services/CustomerServices';
+import { useOutletContext } from 'react-router-dom';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
+import { StarRating } from '../../../sharedComponents/StarRating/StarRating';
+import { validateFeedbackForm } from '../../../utils/validations/Validations';
 
 export const AddFeedback = () => {
-  const routeParams = useParams();
+  const {customerId} = useOutletContext();
+  const [loading, setLoading] = useState(false);
   const [formState, setFormState] = useState({
     title: '',
     description: '',
-    rating: 5,
-    customerId: routeParams.id,
+    rating: 1,
+    customerId: customerId,
   });
+
+  const handleRatingChange = (newRating) => {
+    setFormState({
+      ...formState,
+      rating: newRating,
+    });
+  };
 
   const handleChange = (event) => {
     setFormState({
@@ -25,6 +36,16 @@ export const AddFeedback = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      setLoading(true);
+
+      const formErrors = validateFeedbackForm(formState);
+
+      if (Object.keys(formErrors).length > 0) {
+        Object.values(formErrors).forEach((errorMessage) => {
+          errorToast(errorMessage);
+        });
+        return;
+      }
 
       await addFeedbackByCustomer(formState); 
 
@@ -42,11 +63,15 @@ export const AddFeedback = () => {
         errorToast("An unexpected error occurred. Please try again later.");
       }
     }
+    finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={"Submit Feedback"} pagePath={"Submit-Feedback"} pageLink={`/customer/policy-account/${routeParams.id}`}/>
+      {loading && <Loader />}
+      <AreaTop pageTitle={"Submit Feedback"} pagePath={"Submit-Feedback"} pageLink={`/suraksha/insurances`}/>
       <section className="content-area-form">
         <form className="feedback-form">
             <label className="form-label">
@@ -81,27 +106,9 @@ export const AddFeedback = () => {
               />
             </label>
 
-
-            <label className="form-label">
-              <div className="label-container">
-                <span>Rating:</span>
-                <span className="text-danger"> *</span>
-              </div>
-              <select
-                name="rating"
-                value={formState.rating}
-                onChange={handleChange}
-                className="form-input"
-                required
-              >
-                {[...Array(5)].map((_, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    {i + 1} Star{ i > 0 && 's'}
-                  </option>
-                ))}
-              </select>
-            </label>
-
+            <div className='flex justify-content items-center flex-col'>
+            <StarRating rating={formState.rating} onRatingChange={handleRatingChange}/>
+            </div>
 
           <button type="submit" className="form-submit" onClick={handleSubmit}>
             Submit

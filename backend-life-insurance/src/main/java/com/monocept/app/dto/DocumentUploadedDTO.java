@@ -26,4 +26,6 @@ public class DocumentUploadedDTO {
     private Long agentId;
     
     private Long policyId;
+    
+    private String imageBase64;
 }

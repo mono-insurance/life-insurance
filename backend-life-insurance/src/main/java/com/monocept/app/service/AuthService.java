@@ -6,7 +6,7 @@ import com.monocept.app.dto.LoginResponseDTO;
 
 public interface AuthService {
 
-    LoginResponseDTO updatePassword(String password);
+    String updatePassword(Long id, String password, String newPassword);
 
 	JWTAuthResponse login(LoginDTO loginDto);
 
@@ -17,4 +17,6 @@ public interface AuthService {
 	boolean isAgent(String token, int userId);
 
 	boolean isCustomer(String token, int userId);
+
+	Long isCustomerId(String token);
 }

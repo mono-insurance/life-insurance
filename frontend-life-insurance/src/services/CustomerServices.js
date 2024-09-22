@@ -20,12 +20,25 @@ export const fetchCustomer = async (customerId) => {
 
 
 export const getListOfActiveCitiesByState = async (stateName) => {
-    const token = localStorage.getItem('auth');
     try {
         const response = await axios.get(`http://localhost:8080/suraksha/city/all/active/state`, {
-              headers: { 'Authorization': `Bearer ${token}` },
               params: { stateName }
           }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+
+
+export const getListOfActiveCitiesByStateId = async (id) => {
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/city/all/active/state/${id}`).catch((error) => {throw new AxiosError(error.response.data.message)});
 
         return response.data;
     } 
@@ -177,7 +190,7 @@ export const getAllPolicyAccounts = async (currentPage, itemsPerPage) => {
     const token = localStorage.getItem('auth');
     try {
         const response = await axios.get('http://localhost:8080/suraksha/customer/policy-accounts', {
-              params: { page: currentPage - 1, size: itemsPerPage },
+              params: { page: currentPage - 1, size: itemsPerPage, direction: 'desc' },
               headers: { 'Authorization': `Bearer ${token}` }
           }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
@@ -225,11 +238,12 @@ export const getWithdrawalRequestsByPolicyAccountId = async (id, customerId) => 
 
 
 
-export const fetchingTransactionsByPolicyAccountId = async (id) => {
+export const fetchingTransactionsByPolicyAccountId = async (id, currentPage, itemsPerPage) => {
     const token = localStorage.getItem('auth');
     try {
         const response = await axios.get(`http://localhost:8080/suraksha/transaction/transactions/policy-account/${id}`, {
-              headers: { 'Authorization': `Bearer ${token}` }
+              headers: { 'Authorization': `Bearer ${token}` },
+              params: { page: currentPage - 1, size: itemsPerPage }
           }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
         return response.data;
@@ -273,6 +287,160 @@ export const getAllApprovedRequestsByCustomer = async (currentPage, itemsPerPage
     }
 
 }
+
+
+
+export const updateWithdrawRequestToTrue = async (id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.post(`http://localhost:8080/suraksha/withdrawal-request/customer/withdraw/${id}`, {}, {
+          headers: { 'Authorization': `Bearer ${token}` }
+      }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+export const fetchAllDocumentsByCustomer = async (id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/customer/documents/${id}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+
+
+
+export const uploadDocumentOfCustomer = async (selectedDocument, uploadedFile, customerId) => {
+    const token = localStorage.getItem('auth');
+    const formData = new FormData();
+    formData.append('documentType', selectedDocument);
+    formData.append('file', uploadedFile);
+
+    try {
+        const response = await axios.put(
+            `http://localhost:8080/suraksha/customer/documents/add-or-update/${customerId}`, 
+            formData, 
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Document upload failed:', error);
+        throw error;
+    }
+};
+
+
+
+
+export const getCustomerApprovedDocuments = async (id) => {
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/customer/documents/approved/${id}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+          }).catch((error) => {throw new AxiosError(error.response.data.message)});
+
+        return response.data;
+    } 
+    catch (error) {
+        throw error;
+    }
+
+}
+
+
+
+
+export const generatePayment = async (requestData) => {  
+    const token = localStorage.getItem('auth');
+    try {
+        console.log(requestData);
+        const response = await axios.post('http://localhost:8080/suraksha/payment/sessions', requestData, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+        
+        window.location.href = response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+
+
+export const verifyPaymentIntent = async (sessionId) => {  
+    const token = localStorage.getItem('auth');
+    try {
+        console.log(sessionId);
+        const response = await axios.post('http://localhost:8080/suraksha/payment/verify', { sessionId }, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+        
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+
+
+
+export const generateInstallmentPayment = async (requestData) => {  
+    const token = localStorage.getItem('auth');
+    try {
+        console.log(requestData);
+        const response = await axios.post('http://localhost:8080/suraksha/payment/installment/sessions', requestData, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).catch((error) => {throw new AxiosError(error.response.data.message)});
+        
+        window.location.href = response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+
+
+
+
+export const generatePaymentReceipt = async (id) => {  
+    const token = localStorage.getItem('auth');
+    try {
+        const response = await axios.get(`http://localhost:8080/suraksha/download/receipt/pdf/${id}`, {
+                headers: { 
+                    'Authorization': `Bearer ${token}`
+                },
+                responseType: 'blob',
+            }).catch((error) => {throw new AxiosError(error.response.data.message)});
+        
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
 
 
 

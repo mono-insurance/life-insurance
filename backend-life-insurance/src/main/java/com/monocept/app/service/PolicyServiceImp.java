@@ -56,7 +56,6 @@ public class PolicyServiceImp implements PolicyService{
 	    policy.setIsActive(true);
 	    policy.setInsuranceType(insuranceType);
 	    
-	    System.out.println("yaha pr to aa gya");
 	    if (policyDTO.getDocumentsNeeded() != null && !policyDTO.getDocumentsNeeded().isEmpty()) {
 	        List<DocumentNeeded> documentNeededEntities = policyDTO.getDocumentsNeeded()
 	            .stream()
@@ -224,6 +223,27 @@ public class PolicyServiceImp implements PolicyService{
 		List<PolicyDTO> allPoliciesDTO = dtoService.convertPolicyListEntityToDTO(allPolicies);
 		
 		return new PagedResponse<PolicyDTO>(allPoliciesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+
+
+	@Override
+	public List<PolicyDTO> getListOfAllActivePolicies() {
+		List<Policy> policy = policyRepository.findByIsActiveTrue();
+		
+		return dtoService.convertPolicyListEntityToDTO(policy);
+	}
+
+
+
+	@Override
+	public List<PolicyDTO> getListOfAllActivePoliciesByInsurance(Long id) {
+		InsuranceType insuranceType = insuranceTypeRepository.findById(id)
+	            .orElseThrow(() -> new UserException("InsuranceType not found with id "));
+		
+		List<Policy> policy = policyRepository.findByIsActiveTrueAndInsuranceType(insuranceType);
+		
+		return dtoService.convertPolicyListEntityToDTO(policy);
 	}
 
 

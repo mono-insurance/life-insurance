@@ -1,5 +1,6 @@
 package com.monocept.app.controller;
 
+import com.monocept.app.dto.InsuranceTypeDTO;
 import com.monocept.app.dto.PolicyDTO;
 import com.monocept.app.service.InsuranceTypeService;
 import com.monocept.app.service.PolicyService;
@@ -124,7 +125,8 @@ public class PolicyController {
 	    return new ResponseEntity<PagedResponse<PolicyDTO>>(policies, HttpStatus.OK);
 	}
 
-	@Operation(summary = "By Admin: Get  policy by id")
+	
+	@Operation(summary = "By Admin: Get policy by id")
 	@GetMapping("/policy/{pid}")
 	public ResponseEntity<PolicyDTO> getPolicyById(@PathVariable("pid")Long policyId) {
 
@@ -132,6 +134,29 @@ public class PolicyController {
 
 		return new ResponseEntity<>(policies, HttpStatus.OK);
 	}
+	
+	
+    @Operation(summary = "By All: Get List of All Active Policies")
+    @GetMapping("/all/active")
+    public ResponseEntity<List<PolicyDTO>> getListOfAllActivePolicies() {
+
+    	List<PolicyDTO> policy = policyService.getListOfAllActivePolicies();
+
+        return new ResponseEntity<>(policy, HttpStatus.OK);
+
+    }
+	
+	
+    @Operation(summary = "By All: Get List of All Active policies by insurance Id")
+    @GetMapping("/all/active/{id}")
+    public ResponseEntity<List<PolicyDTO>> getListOfAllActivePoliciesByInsurance(@PathVariable(name="id") Long id) {
+
+    	List<PolicyDTO> policy = policyService.getListOfAllActivePoliciesByInsurance(id);
+
+        return new ResponseEntity<>(policy, HttpStatus.OK);
+
+    }
+	
 	
 	
 	

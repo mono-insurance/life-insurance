@@ -145,4 +145,6 @@ public interface DtoService {
 
 	CommissionDTO convertTransactionEntityToCommissionDTO(Transactions transactions);
 
+	List<DocumentUploadedDTO> convertDocumentUploadedListToDTO(List<DocumentUploaded> documents);
+
 }

@@ -9,7 +9,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { getAllActiveEmployees, getAllEmployees, getAllInactiveEmployees, getEmployeeById } from '../../../services/AdminServices';
 import { errorToast } from '../../../utils/helper/toast';
 import { FilterButton } from '../../../sharedComponents/FilterButton/FilterButton';
-import { covertIdDataIntoTable } from '../../../services/SharedServices';
+import { covertIdDataIntoTable } from '../../../utils/helper/helperFunctions';
 import { validateCustomerId, validateFirstName } from '../../../utils/validations/Validations';
 
 export const GetEmployees = () => {

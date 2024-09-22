@@ -263,4 +263,9 @@ public class DownloadServiceImp implements DownloadService{
 		return withdrawalRequestsRepository.findAll();
 	}
 
+	@Override
+	public Transactions getTransaction(Long id) {
+		 return transactionRepository.findById(id).orElseThrow(()->new UserException("Transaction not found"));
+	}
+
 }

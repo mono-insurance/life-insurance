@@ -23,6 +23,7 @@ import com.monocept.app.repository.AgentRepository;
 import com.monocept.app.repository.AuthRepository;
 import com.monocept.app.repository.CityRepository;
 import com.monocept.app.repository.CustomerRepository;
+import com.monocept.app.repository.DocumentUploadedRepository;
 import com.monocept.app.repository.PolicyAccountRepository;
 import com.monocept.app.repository.PolicyRepository;
 import com.monocept.app.repository.QueryRepository;
@@ -32,12 +33,14 @@ import com.monocept.app.repository.StateRepository;
 
 import com.monocept.app.repository.TransactionsRepository;
 import com.monocept.app.repository.WithdrawalRequestsRepository;
+import com.monocept.app.utils.DocumentType;
 import com.monocept.app.utils.GenderType;
 import com.monocept.app.utils.GlobalSettings;
 import com.monocept.app.utils.NomineeRelation;
 import com.monocept.app.utils.PagedResponse;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +51,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class CustomerServiceImp implements CustomerService {
@@ -84,6 +88,9 @@ public class CustomerServiceImp implements CustomerService {
     private SettingsRepository settingsRepository;
 
     @Autowired
+    private StorageService storageService;
+    
+    @Autowired
     private AuthRepository credentialsRepository;
 
     @Autowired
@@ -94,6 +101,10 @@ public class CustomerServiceImp implements CustomerService {
 
     @Autowired
     private WithdrawalRequestsRepository withdrawalRequestsRepository;
+    
+    @Autowired
+    private  DocumentUploadedRepository documentUploadedRepository;
+    
     @Autowired
     private EmailService emailService;
 
@@ -169,6 +180,16 @@ public class CustomerServiceImp implements CustomerService {
 
     @Override
     public Long customerRegistration(RegistrationDTO registrationDTO) {
+    	
+    	if (credentialsRepository.existsByUsername(registrationDTO.getUsername())) {
+            throw new UserException("Username must be unique");
+        }
+
+        if (credentialsRepository.existsByEmail(registrationDTO.getEmail())) {
+            throw new UserException("Email must be unique");
+        }
+        
+        
         Customer customer = new Customer();
         customer.setFirstName(registrationDTO.getFirstName());
         customer.setLastName(registrationDTO.getLastName());
@@ -177,7 +198,7 @@ public class CustomerServiceImp implements CustomerService {
         customer.setIsActive(true);
         customer.setNomineeName(registrationDTO.getNomineeName());
         customer.setNomineeRelation(NomineeRelation.valueOf(registrationDTO.getNomineeRelation()));
-        customer.setIsApproved(false);
+        customer.setIsApproved(true);
 
         Address address = new Address();
         address.setFirstStreet(registrationDTO.getFirstStreet());
@@ -218,10 +239,10 @@ public class CustomerServiceImp implements CustomerService {
         EmailDTO emailDTO = new EmailDTO();
         emailDTO.setEmailId(credentials.getEmail());
         emailDTO.setTitle("Registration Success");
-        emailDTO.setBody("Congrats!! you have registered with our company as an employee.\n" +
-                " Now, your details will be verified by our company employees" +
-                " and your account will be activated\n We will inform you once details verified" +
+        emailDTO.setBody("Congrats!! you have registered with our company as an customer.\n" +
+                " Now, you can purchase our schemes" +
                 "your username is " + credentials.getUsername());
+        
         emailService.sendAccountCreationEmail(emailDTO);
 
         return credentials.getCustomer().getCustomerId();
@@ -337,7 +358,7 @@ public class CustomerServiceImp implements CustomerService {
         int numberOfPayments = totalMonths / policyAccountDTO.getPaymentTimeInMonths();
         Double balancePerPayment = policyAccountDTO.getInvestmentAmount() / numberOfPayments;
         policyAccount.setTimelyBalance(balancePerPayment);
-        policyAccount.setTotalAmountPaid(0.0);
+        policyAccount.setTotalAmountPaid(balancePerPayment);
 
         Double claimAmount = policyAccountDTO.getInvestmentAmount() * (1 + policy.getProfitRatio() / 100);
         claimAmount = Double.valueOf(String.format("%.2f", claimAmount));
@@ -365,7 +386,7 @@ public class CustomerServiceImp implements CustomerService {
 
         PolicyAccount savedPolicyAccount = policyAccountRepository.save(policyAccount);
         
-        createFutureTransactions(savedPolicyAccount, policyAccountDTO.getPaymentTimeInMonths(), balancePerPayment);
+        createFutureTransactions(savedPolicyAccount, policyAccountDTO.getPaymentTimeInMonths(), balancePerPayment, policyAccountDTO.getTransactionId(), agent, policy.getCommissionInstallment(), policyAccountDTO.getPaymentMade());
 
         if (policy.getPolicyAccounts() != null) policy.getPolicyAccounts().add(savedPolicyAccount);
         else policy.setPolicyAccounts(addFirstPolicyAccount(savedPolicyAccount));
@@ -444,7 +465,7 @@ public class CustomerServiceImp implements CustomerService {
         }
     }
 
-    private void createFutureTransactions(PolicyAccount policyAccount, int paymentTimeInMonths, Double balancePerPayment) {
+    private void createFutureTransactions(PolicyAccount policyAccount, int paymentTimeInMonths, Double balancePerPayment, String trasactionIdentification, Agent agent, float commission, Double totalAmountPaid) {
         LocalDate currentDate = LocalDate.now();
         LocalDate nextPaymentDate = currentDate.plusMonths(paymentTimeInMonths);
 
@@ -452,10 +473,18 @@ public class CustomerServiceImp implements CustomerService {
         Transactions initialPayment = new Transactions();
         initialPayment.setAmount(balancePerPayment);
         initialPayment.setTransactionDate(currentDate);
-        initialPayment.setStatus("pending");
+        initialPayment.setStatus("Done");
         initialPayment.setSerialNo(1L);
         Long position = 2L;
         initialPayment.setPolicyAccount(policyAccount);
+        initialPayment.setTransactionIdentification(trasactionIdentification);
+        initialPayment.setTotalAmountPaid(totalAmountPaid);
+        initialPayment.setLateCharges(false);
+        initialPayment.setTransactionPaidDate(LocalDateTime.now());
+        if(agent != null) {
+        	Double commissionFull = (balancePerPayment*commission)/100;
+        	initialPayment.setAgentCommission(commissionFull);
+        }
         transactionsRepository.save(initialPayment);
 
         // Create future scheduled payments
@@ -463,7 +492,7 @@ public class CustomerServiceImp implements CustomerService {
             Transactions transaction = new Transactions();
             transaction.setAmount(balancePerPayment);
             transaction.setTransactionDate(nextPaymentDate);
-            transaction.setStatus("pending");
+            transaction.setStatus("Pending");
             transaction.setSerialNo(position);
             position += 1L;
             transaction.setPolicyAccount(policyAccount);
@@ -474,41 +503,33 @@ public class CustomerServiceImp implements CustomerService {
         }
     }
 
-    @Override
-    public Double paymentToPay(Long id, LocalDate paymentToBeMade) {
-        String role = accessConService.getUserRole();
-        if (!role.equals("CUSTOMER")) throw new UserException("only customer can create account");
 
-        CustomUserDetails userDetails = accessConService.checkUserAccess();
-        Customer customer = findCustomerById(userDetails.getId());
 
-        PolicyAccount policyAccount = policyAccountRepository.findById(id)
-                .orElseThrow(() -> new UserException("Policy account not found"));
-
-        if (!policyAccount.getCustomer().equals(customer)) {
-            throw new UserException("Unauthorized access to this policy account");
+	@Override
+	public void createInstallmentPayment(InstallmentDTO installmentDTO) {
+		Transactions transaction = transactionsRepository.findById(installmentDTO.getTransactionId()).orElseThrow(()->new UserException("Transaction Not found"));
+		
+		PolicyAccount policyAccount = transaction.getPolicyAccount();
+		
+		transaction.setLateCharges(installmentDTO.getLateCharges());
+		transaction.setTransactionIdentification(installmentDTO.getTransactionIdentification());
+		transaction.setTotalAmountPaid(installmentDTO.getTotalAmountPaid());
+		transaction.setStatus("Done");
+		transaction.setTransactionPaidDate(LocalDateTime.now());
+		
+		System.out.println(policyAccount.getTotalAmountPaid());
+		System.out.println(transaction.getAmount());
+		policyAccount.setTotalAmountPaid(policyAccount.getTotalAmountPaid()+transaction.getAmount());
+		
+		if(policyAccount.getAgent() != null) {
+        	Double commissionFull = (transaction.getAmount()*policyAccount.getPolicy().getCommissionInstallment())/100;
+        	transaction.setAgentCommission(commissionFull);
         }
-        LocalDate currentDate = LocalDate.now();
-        LocalDate gracePeriod = paymentToBeMade.plusDays(15);
-
-        Settings taxChargesSetting = settingsRepository.findBySettingKey(GlobalSettings.TAX_CHARGES)
-                .orElseThrow(() -> new UserException("Tax charges setting not found"));
-        Settings penaltyChargesSetting = settingsRepository.findBySettingKey(GlobalSettings.PENALTY_CHARGES)
-                .orElseThrow(() -> new UserException("Penalty charges setting not found"));
-
-        boolean isLate = currentDate.isAfter(gracePeriod);
-        Double penalty = 0.0;
-
-        if (isLate) {
-            penalty = policyAccount.getTimelyBalance() * (penaltyChargesSetting.getSettingValue() / 100);
-        }
-
-        Double totalAmountToPay = policyAccount.getTimelyBalance() + penalty;
-        Double taxCharges = totalAmountToPay * (taxChargesSetting.getSettingValue() / 100);
-        totalAmountToPay += taxCharges;
-
-        return totalAmountToPay;
-    }
+		
+		
+		policyAccountRepository.save(policyAccount);
+		
+	}
 
 
     @Override
@@ -660,6 +681,61 @@ public class CustomerServiceImp implements CustomerService {
         
         return dtoService.convertCustomerToCustomerCreationDTO(customer);
 	}
+
+	@Override
+	public List<DocumentUploadedDTO> getDocumentsOfCustomer(Long customerId) {
+		Customer customer = findCustomerById(customerId);
+		
+		List<DocumentUploaded> documents = documentUploadedRepository.findByCustomer(customer);
+		
+		List<DocumentUploadedDTO> documentsDTO = dtoService.convertDocumentUploadedListToDTO(documents);
+		
+		return documentsDTO;
+		
+	}
+
+	@Override
+	public String addOrUpdateDocumentsOfCustomer(Long customerId, String documentName, MultipartFile file) {
+		try {
+			Customer customer = findCustomerById(customerId);
+			
+            DocumentType documentType = DocumentType.valueOf(documentName.toUpperCase());
+            
+            DocumentUploaded documentUploaded = documentUploadedRepository.findByDocumentTypeAndCustomer(documentType, customer);
+            
+            if (documentUploaded == null) {
+            	DocumentUploadedDTO documentUploadedDTO = new DocumentUploadedDTO();
+            	documentUploadedDTO.setDocumentType(documentName);
+            	documentUploadedDTO.setIsApproved(false);
+            	documentUploadedDTO.setCustomerId(customerId);
+            	storageService.addUserDocuments(documentUploadedDTO, file);
+            	
+            	return "New Document uploaded successfully";
+            }
+            else {
+            	storageService.updateUserDocuments(customer, documentUploaded, file);
+            	
+            	return "Document uploaded successfully. wait for verification";
+            }
+            
+
+        } catch (IllegalArgumentException e) {
+            // If documentType is not valid, throw an error
+            throw new UserException("Invalid document type: " + documentName);
+        }
+	}
+
+	@Override
+	public List<DocumentUploadedDTO> getApprovedDocumentsOfCustomer(Long customerId) {
+		Customer customer = findCustomerById(customerId);
+		
+		List<DocumentUploaded> documents = documentUploadedRepository.findByCustomerAndIsApprovedTrue(customer);
+		
+		List<DocumentUploadedDTO> documentsDTO = dtoService.convertDocumentUploadedListToDTO(documents);
+		
+		return documentsDTO;
+	}
+
 
 
 }

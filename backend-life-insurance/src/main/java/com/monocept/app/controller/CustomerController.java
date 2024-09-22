@@ -2,19 +2,24 @@ package com.monocept.app.controller;
 
 import com.monocept.app.dto.CustomerCreationDTO;
 import com.monocept.app.dto.CustomerDTO;
-
+import com.monocept.app.dto.DocumentUploadedDTO;
 import com.monocept.app.service.CustomerService;
 import com.monocept.app.service.StorageService;
+import com.monocept.app.service.StripeService;
 import com.monocept.app.utils.PagedResponse;
 
 import com.monocept.app.dto.PolicyAccountDTO;
 import com.monocept.app.dto.RegistrationDTO;
+import com.monocept.app.dto.StripeChargeDTO;
+import com.monocept.app.dto.StripeTokenDTO;
 import com.monocept.app.dto.WithdrawalRequestsDTO;
+import com.monocept.app.entity.DocumentUploaded;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,10 +36,31 @@ public class CustomerController {
 
     @Autowired
     private StorageService storageService;
+    
+    @Autowired
+    private StripeService stripeService;
 
 
     public CustomerController(CustomerService customerService) {
         this.customerService = customerService;
+    }
+    
+    
+    @PostMapping("/card/token")
+    @ResponseBody
+    public StripeTokenDTO createCardToken(@RequestBody StripeTokenDTO model) {
+    	
+    	return stripeService.createCardToken(model);
+       
+    }
+    
+    
+    @PostMapping("/charge")
+    @ResponseBody
+    public StripeChargeDTO charge(@RequestBody StripeChargeDTO model) {
+    	
+    	return stripeService.charge(model);
+       
     }
 
 
@@ -73,17 +99,6 @@ public class CustomerController {
         PolicyAccountDTO policyAccount = customerService.createPolicyAccount(policyAccountDTO);
 
         return new ResponseEntity<PolicyAccountDTO>(policyAccount, HttpStatus.OK);
-
-    }
-
-
-    @Operation(summary = "By Customer: Payment to pay")
-    @GetMapping("/policy-account/{id}/payment")
-    public ResponseEntity<Double> paymentToPay(@PathVariable(name = "id") Long id, @RequestParam LocalDate paymentToBeMade) {
-
-        Double payment = customerService.paymentToPay(id, paymentToBeMade);
-
-        return new ResponseEntity<Double>(payment, HttpStatus.OK);
 
     }
 
@@ -157,5 +172,32 @@ public class CustomerController {
 
     	CustomerCreationDTO customer = customerService.updateCustomer(customerDTO);
         return new ResponseEntity<CustomerCreationDTO>(customer, HttpStatus.OK);
+    }
+    
+    
+    @Operation(summary = "By Customer: Get All Documents")
+    @GetMapping("/documents/{id}")
+    public ResponseEntity<List<DocumentUploadedDTO>> getDocumentsOfCustomer(@PathVariable(name="id") Long customerId) {
+
+    	List<DocumentUploadedDTO> documents = customerService.getDocumentsOfCustomer(customerId);
+        return new ResponseEntity<List<DocumentUploadedDTO>>(documents, HttpStatus.OK);
+    }
+    
+    
+    @Operation(summary = "By Customer: Get All Documents")
+    @GetMapping("/documents/approved/{id}")
+    public ResponseEntity<List<DocumentUploadedDTO>> getApprovedDocumentsOfCustomer(@PathVariable(name="id") Long customerId) {
+
+    	List<DocumentUploadedDTO> documents = customerService.getApprovedDocumentsOfCustomer(customerId);
+        return new ResponseEntity<List<DocumentUploadedDTO>>(documents, HttpStatus.OK);
+    }
+    
+    
+    @Operation(summary = "By Customer: Add or Update Document")
+    @PutMapping("/documents/add-or-update/{id}")
+    public ResponseEntity<String> addOrUpdateDocumentsOfCustomer(@PathVariable(name="id") Long customerId, @RequestParam(name="documentType") String documentType, @RequestParam(name = "file") MultipartFile file) {
+
+    	String str = customerService.addOrUpdateDocumentsOfCustomer(customerId, documentType, file);
+        return new ResponseEntity<String>(str, HttpStatus.OK);
     }
 }

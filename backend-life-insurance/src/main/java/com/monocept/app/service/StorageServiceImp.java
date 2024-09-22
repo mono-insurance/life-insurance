@@ -81,8 +81,9 @@ public class StorageServiceImp implements StorageService {
 
         DocumentUploaded documentUploaded = findDocumentById(documentId);
         String fileName = documentUploaded.getDocumentType().toString();
-        return downloadFromS3(fileName);
-    }
+        String cloudFileName = documentUploaded.getCloudFileName();
+        return downloadFromS3(cloudFileName);
+    } 
 
     @Override
     public byte[] downloadPolicyImage(Long pid) {
@@ -107,10 +108,7 @@ public class StorageServiceImp implements StorageService {
 
     @Override
     public Boolean addUserDocuments(DocumentUploadedDTO documentUploadedDTO, MultipartFile file) {
-        CustomUserDetails customUserDetails=accessConService.checkUserAccess();
-        if(customUserDetails.getId() == null){
-            throw new RoleAccessException("you don't have access to upload documents");
-        }
+
         File fileObj = convertMultiPartFileToFile(file);
         String newFileName = System.currentTimeMillis() + "_" + documentUploadedDTO.getDocumentType() + file.getOriginalFilename();
         uploadDocToS3(fileObj, newFileName);
@@ -168,13 +166,6 @@ public class StorageServiceImp implements StorageService {
                 documentUploadedList.add(documentUploaded);
                 agent.setDocuments(documentUploadedList);
             }
-            agentRepository.save(agent);
-            EmailDTO emailDTO=new EmailDTO();
-            emailDTO.setEmailId(agent.getCredentials().getEmail());
-
-            emailDTO.setTitle("Document uploaded successfully");
-            emailDTO.setBody("Congrats!! your document "+documentUploaded.getDocumentType()+" has been uploaded.\n");
-            emailService.sendAccountCreationEmail(emailDTO);
         }
         if (documentUploadedDTO.getCustomerId() != null) {
             Customer customer = findCustomer(documentUploadedDTO.getCustomerId());
@@ -186,7 +177,6 @@ public class StorageServiceImp implements StorageService {
                 documentUploadedList.add(documentUploaded);
                 customer.setDocuments(documentUploadedList);
             }
-            customerRepository.save(customer);
             EmailDTO emailDTO=new EmailDTO();
             emailDTO.setEmailId(customer.getCredentials().getEmail());
 
@@ -259,6 +249,32 @@ public class StorageServiceImp implements StorageService {
 
         return downloadFromS3(newFileName);
     }
+
+	@Override
+	public void updateUserDocuments(Customer customer, DocumentUploaded documentUploaded, MultipartFile file) {
+		// TODO Auto-generated method stub
+		
+		if(documentUploaded!= null && documentUploaded.getCloudFileName()!= null) {
+			deleteFromS3(documentUploaded.getCloudFileName());
+			
+			customer.getDocuments().remove(documentUploaded);
+			documentUploadedRepository.delete(documentUploaded);
+		}
+		File fileObj = convertMultiPartFileToFile(file);
+        String newFileName = System.currentTimeMillis() + "_" + documentUploaded.getDocumentType() + "_" + file.getOriginalFilename();
+        uploadDocToS3(fileObj, newFileName);
+		
+        DocumentUploaded newDocumentUploaded = new DocumentUploaded();
+        newDocumentUploaded.setCloudFileName(newFileName);
+        newDocumentUploaded.setCustomer(customer);
+        newDocumentUploaded.setIsApproved(false);
+        newDocumentUploaded.setDocumentType(documentUploaded.getDocumentType());
+        newDocumentUploaded = documentUploadedRepository.save(newDocumentUploaded);
+        
+        customer.getDocuments().add(newDocumentUploaded);
+        customerRepository.save(customer);
+        
+	}
 
     
 }

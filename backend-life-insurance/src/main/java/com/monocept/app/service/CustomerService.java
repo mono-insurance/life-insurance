@@ -1,8 +1,12 @@
 package com.monocept.app.service;
 
 import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.monocept.app.dto.*;
+import com.monocept.app.entity.DocumentUploaded;
 import com.monocept.app.utils.PagedResponse;
 
 import jakarta.validation.Valid;
@@ -24,8 +28,6 @@ public interface CustomerService {
 
 	PolicyAccountDTO createPolicyAccount(PolicyAccountDTO policyAccountDTO);
 
-	Double paymentToPay(Long id, LocalDate paymentToBeMade);
-
 	PagedResponse<WithdrawalRequestsDTO> getAllPolicyClaimsRequest(int pageNo, int size, String sort, String sortBy,
                                                                    String sortDirection, Long customerId);
 
@@ -44,5 +46,13 @@ public interface CustomerService {
 	CustomerCreationDTO getCustomerFullProfile(Long customerId);
 
 	CustomerCreationDTO updateCustomer(CustomerCreationDTO customerDTO);
+
+	List<DocumentUploadedDTO> getDocumentsOfCustomer(Long customerId);
+
+	String addOrUpdateDocumentsOfCustomer(Long customerId, String documentType, MultipartFile file);
+
+	List<DocumentUploadedDTO> getApprovedDocumentsOfCustomer(Long customerId);
+
+	void createInstallmentPayment(InstallmentDTO installmentDTO);
 
 }

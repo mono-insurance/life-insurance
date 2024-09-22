@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/suraksha/agent")
@@ -24,7 +25,14 @@ public class AgentController {
     
     
     
-    // no testing done here
+    @Operation(summary = "By Anyone: Register for the role of agent and upload the files for verification")
+    @PostMapping(value = {"/agent/registration"})
+    public ResponseEntity<String> agentRegistration(@ModelAttribute RegistrationDTO registrationDTO, @RequestParam("file1") MultipartFile file1, @RequestParam("file2") MultipartFile file2){
+    	
+        String response = agentService.agentRegistration(registrationDTO, file1, file2);
+        
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
     
     
     

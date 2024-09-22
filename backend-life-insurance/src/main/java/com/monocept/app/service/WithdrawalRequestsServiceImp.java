@@ -424,4 +424,17 @@ public class WithdrawalRequestsServiceImp implements WithdrawalRequestsService {
 	}
 
 
+	@Override
+	public WithdrawalRequestsDTO updateWithdrawalRequestForCustomer(Long id) {
+		WithdrawalRequests withdrawalRequest = withdrawalRequestRepository.findById(id)
+                .orElseThrow(() -> new UserException("Withdrawal request not found"));
+		
+		withdrawalRequest.setIsWithdraw(true);
+		
+		withdrawalRequest= withdrawalRequestRepository.save(withdrawalRequest);
+		
+		return dtoService.convertWithdrawalRequestToDTO(withdrawalRequest);
+	}
+
+
 }

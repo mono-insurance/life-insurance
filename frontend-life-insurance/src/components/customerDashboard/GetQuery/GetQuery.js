@@ -1,33 +1,34 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { AreaTop } from '../../../sharedComponents/Title/Title';
-import { PaginationContext } from '../../../context/PaginationContext';
 import './getQuery.scss';
 import { ToastContainer } from 'react-toastify';
 import { errorToast } from '../../../utils/helper/toast';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useOutletContext, useParams, useSearchParams } from 'react-router-dom';
 import { FilterButton } from '../../../sharedComponents/FilterButton/FilterButton';
 import { getAllResolvedQueries } from '../../../services/AdminServices';
 import { Pagination } from '../../../sharedComponents/Table/Pagination/Pagination';
 import { getAllResolvedQueriesByCustomer, getAllUnresolvedQueriesByCustomer } from '../../../services/CustomerServices';
 import { TableAction } from '../../../sharedComponents/Table/TableAction/TableAction';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const GetQuery = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [data, setData] = useState({});
-  const routeParams = useParams();
-  const [keysToBeIncluded, setKeysToBeIncluded] = useState([]);
+  const navigate = useNavigate();
   const [showFilterButton, setShowFilterButton] = useState(true);
   const [filterType, setFilterType] = useState('');
-  const [filter, setFilter] = useState(false);
-  const [resolved, setResolved] = useState('');
   const [showPagination, setShowPagination] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
-  const { id: customerId } = useParams();
+  const {customerId} = useOutletContext();
+  const [loading, setLoading] = useState(true);
   const filterOptions = [
     { label: 'Your resolved Queries', value: 'your-resolved-query' },
     { label: 'Your Unresolved Queries', value: 'your-unresolved-query' }
 ];
+
+const prevCurrentPageRef = useRef(currentPage);
+const prevItemsPerPageRef = useRef(itemsPerPage);
 
 const resetPagination = () => {
   setCurrentPage(1);
@@ -37,52 +38,44 @@ const resetPagination = () => {
   const handleSearch = () => {
     resetPagination();
     if(filterType === 'your-resolved-query'){
-      setSearchParams({filterType, resolved, currentPage, itemsPerPage});
-      setResolved('true');
+      setSearchParams({filterType, currentPage, itemsPerPage});
     }
     if(filterType === 'your-unresolved-query'){
-        setSearchParams({filterType, resolved, currentPage, itemsPerPage});
-        setResolved('false');
+      setSearchParams({filterType, currentPage, itemsPerPage});
     }
-    if(filter === false) {
-      setFilter(true);
-    }
-    else{
-        fetchQueries();
-    }
+    setShowFilterButton(false);
   }
   
   const handleReset = () => {
     setFilterType('');
     setShowFilterButton(true);
     resetPagination();
-    setFilter(false);
-    setResolved('');
     setShowPagination(true);
-    setSearchParams({});
+    setSearchParams({currentPage: 1, itemsPerPage: 10});
   };
 
   const unresolvedActions = (queryId) => [
-    { name: "Edit", url: `/customer/query/${customerId}/edit/${queryId}` },
-    { name: "Delete", url: `/customer/query/${customerId}/delete/${queryId}` }
+    { name: "Edit", url: `/suraksha/customer/query/edit/${queryId}` },
+    { name: "Delete", url: `/suraksha/customer/query/delete/${queryId}` }
   ];
 
-  const fetchQueries = async () => {
+  const fetchQueries = async (filterTypeFromParams, currentPageFromParams, itemsPerPageFromParams) => {
     try {
+        setLoading(true);
         let response = {};
 
-        if(filterType === 'your-resolved-query') {
-          response = await getAllResolvedQueriesByCustomer(currentPage, itemsPerPage, routeParams.id);
+        if(filterTypeFromParams === 'your-resolved-query') {
+          response = await getAllResolvedQueriesByCustomer(currentPageFromParams, itemsPerPageFromParams, customerId);
         }
-        else if(filterType === 'your-unresolved-query') {
-          response = await getAllUnresolvedQueriesByCustomer(currentPage, itemsPerPage, routeParams.id);
+        else if(filterTypeFromParams === 'your-unresolved-query') {
+          response = await getAllUnresolvedQueriesByCustomer(currentPageFromParams, itemsPerPageFromParams, customerId);
         }
         else {
-          response = await getAllResolvedQueries(currentPage, itemsPerPage);
+          response = await getAllResolvedQueries(currentPageFromParams, itemsPerPageFromParams);
         }
+        console.log(currentPage, itemsPerPage, filterType);
         console.log(response);
         setData(response);
-        setKeysToBeIncluded(["question", "answer"]);
 
     } catch (error) {
         setData([]);
@@ -91,18 +84,58 @@ const resetPagination = () => {
         } else {
             errorToast("An unexpected error occurred. Please try again later.");
         }
+    } finally{
+        setLoading(false);
     }
 };
 
   useEffect(() => {
-    fetchQueries();
+    const filterTypeFromParams = searchParams.get('filterType') || '';
+    const currentPageFromParams = parseInt(searchParams.get('currentPage')) || 1;
+    const itemsPerPageFromParams = parseInt(searchParams.get('itemsPerPage')) || 10;
 
-  }, [filter, currentPage, itemsPerPage, searchParams]);
+    if (filterTypeFromParams === 'your-resolved-query' || filterTypeFromParams === 'your-unresolved-query') {
+      setFilterType(filterTypeFromParams);
+      setShowFilterButton(false);
+    }
+    else{
+      setFilterType('');
+      setShowFilterButton(true);
+    }
+    if (currentPageFromParams != prevCurrentPageRef.current || itemsPerPageFromParams != prevItemsPerPageRef.current) {
+      prevCurrentPageRef.current = currentPageFromParams;
+      prevItemsPerPageRef.current = itemsPerPageFromParams;
+      setCurrentPage(currentPageFromParams);
+      setItemsPerPage(itemsPerPageFromParams);
+    }
+    if (customerId) {
+      fetchQueries(filterTypeFromParams, currentPageFromParams, itemsPerPageFromParams);
+    }
+  }, [searchParams, customerId]);
+
+  useEffect(() => {
+    if (currentPage != prevCurrentPageRef.current || itemsPerPage != prevItemsPerPageRef.current) {
+      prevCurrentPageRef.current = currentPage;
+      prevItemsPerPageRef.current = itemsPerPage;
+      setSearchParams({
+        filterType: searchParams.get('filterType'),
+        currentPage: currentPage,
+        itemsPerPage: itemsPerPage,
+      });
+    }
+  }, [currentPage, itemsPerPage, setSearchParams, searchParams]);
+
 
   return (
     <>
       <div className='content-area-query'>
-        <AreaTop pageTitle={"Get All Queries"} pagePath={"Queries"} pageLink={`/customer/policy-account/${routeParams.id}`} />
+        {loading && <Loader />}
+        <div className='flex justify-between'>
+        <AreaTop pageTitle={"Get All Queries"} pagePath={"Queries"} pageLink={`/suraksha/insurances`} />
+        <button type="button" className="form-submit-b rounded-full" onClick={()=> navigate('/suraksha/customer/add-query')}>
+            Ask Query
+        </button>
+        </div>
         <section className="content-area-list-query">
             <div className="data-table-information">
               <h3 className="data-table-title">All FAQs</h3>

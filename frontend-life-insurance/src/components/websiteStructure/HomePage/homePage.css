@@ -1,0 +1,26 @@
+.hover\:pendulum:hover {
+    animation: pendulum 0.8s infinite;
+}
+
+@keyframes pendulum {
+    0% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-10px);
+    }
+    50% {
+        transform: translateX(0);
+    }
+    75% {
+        transform: translateX(10px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+
+.custom-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}

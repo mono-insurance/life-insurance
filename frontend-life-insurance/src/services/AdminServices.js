@@ -446,10 +446,8 @@ export const getAllInactivePolicy = async (currentPage, itemsPerPage) => {
 
 
 export const getPolicyById = async (id) => {
-    const token = localStorage.getItem('auth');
     try {
         const response = await axios.get(`http://localhost:8080/suraksha/policy/policy/${id}`, {
-              headers: { 'Authorization': `Bearer ${token}` }
           }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
         return response.data;
@@ -511,10 +509,8 @@ export const createNewCity = async (formState) => {
 
 
 export const getListOfActiveStates = async () => {
-    const token = localStorage.getItem('auth');
     try {
         const response = await axios.get(`http://localhost:8080/suraksha/state/all/active`, {
-              headers: { 'Authorization': `Bearer ${token}` }
           }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
         return response.data;
@@ -697,10 +693,8 @@ export const createNewPolicy = async (formState) => {
 
 
 export const fetchListOfActiveInsuranceCategories = async () => {
-    const token = localStorage.getItem('auth');
     try {
         const response = await axios.get(`http://localhost:8080/suraksha/insurancetype/all/active`, {
-              headers: { 'Authorization': `Bearer ${token}` }
           }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
         return response.data;

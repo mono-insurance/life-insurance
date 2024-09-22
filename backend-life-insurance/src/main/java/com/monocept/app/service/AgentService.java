@@ -1,11 +1,13 @@
 package com.monocept.app.service;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.monocept.app.dto.*;
 import com.monocept.app.utils.PagedResponse;
 import jakarta.validation.Valid;
 
 public interface AgentService {
-    Long agentRegisterRequest(@Valid CredentialsDTO registrationDTO);
+    Long agentRegisterRequest(CredentialsDTO registrationDTO);
 
     AgentDTO updateAgent(AgentDTO agentDTO);
 
@@ -29,4 +31,6 @@ public interface AgentService {
 	Boolean activateAgent(Long agentId);
 
 	Boolean approveAgent(Long agentId, Boolean isApproved);
+
+	String agentRegistration(RegistrationDTO registrationDTO, MultipartFile file1, MultipartFile file2);
 }

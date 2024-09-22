@@ -58,6 +58,12 @@ public class PolicyAccountDTO {
 
     
     @NotNull(message = "Nominee relation is mandatory")
-    private NomineeRelation nomineeRelation;
+    private String nomineeRelation;
+    
+    private String transactionId;
+    
+    
+    private Double paymentMade;
+    
 
 }

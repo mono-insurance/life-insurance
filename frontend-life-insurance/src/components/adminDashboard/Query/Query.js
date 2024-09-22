@@ -6,7 +6,7 @@ import { useContext, useEffect, useState } from 'react';
 import { getAllQueries, getAllResolvedQueries, getAllUnresolvedQueries, getQueriesByCustomerId } from '../../../services/AdminServices';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { FilterButton } from '../../../sharedComponents/FilterButton/FilterButton';
-import { covertIdDataIntoTable } from '../../../services/SharedServices';
+import { covertIdDataIntoTable } from '../../../utils/helper/helperFunctions';
 import { validateCustomerId } from '../../../utils/validations/Validations';
 import { ToastContainer } from 'react-toastify';
 import { errorToast } from '../../../utils/helper/toast';

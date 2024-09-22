@@ -72,7 +72,7 @@ public class JwtTokenProvider {
 
     // validate Jwt token
     public boolean validateToken(String token){
-        System.out.println("Token is : '" + token + "'");
+        System.out.println("Token is: '" + token + "'");
 
         try{
             Jwts.parserBuilder()

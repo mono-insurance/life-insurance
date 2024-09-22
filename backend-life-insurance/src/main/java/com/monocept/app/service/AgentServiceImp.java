@@ -4,8 +4,12 @@ import com.monocept.app.dto.*;
 import com.monocept.app.entity.*;
 import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.*;
+import com.monocept.app.utils.DocumentType;
+import com.monocept.app.utils.GenderType;
+import com.monocept.app.utils.NomineeRelation;
 import com.monocept.app.utils.PageResult;
 import com.monocept.app.utils.PagedResponse;
+
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,9 +18,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,6 +41,9 @@ public class AgentServiceImp implements AgentService {
 
     private final EmailService emailService;
     private final WithdrawalRequestsRepository withdrawalRequestsRepository;
+    
+    @Autowired
+    private StorageService storageService;
 
 
     public AgentServiceImp(DtoService dtoService, AccessConService accessConService, AgentRepository agentRepository,
@@ -323,5 +331,103 @@ public class AgentServiceImp implements AgentService {
         emailService.sendAccountCreationEmail(emailDTO);
 //		send email to agent
 		return true;
+	}
+
+	@Override
+	public String agentRegistration(RegistrationDTO registrationDTO, MultipartFile file1, MultipartFile file2) {
+		if (authRepository.existsByUsername(registrationDTO.getUsername())) {
+            throw new UserException("Username must be unique");
+        }
+
+        if (authRepository.existsByEmail(registrationDTO.getEmail())) {
+            throw new UserException("Email must be unique");
+        }
+        
+        
+        Agent agent = new Agent();
+        agent.setFirstName(registrationDTO.getFirstName());
+        agent.setLastName(registrationDTO.getLastName());
+        agent.setDateOfBirth(registrationDTO.getDateOfBirth());
+        agent.setIsActive(true);
+        agent.setIsApproved(false);
+        agent.setQualification(registrationDTO.getQualification());
+        agent.setBalance(0.0);
+        agent.setWithdrawalAmount(0.0);
+
+        Address address = new Address();
+        address.setFirstStreet(registrationDTO.getFirstStreet());
+        address.setLastStreet(registrationDTO.getLastStreet());
+        address.setPincode(registrationDTO.getPincode());
+
+        State state = stateRepository.findById(registrationDTO.getStateId())
+                .orElseThrow(() -> new UserException("State not found"));
+        if (!state.getIsActive()) {
+            throw new UserException("Selected state is inactive");
+        }
+
+        City city = cityRepository.findById(registrationDTO.getCityId())
+                .orElseThrow(() -> new UserException("City not found"));
+        if (!city.getIsActive()) {
+            throw new UserException("Selected city is inactive");
+        }
+
+        address.setState(state);
+        address.setCity(city);
+
+        address = addressRepository.save(address);
+        agent.setAddress(address);
+
+        Credentials credentials = new Credentials();
+        credentials.setUsername(registrationDTO.getUsername());
+        credentials.setEmail(registrationDTO.getEmail());
+        credentials.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
+        credentials.setMobileNumber(registrationDTO.getMobileNumber());
+        credentials.setAgent(agent);
+
+        Role role = roleRepository.findByName("ROLE_AGENT")
+                .orElseThrow(() -> new RuntimeException("Role Agent not found"));
+        credentials.setRole(role);
+
+        agent.setCredentials(credentials);
+        credentials = authRepository.save(credentials);
+        
+        try {
+        	
+        	DocumentUploadedDTO documentUploadedDTO = new DocumentUploadedDTO();
+        	documentUploadedDTO.setDocumentType("AADHAR_CARD");
+        	documentUploadedDTO.setIsApproved(false);
+        	documentUploadedDTO.setAgentId(credentials.getId());
+        	storageService.addUserDocuments(documentUploadedDTO, file1);
+        	
+        	System.out.println("-------------------------------------wefqwefq-----------------------------------------");
+        	
+        	DocumentUploadedDTO documentUploadedDTO2 = new DocumentUploadedDTO();
+        	documentUploadedDTO2.setDocumentType("EDUCATIONAL_CERTIFICATES");
+        	documentUploadedDTO2.setIsApproved(false);
+        	documentUploadedDTO2.setAgentId(credentials.getId());
+        	storageService.addUserDocuments(documentUploadedDTO2, file2);
+            	
+        	System.out.println("--------------------------------------32334324-----------------------------------------");
+            
+        } 
+        catch (UserException e) {
+        	
+            authRepository.delete(credentials);
+            throw new UserException("User registration failed due to file upload error");
+        }
+        
+        System.out.println("--------------------------------------34-----------------------------------------");
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setEmailId(credentials.getEmail());
+        emailDTO.setTitle("Registration Success");
+        emailDTO.setBody("Congrats!! you have registered with our company as an agent.\n" +
+                " Now, your details will be verified by our company employees" +
+                " and your account will be activated\n We will inform you once details verified" +
+                "your username is " + credentials.getUsername());
+        
+        emailService.sendAccountCreationEmail(emailDTO);
+        System.out.println("--------------------------------------32334324--	d213---------------------------------------");
+        
+        return "Agent registered successfully!.";
 	}
 }
