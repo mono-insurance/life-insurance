@@ -48,6 +48,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.and())
                 .authorizeHttpRequests((authorize) ->
                         authorize
+                        
+                        		.requestMatchers("/suraksha/customer/card/token" , "/suraksha/customer/charge").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/suraksha/admin/**").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/suraksha/admin/**").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, "/suraksha/admin/**").hasRole("ADMIN")
@@ -59,6 +61,8 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.DELETE, "/suraksha/settings/**").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.PUT, "/suraksha/settings/**").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.PATCH, "/suraksha/settings/**").hasRole("ADMIN")
+                                .requestMatchers("/suraksha/customer/customer/registration", "/suraksha/agent/agent/registration").permitAll()
+                                .requestMatchers("/suraksha/insurancetype/all/active").permitAll()
 
                                 .requestMatchers(HttpMethod.POST, "/suraksha/payment/**").hasRole("CUSTOMER")
                                 .requestMatchers(HttpMethod.GET, "/suraksha/payment/**").hasRole("CUSTOMER")
@@ -98,6 +102,7 @@ public class SecurityConfig {
                                 hasAnyRole("CUSTOMER","AGENT","EMPLOYEE","ADMIN")
                                 .requestMatchers(HttpMethod.PATCH, "/suraksha/employee/**").
                                 hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers("/suraksha/state/all/active", "/suraksha/city/all/active/state/**").permitAll()
 
                                 .requestMatchers(HttpMethod.PUT, "/suraksha/state/**").
                                 hasAnyRole("EMPLOYEE","ADMIN")
@@ -108,8 +113,9 @@ public class SecurityConfig {
 
                                 .requestMatchers("/public/api/auth/**").permitAll()
                                 .requestMatchers("/swagger-ui/**","/v3/api-docs").permitAll()
-
-                                .requestMatchers(HttpMethod.GET, "/suraksha/policy/**").permitAll()
+                                .requestMatchers("/suraksha/policy/policy/{pid}" , "/suraksha/policy/all/**", "/suraksha/policy/download/policy-image/{pid}").permitAll()
+                                .requestMatchers("/suraksha/insurancetype/all/**").permitAll()
+                                
 
                                 .anyRequest().authenticated()
 //                                .anyRequest().permitAll()

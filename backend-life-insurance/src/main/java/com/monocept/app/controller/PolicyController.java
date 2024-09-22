@@ -1,5 +1,6 @@
 package com.monocept.app.controller;
 
+import com.monocept.app.dto.InsuranceTypeDTO;
 import com.monocept.app.dto.PolicyDTO;
 import com.monocept.app.service.InsuranceTypeService;
 import com.monocept.app.service.PolicyService;
@@ -72,10 +73,9 @@ public class PolicyController {
     }
 
     @PostMapping("/eligible-check/{pid}")
-    ResponseEntity<Boolean>isCustomerEligible(@PathVariable("pid")Long policyId){
-        Boolean isEligible=policyService.isCustomerEligible(policyId);
-        return new ResponseEntity<>(isEligible,HttpStatus.OK);
-
+    ResponseEntity<Boolean>isCustomerEligible(@PathVariable("pid")Long policyId) {
+        Boolean isEligible = policyService.isCustomerEligible(policyId);
+        return new ResponseEntity<>(isEligible, HttpStatus.OK);
     }
 
     @Operation(summary = "By Admin: Get All Policies")
@@ -127,6 +127,27 @@ public class PolicyController {
 
         return new ResponseEntity<>(policies, HttpStatus.OK);
     }
+	
+	
+    @Operation(summary = "By All: Get List of All Active Policies")
+    @GetMapping("/all/active")
+    public ResponseEntity<List<PolicyDTO>> getListOfAllActivePolicies() {
 
+    	List<PolicyDTO> policy = policyService.getListOfAllActivePolicies();
+
+        return new ResponseEntity<>(policy, HttpStatus.OK);
+
+    }
+	
+	
+    @Operation(summary = "By All: Get List of All Active policies by insurance Id")
+    @GetMapping("/all/active/{id}")
+    public ResponseEntity<List<PolicyDTO>> getListOfAllActivePoliciesByInsurance(@PathVariable(name="id") Long id) {
+
+    	List<PolicyDTO> policy = policyService.getListOfAllActivePoliciesByInsurance(id);
+
+        return new ResponseEntity<>(policy, HttpStatus.OK);
+
+    }
 
 }

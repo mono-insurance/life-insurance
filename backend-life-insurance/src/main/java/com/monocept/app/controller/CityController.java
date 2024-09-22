@@ -115,5 +115,16 @@ public class CityController {
         return new ResponseEntity<>(cities, HttpStatus.OK);
 
     }
+    
+    
+    @Operation(summary = "By All: Get All Activated Cities by State Id")
+    @GetMapping("/all/active/state/{id}")
+    public ResponseEntity<List<CityDTO>> getListOfAllActiveCitiesByStateId(@PathVariable(name="id") Long id) {
+
+    	List<CityDTO> cities = cityService.getListOfAllActiveCitiesByStateId(id);
+
+        return new ResponseEntity<>(cities, HttpStatus.OK);
+
+    }
 
 }

@@ -1,29 +1,30 @@
-import React, { useState } from 'react'
-import { NavLink, Outlet } from 'react-router-dom';
-// import './securityDashboard.css'
+
+import React from 'react';
+import { Outlet } from 'react-router-dom';
+import photo from '../../assets/images/theme_Photo.jpg';
 
 export const SecurityDashboard = () => {
-    const [window, setWindow] = useState('login');
+  return (
+    <div className="flex flex-col md:flex-row h-screen">
+      {/* Left Container */}
+      <div className="md:w-1/2 flex flex-col justify-center items-center p-8 h-full">
+        <h1 className="text-3xl md:text-5xl font-bold text-indigo-500 mb-8">
+          WELCOME TO SURAKSHA
+        </h1>
+        {/* Image Container */}
+        <div className="relative w-full h-auto overflow-hidden">
+          <img
+            className="w-full h-[90%] object-cover object-top transform translate-b-[-10%]"
+            src={photo}
+            alt="Suraksha Welcome"
+          />
+        </div>
+      </div>
 
-    return (
-        <>
-            <div className='main-container'>
-                <div className='container'>
-                    <div className='form-toggle'>
-                        <NavLink to="/auth/login" className={`menu-link ${window === 'login' ? 'active' : ''}`} onClick={() => setWindow('login')}>
-                            <span className="menu-link-text">Login</span>
-                        </NavLink>
-                        <NavLink to="/auth/register" className={`menu-link ${window === 'register' ? 'active' : ''}`} onClick={() => setWindow('register')}>
-                            <span className="menu-link-text">Register</span>
-                        </NavLink>
-                    </div>
-                    <div className='form-container'>
-                        <Outlet />
-                    </div>
-                </div>
-            </div>
-
-
-        </>
-    )
-}
+      {/* Right Container */}
+      <div className="md:w-1/2 flex justify-center items-center bg-gray-100 p-8">
+        <Outlet />
+      </div>
+    </div>
+  );
+};

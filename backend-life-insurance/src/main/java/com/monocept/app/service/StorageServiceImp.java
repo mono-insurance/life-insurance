@@ -80,8 +80,9 @@ public class StorageServiceImp implements StorageService {
 
         DocumentUploaded documentUploaded = findDocumentById(documentId);
         String fileName = documentUploaded.getDocumentType().toString();
-        return downloadFromS3(fileName);
-    }
+        String cloudFileName = documentUploaded.getCloudFileName();
+        return downloadFromS3(cloudFileName);
+    } 
 
     @Override
     public byte[] downloadPolicyImage(Long pid) {
@@ -211,6 +212,8 @@ public class StorageServiceImp implements StorageService {
             if (!customUserDetails.getId().equals(documentUploadedDTO.getCustomerId()) && role.equals("CUSTOMER")) {
                 throw new UserException("You can only upload your own documents");
             }
+        }
+        if (documentUploadedDTO.getCustomerId() != null) {
             Customer customer = findCustomer(documentUploadedDTO.getCustomerId());
             documentUploaded.setCustomer(customer);
             documentUploaded = documentUploadedRepository.save(documentUploaded);
@@ -221,7 +224,7 @@ public class StorageServiceImp implements StorageService {
                 customer.setDocuments(documentUploadedList);
             }
             customerRepository.save(customer);
-            EmailDTO emailDTO = new EmailDTO();
+            EmailDTO emailDTO=new EmailDTO();
             emailDTO.setEmailId(customer.getCredentials().getEmail());
 
             emailDTO.setTitle("Document uploaded successfully");
@@ -292,6 +295,32 @@ public class StorageServiceImp implements StorageService {
 
         return downloadFromS3(newFileName);
     }
+
+	@Override
+	public void updateUserDocuments(Customer customer, DocumentUploaded documentUploaded, MultipartFile file) {
+		// TODO Auto-generated method stub
+		
+		if(documentUploaded!= null && documentUploaded.getCloudFileName()!= null) {
+			deleteFromS3(documentUploaded.getCloudFileName());
+			
+			customer.getDocuments().remove(documentUploaded);
+			documentUploadedRepository.delete(documentUploaded);
+		}
+		File fileObj = convertMultiPartFileToFile(file);
+        String newFileName = System.currentTimeMillis() + "_" + documentUploaded.getDocumentType() + "_" + file.getOriginalFilename();
+        uploadDocToS3(fileObj, newFileName);
+		
+        DocumentUploaded newDocumentUploaded = new DocumentUploaded();
+        newDocumentUploaded.setCloudFileName(newFileName);
+        newDocumentUploaded.setCustomer(customer);
+        newDocumentUploaded.setIsApproved(false);
+        newDocumentUploaded.setDocumentType(documentUploaded.getDocumentType());
+        newDocumentUploaded = documentUploadedRepository.save(newDocumentUploaded);
+        
+        customer.getDocuments().add(newDocumentUploaded);
+        customerRepository.save(customer);
+        
+	}
 
     
 }

@@ -10,6 +10,9 @@ import com.monocept.app.service.*;
 import com.monocept.app.utils.PagedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -169,11 +172,31 @@ public class AuthController {
 
         return ResponseEntity.ok(customerOrNot);
     }
-
+    @Operation(summary = "By Anyone: Verify Customer")
+    @GetMapping(value = {"/verify/customer"})
+    public ResponseEntity<CustomerCreationDTO> isCustomerId(@RequestHeader("Authorization") String token){
+    	System.out.println("Received Token: " + token);
+    	
+    	if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+    	Long customerOrNot = authService.isCustomerId(token);
+        System.out.println(customerOrNot);
+        
+        if(customerOrNot != 0L) {
+        	CustomerCreationDTO customer = customerService.getCustomerFullProfile(customerOrNot);
+        	return ResponseEntity.ok(customer);
+        }
+        return ResponseEntity.ok(null);
+    }
 
     @PostMapping("/update-password")
-    ResponseEntity<LoginResponseDTO> updatePassword(@RequestBody String password) {
-        LoginResponseDTO loginResponseDTO = authService.updatePassword(password);
-        return new ResponseEntity<>(loginResponseDTO, HttpStatus.OK);
+    ResponseEntity<String> updatePassword(@RequestBody Map<String, String> request) {
+        String oldPassword = request.get("oldPassword");
+        String newPassword = request.get("newPassword");
+        Long id = Long.parseLong(request.get("id"));  // Assuming `id` is of type Long
+        
+        String str = authService.updatePassword(id, oldPassword, newPassword);
+        return new ResponseEntity<>(str, HttpStatus.OK);
     }
 }

@@ -1,6 +1,7 @@
 package com.monocept.app.repository;
 
 import com.monocept.app.entity.InsuranceType;
+import com.monocept.app.entity.Policy;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,4 +21,6 @@ public interface InsuranceTypeRepository extends JpaRepository<InsuranceType,Lon
 	Optional<InsuranceType> findByTypeIdAndIsActiveTrue(Long id);
 
 	List<InsuranceType> findByIsActiveTrue();
+
+
 }

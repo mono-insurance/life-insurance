@@ -7,7 +7,7 @@ import com.monocept.app.dto.PasswordResetDTO;
 
 public interface AuthService {
 
-    LoginResponseDTO updatePassword(String password);
+    String updatePassword(Long id, String password, String newPassword);
 
 	JWTAuthResponse login(LoginDTO loginDto);
 
@@ -24,4 +24,6 @@ public interface AuthService {
 	Boolean otpConfirmation(String otp, String userId);
 
 	Boolean passwordReset(PasswordResetDTO passwordResetDTO);
+
+	Long isCustomerId(String token);
 }

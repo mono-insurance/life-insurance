@@ -50,7 +50,7 @@ export const Sidebar = () => {
   const handleLogout = () => {
     localStorage.removeItem('auth');
     resetSidebar();
-    window.location.href = '/auth/login';
+    window.location.href = '/suraksha/login';
   };
 
   // closing the navbar when clicked outside the sidebar area
