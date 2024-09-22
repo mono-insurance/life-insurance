@@ -216,9 +216,7 @@ export const ViewPolicyAccount = () => {
         setLoading(false);
 //>>>>>>> 660a0b3446f2ae63bc3cc6ff40f6c9a48ffecf0c
       }
-    }
-
-  };
+    };
   const actions = (transactionId) => [
     { name: 'View', url: `/customer/${userId}/perform-transaction/${transactionId}` }
   ]

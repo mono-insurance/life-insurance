@@ -75,8 +75,7 @@ export const AgentDashboard = () => {
       }
       else if (filterType === 'id') {
         validateUserId(id);
-        const data = await getCustomerById(id);
-        response = covertIdDataIntoTable(data);
+        response = await getCustomerById(id);
         formattedData = formatRoleForTable(response);
       }
       else {

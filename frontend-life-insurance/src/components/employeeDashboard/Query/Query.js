@@ -89,8 +89,8 @@ export const EmpQuery = () => {
       }
       else if (filterType === 'id') {
         validateCustomerId(id);
-        const data = await getQueriesByCustomerId(id);
-        response = covertIdDataIntoTable(data);
+        response = await getQueriesByCustomerId(id);
+        // response = covertIdDataIntoTable(data);
       }
       else {
         response = await getAllQueries(currentPage, itemsPerPage);

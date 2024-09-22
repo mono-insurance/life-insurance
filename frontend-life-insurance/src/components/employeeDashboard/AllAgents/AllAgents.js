@@ -91,8 +91,8 @@ export const AllAgents = () => {
                 setShowActiveAgents(false)
             }
             else if (filterType === 'id') {
-                const data = await getAgentsById(id);
-                response = covertIdDataIntoTable(data);
+                response = await getAgentsById(id);
+                
             }
             else {
                 console.log("in default customers ")

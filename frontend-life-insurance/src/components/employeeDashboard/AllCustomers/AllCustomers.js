@@ -131,8 +131,7 @@ export const AllCustomers = () => {
             }
             else if (filterType === 'id') {
                 validateCustomerId(id);
-                const data = await getCustomerById(id);
-                response = covertIdDataIntoTable(data);
+                response= await getCustomerById(id);
             }
             else {
                 console.log("in default customers ")

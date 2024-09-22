@@ -8,7 +8,7 @@ import { Table } from '../../../sharedComponents/Table/Table';
 import { PaginationContext } from '../../../context/PaginationContext';
 import { ProgressBar } from '../../../sharedComponents/ProgressBar/ProgresBar';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { covertIdDataIntoTable, formatRoleForTable } from '../../../services/SharedServices';
+import { formatRoleForTable } from '../../../services/SharedServices';
 import { getAllCustomers, getAllCustomersByCharacters, fetchEmployeeDashboard, getCustomerById } from '../../../services/EmployeeServices';
 import { FilterButton } from '../../../sharedComponents/FilterButton/FilterButton';
 import { validateFirstName, validateUserId } from '../../../utils/validations/Validations';
@@ -73,8 +73,7 @@ export const EmployeeDashboard = () => {
             }
             else if (filterType === 'id') {
                 validateUserId(id);
-                const data = await getCustomerById(id);
-                response = covertIdDataIntoTable(data);
+                response = await getCustomerById(id);
             }
             else {
                 const formData = {
