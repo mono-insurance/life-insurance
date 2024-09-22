@@ -149,14 +149,14 @@ public class DownloadServiceImp implements DownloadService{
 	        List<String> data = Arrays.asList(
 	        		String.valueOf(customer.getCustomerId()), 
                     customer.getFirstName(),           
-                    customer.getLastName(),                      
+                    customer.getLastName() != null ? customer.getLastName() : "",                      
                     String.valueOf(customer.getDateOfBirth()), 
                     String.valueOf(customer.getGender()), 
                     String.valueOf(customer.getIsActive()), 
                     customer.getNomineeName(),  
                     String.valueOf(customer.getNomineeRelation()),
                     String.valueOf(customer.getIsApproved()), 
-                    customer.getAddress() != null ? customer.getAddress().toString() : "N/A",
+                    customer.getAddress() != null ? customer.getAddress().getPincode() : "N/A",
                     customer.getCredentials() != null ? customer.getCredentials().getUsername() : "N/A"
 	            );
 
@@ -228,12 +228,18 @@ public class DownloadServiceImp implements DownloadService{
             for (WithdrawalRequests request : withdrawalRequests) {
                 List<String> data = Arrays.asList(
                     String.valueOf(request.getWithdrawalRequestsId()), 
-                    request.getRequestType(),
-                    String.valueOf(request.getAmount()), 
-                    String.valueOf(request.getIsWithdraw()), 
-                    String.valueOf(request.getIsApproved()), 
-                    String.valueOf(request.getPolicyAccount().getPolicyAccountId()), 
-                    String.valueOf(request.getAgent().getAgentId())
+                    request.getRequestType() != null ? request.getRequestType() : "",  // Null check for requestType
+                    String.valueOf(request.getAmount()),
+                    String.valueOf(request.getIsWithdraw()),
+                    String.valueOf(request.getIsApproved()),
+
+                    // Null check for PolicyAccount and PolicyAccountId
+                    request.getPolicyAccount() != null && request.getPolicyAccount().getPolicyAccountId() != null ? 
+                        String.valueOf(request.getPolicyAccount().getPolicyAccountId()) : "",
+
+                    // Null check for Agent and AgentId
+                    request.getAgent() != null && request.getAgent().getAgentId() != null ? 
+                        String.valueOf(request.getAgent().getAgentId()) : ""
                 );
                 csvPrinter.printRecord(data);
             }

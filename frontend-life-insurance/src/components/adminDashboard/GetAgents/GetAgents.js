@@ -169,7 +169,7 @@ const resetPagination = () => {
   return (
     <>
         <div className='content-area-agents'>
-          <AreaTop pageTitle={"Get All Agents"} pagePath={"Agent"} pageLink={`/admin/dashboard/${routeParams.id}`}/>
+          <AreaTop pageTitle={"Get All Agents"} pagePath={"Agent"} pageLink={`/suraksha/admin/dashboard/${routeParams.id}`}/>
           <section className="content-area-table-agents">
             <div className="data-table-information">
               <h3 className="data-table-title">Agents</h3>

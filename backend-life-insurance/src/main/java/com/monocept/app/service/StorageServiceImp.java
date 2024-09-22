@@ -8,15 +8,21 @@ import com.amazonaws.util.IOUtils;
 import com.monocept.app.dto.CustomUserDetails;
 import com.monocept.app.dto.DocumentUploadedDTO;
 import com.monocept.app.dto.EmailDTO;
+import com.monocept.app.dto.EmployeeDTO;
 import com.monocept.app.entity.*;
 import com.monocept.app.exception.RoleAccessException;
 import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.*;
 import com.monocept.app.utils.DocumentType;
+import com.monocept.app.utils.PagedResponse;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,6 +41,7 @@ public class StorageServiceImp implements StorageService {
     private final AgentRepository agentRepository;
     private final CustomerRepository customerRepository;
     private final EmailService emailService;
+    
 
     @Value("${application.bucket.name}")
     private String bucketName;
@@ -275,6 +282,7 @@ public class StorageServiceImp implements StorageService {
         customerRepository.save(customer);
         
 	}
+
 
     
 }

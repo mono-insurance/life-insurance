@@ -304,6 +304,256 @@ export const validatePasswordInfoForm = (formPasswordInfo) => {
 
 
 
+export const validateAdminForm = (formState) => {
+  const errors = {};
+
+  // Validate First Name
+  if (validator.isEmpty(formState.firstName)) {
+    errors.firstName = 'First Name is required';
+  }
+
+  // Validate Username
+  if (validator.isEmpty(formState.username)) {
+    errors.username = 'Username is required';
+  }
+
+  // Validate Email
+  if (validator.isEmpty(formState.email)) {
+    errors.email = 'Email is required';
+  } else if (!validator.isEmail(formState.email)) {
+    errors.email = 'Please enter a valid email address';
+  }
+
+  // Validate Password
+  if (validator.isEmpty(formState.password)) {
+    errors.password = 'Password is required';
+  } else if (!validator.isStrongPassword(formState.password)) {
+    errors.password = 'Password must include 8 characters, with a mix of letters, numbers, and symbols';
+  }
+
+  // Validate Mobile Number
+  const mobilePattern = /^\+91\d{10}$/;
+  if (!formState.mobileNumber.trim()) {
+    errors.mobileNumber = 'Mobile number is required';
+  } else if (!mobilePattern.test(formState.mobileNumber)) {
+    errors.mobileNumber = 'Mobile number must be in the format +91XXXXXXXXXX';
+  }
+
+  return errors;
+};
+
+
+
+export const validateEmployeeId = (id) => {
+  if (validator.isEmpty(id) || id === undefined) {
+    throw new SurakshaError("Employee ID is required.");
+  }
+
+  if (!validator.isInt(id, { gt: 0 })) {
+    throw new SurakshaError("Employee ID must be a valid number greater than zero.");
+  }
+};
+
+
+
+
+export const validateUpdateEmployeeForm = (formState, isPassword) => {
+  const errors = {};
+
+  // Validate First Name
+  if (validator.isEmpty(formState.firstName)) {
+    errors.firstName = 'First Name is required';
+  }
+
+  // Validate Date of Birth
+  if (validator.isEmpty(formState.dateOfBirth)) {
+    errors.dateOfBirth = 'Date of Birth is required';
+  } else if (!validator.isDate(formState.dateOfBirth, { format: 'YYYY-MM-DD', strictMode: true })) {
+    errors.dateOfBirth = 'Date of Birth must be in the format YYYY-MM-DD';
+  }
+
+  // Validate Qualification
+  if (validator.isEmpty(formState.qualification)) {
+    errors.qualification = 'Qualification is required';
+  }
+
+  // Validate Username
+  if (validator.isEmpty(formState.username)) {
+    errors.username = 'Username is required';
+  }
+
+  // Validate Email
+  if (validator.isEmpty(formState.email)) {
+    errors.email = 'Email is required';
+  } else if (!validator.isEmail(formState.email)) {
+    errors.email = 'Please enter a valid email address';
+  }
+
+  // Validate Password
+  if(isPassword) {
+  if (validator.isEmpty(formState.password)) {
+    errors.password = 'Password is required';
+  } else if (!validator.isStrongPassword(formState.password, { minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 })) {
+    errors.password = 'Password must include at least 8 characters with a mix of uppercase, lowercase, numbers, and symbols';
+  }}
+
+  // Validate Mobile Number
+  const mobilePattern = /^\+91\d{10}$/;
+  if (!formState.mobileNumber.trim()) {
+    errors.mobileNumber = 'Mobile number is required';
+  } else if (!mobilePattern.test(formState.mobileNumber)) {
+    errors.mobileNumber = 'Mobile number must be in the format +91XXXXXXXXXX';
+  }
+
+  return errors;
+};
+
+
+
+
+export const validatePolicyForm = (formState) => {
+  const errors = {};
+
+  // Check if policyName is provided
+  if (!formState.policyName.trim()) {
+    errors.policyName = "Policy name is required";
+  }
+
+  // Check if commissionNewRegistration is a valid number and within acceptable range
+  if (!formState.commissionNewRegistration) {
+    errors.commissionNewRegistration = "Commission for new registration is required";
+  } else if (isNaN(formState.commissionNewRegistration) || formState.commissionNewRegistration <= 0) {
+    errors.commissionNewRegistration = "Commission for new registration must be a positive number";
+  }
+
+  // Check if commissionInstallment is a valid number and within acceptable range
+  if (!formState.commissionInstallment) {
+    errors.commissionInstallment = "Commission for installment is required";
+  } else if (isNaN(formState.commissionInstallment) || formState.commissionInstallment <= 0) {
+    errors.commissionInstallment = "Commission for installment must be a positive number";
+  }
+
+  // Check if description is provided
+  if (!formState.description.trim()) {
+    errors.description = "Description is required";
+  }
+
+  // Validate minPolicyTerm and maxPolicyTerm
+  if (!formState.minPolicyTerm || isNaN(formState.minPolicyTerm)) {
+    errors.minPolicyTerm = "Minimum policy term is required and must be a number";
+  }
+  if (!formState.maxPolicyTerm || isNaN(formState.maxPolicyTerm)) {
+    errors.maxPolicyTerm = "Maximum policy term is required and must be a number";
+  } else if (parseInt(formState.minPolicyTerm) > parseInt(formState.maxPolicyTerm)) {
+    errors.maxPolicyTerm = "Maximum policy term cannot be less than minimum policy term";
+  }
+
+  // Validate minAge and maxAge
+  if (!formState.minAge || isNaN(formState.minAge)) {
+    errors.minAge = "Minimum age is required and must be a number";
+  }
+  if (!formState.maxAge || isNaN(formState.maxAge)) {
+    errors.maxAge = "Maximum age is required and must be a number";
+  } else if (parseInt(formState.minAge) > parseInt(formState.maxAge)) {
+    errors.maxAge = "Maximum age cannot be less than minimum age";
+  }
+
+  // Validate minInvestmentAmount and maxInvestmentAmount
+  if (!formState.minInvestmentAmount || isNaN(formState.minInvestmentAmount)) {
+    errors.minInvestmentAmount = "Minimum investment amount is required and must be a number";
+  }
+  if (!formState.maxInvestmentAmount || isNaN(formState.maxInvestmentAmount)) {
+    errors.maxInvestmentAmount = "Maximum investment amount is required and must be a number";
+  } else if (parseInt(formState.minInvestmentAmount) > parseInt(formState.maxInvestmentAmount)) {
+    errors.maxInvestmentAmount = "Maximum investment amount cannot be less than minimum investment amount";
+  }
+
+
+  // Check if insuranceTypeId is provided
+  if (!formState.insuranceTypeId) {
+    errors.insuranceTypeId = "Insurance type ID is required";
+  }
+
+  // Check if profitRatio is a valid number
+  if (!formState.profitRatio) {
+    errors.profitRatio = "Profit ratio is required";
+  } else if (isNaN(formState.profitRatio) || formState.profitRatio <= 0) {
+    errors.profitRatio = "Profit ratio must be a positive number";
+  }
+
+  // Validate if file is provided
+  if (!formState.file) {
+    errors.file = "Policy document file is required";
+  }
+
+  // Check if at least one document is needed
+  if (!formState.documentsNeeded.length) {
+    errors.documentsNeeded = "At least one document is required";
+  }
+
+
+  return errors;
+};
+
+
+
+export const validateAgentId = (id) => {
+  if (validator.isEmpty(id) || id === undefined) {
+    throw new SurakshaError("Agent ID is required.");
+  }
+
+  if (!validator.isInt(id, { gt: 0 })) {
+    throw new SurakshaError("Agent ID must be a valid number greater than zero.");
+  }
+};
+
+
+
+export const validatePolicyId = (id) => {
+  if (validator.isEmpty(id) || id === undefined) {
+    throw new SurakshaError("Policy ID is required.");
+  }
+
+  if (!validator.isInt(id, { gt: 0 })) {
+    throw new SurakshaError("Policy ID must be a valid number greater than zero.");
+  }
+};
+
+
+
+export const validateTypeId = (id) => {
+  if (validator.isEmpty(id) || id === undefined) {
+    throw new SurakshaError("Type ID is required.");
+  }
+
+  if (!validator.isInt(id, { gt: 0 })) {
+    throw new SurakshaError("Type ID must be a valid number greater than zero.");
+  }
+};
+
+export const validateAdminProfileForm = (formState) => {
+  const errors = {};
+
+  if (validator.isEmpty(formState.firstName)) {
+    errors.firstName = 'First Name is required';
+  }
+
+  if (validator.isEmpty(formState.email) || !validator.isEmail(formState.email)) {
+    errors.email = 'A valid Email is required';
+  }
+
+  const mobilePattern = /^\+91\d{10}$/;
+  if (!formState.mobileNumber.trim()) {
+    errors.mobileNumber = 'Mobile number is required';
+  } else if (!mobilePattern.test(formState.mobileNumber)) {
+    errors.mobileNumber = 'Mobile number must be in the format +91XXXXXXXXXX';
+  }
+
+  return errors;
+};
+
+
+
 
 export const validateForm = (formState) => {
   const errors = {};

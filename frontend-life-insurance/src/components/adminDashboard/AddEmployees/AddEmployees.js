@@ -5,10 +5,13 @@ import { errorToast, successToast } from '../../../utils/helper/toast';
 import { ToastContainer } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { createNewEmployee } from '../../../services/AdminServices'; // You'll need to create this service
-import { validateForm } from '../../../utils/validations/Validations';
+import { validateForm, validateUpdateEmployeeForm } from '../../../utils/validations/Validations';
+import { set } from 'date-fns';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const AddEmployees = () => {
   const routeParams = useParams();
+  const [loading, setLoading] = useState(false);
   const [formState, setFormState] = useState({
     firstName: '',
     lastName: '',
@@ -31,7 +34,8 @@ export const AddEmployees = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const formErrors = validateForm(formState);
+      setLoading(true);
+      const formErrors = validateUpdateEmployeeForm(formState, true);
 
       if (Object.keys(formErrors).length > 0) {
         Object.values(formErrors).forEach((errorMessage) => {
@@ -61,12 +65,15 @@ export const AddEmployees = () => {
       } else {
           errorToast("An unexpected error occurred. Please try again later.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={"Create New Employee"} pagePath={"Create-Employee"} pageLink={`/admin/dashboard/${routeParams.id}`}/>
+      {loading && <Loader />}
+      <AreaTop pageTitle={"Create New Employee"} pagePath={"Create-Employee"} pageLink={`/suraksha/admin/get-employees/${routeParams.id}`}/>
       <section className="content-area-form">
       <form className="employee-form">
         <div className="form-row">

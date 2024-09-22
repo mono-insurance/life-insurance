@@ -4,10 +4,12 @@ import { errorToast, successToast } from '../../../utils/helper/toast';
 import { useParams } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { updateCity, getCityById, getListOfActiveStates } from '../../../services/AdminServices'; 
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const UpdateCity = () => {
   const { id, cityId } = useParams(); // Get cityId from the URL parameters
   const [states, setStates] = useState([]); // To hold the list of states
+  const [loading, setLoading] = useState(false);
   const [formState, setFormState] = useState({
     cityName: '',
     stateId: '',
@@ -18,6 +20,7 @@ export const UpdateCity = () => {
   useEffect(() => {
     const fetchCityAndStates = async () => {
       try {
+        setLoading(true);
         // Fetch city details by cityId
         const cityResponse = await getCityById(cityId);
         setFormState({
@@ -30,7 +33,13 @@ export const UpdateCity = () => {
         const statesResponse = await getListOfActiveStates();
         setStates(statesResponse);
       } catch (error) {
-        errorToast('Failed to load city details or states. Please try again later.');
+        if (error.response?.data?.message || error.specificMessage) {
+            errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+            errorToast("An unexpected error occurred. Please try again later.");
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -48,6 +57,7 @@ export const UpdateCity = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      setLoading(true);
       if (!formState.cityName.trim() || !formState.stateId) {
         errorToast("City name and state must be provided");
         return;
@@ -63,12 +73,15 @@ export const UpdateCity = () => {
       } else {
         errorToast("An unexpected error occurred. Please try again later.");
       }
+    }finally{
+      setLoading(false);
     }
   };
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={`Update City ${cityId}`} pagePath={"Update-City"} pageLink={`/admin/get-city/${id}`} />
+      {loading && <Loader />}
+      <AreaTop pageTitle={`Update City ${cityId}`} pagePath={"Update-City"} pageLink={`/suraksha/admin/get-city/${id}`} />
       <section className="content-area-form">
         <form className="city-form" onSubmit={handleSubmit}>
           <label className="form-label">

@@ -41,7 +41,7 @@ export const Login = () => {
             successToast("Login successful!");
 
             if(response.data.role === "Admin"){
-                navigate(`/admin/dashboard/${response.data.id}`)
+                navigate(`/suraksha/admin/dashboard/${response.data.id}`)
             }
 
             if(response.data.role === "Customer"){

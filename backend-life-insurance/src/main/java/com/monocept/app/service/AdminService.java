@@ -63,4 +63,6 @@ public interface AdminService {
 	SystemCounts wholeSystemStats();
 
 	PagedResponse<UserDTO> getNewUsers(int page, int size, String sortBy, String direction);
+
+	boolean approveDocuments(Long id);
 }

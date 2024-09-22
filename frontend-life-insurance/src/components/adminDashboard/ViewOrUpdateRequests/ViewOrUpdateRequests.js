@@ -5,9 +5,11 @@ import { ToastContainer } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { approveOrRejectWithdrawalRequests, fetchWihdrawalRequestById } from '../../../services/AdminServices';
 import './viewOrUpdateRequests.scss';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const ViewOrUpdateRequests = () => {
   const { id, requestsId } = useParams(); // Get request ID from the URL parameters
+  const [loading, setLoading] = useState(true);
   const [formState, setFormState] = useState({
     requestType: '',
     amount: '',
@@ -20,10 +22,17 @@ export const ViewOrUpdateRequests = () => {
   useEffect(() => {
     const fetchRequest = async () => {
       try {
+        setLoading(true);
         const request = await fetchWihdrawalRequestById(requestsId); // Fetch existing request details
         setFormState(request);
       } catch (error) {
-        errorToast('Error fetching request details.');
+        if (error.response?.data?.message || error.specificMessage) {
+            errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+            errorToast("An unexpected error occurred. Please try again later.");
+        }
+      }finally{
+        setLoading(false);
       }
     };
 
@@ -32,25 +41,40 @@ export const ViewOrUpdateRequests = () => {
 
   const handleApprove = async () => {
     try {
+      setLoading(true);
       await approveOrRejectWithdrawalRequests(requestsId, true );
       successToast('Request approved successfully!');
     } catch (error) {
-      errorToast('Error approving request.');
+      if (error.response?.data?.message || error.specificMessage) {
+          errorToast(error.response?.data?.message || error.specificMessage);
+      } else {
+          errorToast("An unexpected error occurred. Please try again later.");
+      }
+    }finally{
+      setLoading(false);
     }
   };
 
   const handleReject = async () => {
     try {
+      setLoading(true);
       await approveOrRejectWithdrawalRequests(requestsId, false );
       successToast('Request rejected successfully!');
     } catch (error) {
-      errorToast('Error rejecting request.');
+      if (error.response?.data?.message || error.specificMessage) {
+          errorToast(error.response?.data?.message || error.specificMessage);
+      } else {
+          errorToast("An unexpected error occurred. Please try again later.");
+      }
+    }finally{
+      setLoading(false);
     }
   };
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={`View/Update Request ${requestsId}`} pagePath={"View-Request"} pageLink={`/admin/requests/${id}`} />
+      {loading && <Loader />}
+      <AreaTop pageTitle={`View/Update Request ${requestsId}`} pagePath={"View-Request"} pageLink={`/suraksha/admin/requests/${id}`} />
       <section className="content-area-form">
         <form className="withdraw-form">
           <div className="form-row">

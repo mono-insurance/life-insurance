@@ -5,9 +5,11 @@ import { errorToast, successToast } from '../../../utils/helper/toast';
 import { useParams } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { addOrUpdateSettings, fetchGlobalSettingsByKey } from '../../../services/AdminServices';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const InsuranceSettings = () => {
   const routeParams = useParams();
+  const [loading, setLoading] = useState(false);
   
   const [cancellationChargesState, setCancellationChargesState] = useState({
     settingKey: 'CANCELLATION_CHARGES',
@@ -22,7 +24,7 @@ export const InsuranceSettings = () => {
   useEffect(() => {
     const fetchInsuranceData = async () => {
       try {
-        
+        setLoading(true);
         const cancellationResponse = await fetchGlobalSettingsByKey('CANCELLATION_CHARGES');
         
         const penaltyResponse = await fetchGlobalSettingsByKey('PENALTY_CHARGES');
@@ -38,8 +40,14 @@ export const InsuranceSettings = () => {
           settingValue: penaltyResponse.settingValue || ''
         }));
       } catch (error) {
-        errorToast("Failed to fetch insurance settings. Please try again later.");
-      }
+        if (error.response?.data?.message || error.specificMessage) {
+          errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+            errorToast("An unexpected error occurred. Please try again later.");
+        }
+    }finally{
+      setLoading(false);
+  }
     };
 
     fetchInsuranceData();
@@ -64,6 +72,7 @@ export const InsuranceSettings = () => {
   const handleCancellationChargesSubmit = async (event) => {
     event.preventDefault();
     try {
+      setLoading(true);
       if (cancellationChargesState.settingValue.trim() === '') {
         errorToast("Cancellation charges cannot be empty");
         return;
@@ -73,13 +82,20 @@ export const InsuranceSettings = () => {
 
       successToast("Cancellation charges updated successfully!");
     } catch (error) {
-      errorToast(error.response?.data?.message || "An unexpected error occurred. Please try again later.");
-    }
+      if (error.response?.data?.message || error.specificMessage) {
+        errorToast(error.response?.data?.message || error.specificMessage);
+      } else {
+          errorToast("An unexpected error occurred. Please try again later.");
+      }
+  }finally{
+    setLoading(false);
+}
   };
 
   const handlePenaltyChargesSubmit = async (event) => {
     event.preventDefault();
     try {
+      setLoading(true);
       if (penaltyChargesState.settingValue.trim() === '') {
         errorToast("Penalty charges cannot be empty");
         return;
@@ -89,13 +105,20 @@ export const InsuranceSettings = () => {
 
       successToast("Penalty charges updated successfully!");
     } catch (error) {
-      errorToast(error.response?.data?.message || "An unexpected error occurred. Please try again later.");
-    }
+      if (error.response?.data?.message || error.specificMessage) {
+        errorToast(error.response?.data?.message || error.specificMessage);
+      } else {
+          errorToast("An unexpected error occurred. Please try again later.");
+      }
+  }finally{
+    setLoading(false);
+}
   };
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={"Insurance Settings"} pagePath={"Insurance-Settings"} pageLink={`/admin/dashboard/${routeParams.id}`} />
+      {loading && <Loader />}
+      <AreaTop pageTitle={"Insurance Settings"} pagePath={"Insurance-Settings"} pageLink={`/suraksha/admin/dashboard/${routeParams.id}`} />
       <section className="content-area-form">
         <form className="insurance-settings-form" onSubmit={handleCancellationChargesSubmit}>
           <label className="form-label">

@@ -1,15 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { AreaTop } from '../../../sharedComponents/Title/Title';
 import { Table } from '../../../sharedComponents/Table/Table';
 import { PaginationContext } from '../../../context/PaginationContext';
 import './getCustomers.scss';
 import { ToastContainer } from 'react-toastify';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { deleteUser, getAllActiveCustomers, getAllCustomers, getAllInactiveCustomers, getCustomerById } from '../../../services/AdminServices';
+import { deleteUser, downloadCustomersInCSV, getAllActiveCustomers, getAllCustomers, getAllInactiveCustomers, getCustomerById } from '../../../services/AdminServices';
 import { errorToast, successToast } from '../../../utils/helper/toast';
 import { FilterButton } from '../../../sharedComponents/FilterButton/FilterButton';
 import { covertIdDataIntoTable } from '../../../utils/helper/helperFunctions';
 import { validateCustomerId, validateFirstName } from '../../../utils/validations/Validations';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 
 export const GetCustomers = () => {
@@ -25,18 +26,22 @@ export const GetCustomers = () => {
     const [active, setActive] = useState('');
     const [showPagination, setShowPagination] = useState(true);
     const [searchParams, setSearchParams] = useSearchParams();
+    const [loading, setLoading] = useState(true);
     const filterOptions = [
       { label: 'Search by Customer Id', value: 'id' },
       { label: 'Search by Active', value: 'active' },
       { label: 'Search by Inactive', value: 'inactive' }
   ];
 
+  const prevCurrentPageRef = useRef(currentPage);
+const prevItemsPerPageRef = useRef(itemsPerPage);
+
 
   const resetPagination = () => {
     setCurrentPage(1);
     setItemsPerPage(10);
   };
-
+  
     const handleSearch = () => {
       resetPagination();
       if(filterType === 'id'){
@@ -44,19 +49,14 @@ export const GetCustomers = () => {
         setShowPagination(false);
       }
       if(filterType === 'active'){
-        setSearchParams({filterType, active, currentPage, itemsPerPage});
+        setSearchParams({filterType, currentPage, itemsPerPage});
         setShowPagination(true);
       }
       if(filterType === 'inactive'){
-        setSearchParams({filterType, active, currentPage, itemsPerPage});
+        setSearchParams({filterType, currentPage, itemsPerPage});
         setShowPagination(true);
       }
-      if(filter === false) {
-        setFilter(true);
-      }
-      else{
-        customerTable();
-      }
+      setShowFilterButton(false);
     }
     
     const handleReset = () => {
@@ -65,13 +65,11 @@ export const GetCustomers = () => {
       setActive('');
       setShowFilterButton(true);
       resetPagination();
-      setFilter(false);
       setShowPagination(true);
-      setSearchParams({});
+      setSearchParams({currentPage: 1, itemsPerPage: 10});
     };
   
     const actions = (id) => [
-      { name: "View", url: `/customer/view/${id}` },
       { name: "Edit", url: `/customer/edit/${id}` },
       { name: "Delete", url: `/customer/delete/${id}` }
     ];
@@ -81,7 +79,7 @@ export const GetCustomers = () => {
       const customerTable = async () => {
         try {
             let response = {};
-
+            setLoading(true);
             if(filterType === 'active') {
               response = await getAllActiveCustomers(currentPage, itemsPerPage);
             }
@@ -98,7 +96,7 @@ export const GetCustomers = () => {
             }
             
             setData(response);
-            setKeysToBeIncluded(["id", "firstName", "lastName", "username",  "email", "mobileNumber", "isActive", "isApproved"]);
+            setKeysToBeIncluded(["id", "firstName", "lastName", "username",  "email", "mobileNumber", "isActive"]);
   
         } catch (error) {
             setData([]);
@@ -107,71 +105,105 @@ export const GetCustomers = () => {
             } else {
                 errorToast("An unexpected error occurred. Please try again later.");
             }
+        }finally{
+          setLoading(false);
         }
     };
-  
-  
-  
-      // useEffect(() => {
-      //   const filterTypeParam = searchParams.get('filterType') || '';
-      //   const idParam = searchParams.get('id') || '';
-      //   const firstNameParam = searchParams.get('firstName') || '';
-      //   const currentPageParam = Number(searchParams.get('currentPage')) || 1;
-      //   const itemsPerPageParam = Number(searchParams.get('itemsPerPage')) || 10;
-      //   console.log(filterTypeParam, idParam, firstNameParam, currentPageParam, itemsPerPageParam);
-      //   if (filterTypeParam === 'id' || filterTypeParam === 'firstName') {
-      //     setFilterType(filterTypeParam);
-      //     setShowFilterButton(!filterTypeParam);
-      //     setFilter(true);
-      //     if (filterTypeParam === 'firstName') {
-      //       setFirstName(firstNameParam);
-      //       handlePageChange(currentPageParam);
-      //       handleItemsPerPageChange(itemsPerPageParam);
-      //     } else if (filterTypeParam === 'id') {
-      //       setId(idParam);
-      //       setShowPagination(false);
-      //       resetPagination();
-      //     }
-      //   } else {
-      //     setShowFilterButton(true);
-      //     setId('');
-      //     setFirstName('');
-      //     setFilterType('');
-      //     setFilter(false);
-      //     setShowPagination(true);
-      //     resetPagination();
-      //   }
-      // },[searchParams]);
-  
-  
-      useEffect(() => {
-        // const hasSearchParams = searchParams.toString() !== '';
-  
-        // if(!hasSearchParams) {
-        //   setShowFilterButton(true);
-        //   setId('');
-        //   setFirstName('');
-        //   setFilterType('');
-        //   setFilter(false);
-        //   setShowPagination(true);
-        // }
+
+
+    const handleDownloadCustomersInCSV = async (event) => {
+      event.preventDefault();
+      try {
+        setLoading(true);
+    
+        // Call the function to get the CSV data from the backend
+        const response = await downloadCustomersInCSV(); 
         
-        // const timeoutId = setTimeout(() => {
-        //   customerTable();
-        // }, hasSearchParams ? 0: 0);
-        // return () => clearTimeout(timeoutId);
-        customerTable();
+        // Convert the response data to a Blob (assuming the response is in CSV text format)
+        const csvBlob = new Blob([response], { type: 'text/csv' });
+    
+        // Create a download URL for the CSV blob
+        const csvUrl = URL.createObjectURL(csvBlob);
+    
+        // Create a temporary link element
+        const link = document.createElement('a');
+        link.href = csvUrl;
+    
+        // Set the downloaded file name with the correct .csv extension
+        link.setAttribute('download', 'requests.csv');
+    
+        // Append the link to the body, click it, and then remove it
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    
+      } catch (error) {
+        console.log(error);
+        const errorMessage = error.response?.data?.message || error.specificMessage || 'An unexpected error occurred. Please try again later.';
+        errorToast(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    };
   
-      }, [filter, currentPage, itemsPerPage, searchParams]);
+
+  
+  useEffect(() => {
+    const filterTypeFromParams = searchParams.get('filterType') || '';
+    const currentPageFromParams = parseInt(searchParams.get('currentPage')) || 1;
+    const itemsPerPageFromParams = parseInt(searchParams.get('itemsPerPage')) || 10;
+    const idFromParams = searchParams.get('id') || '';
+
+    if (filterTypeFromParams === 'active' || filterTypeFromParams === 'inactive' ) {
+      setFilterType(filterTypeFromParams);
+      setShowFilterButton(false);
+      setShowPagination(true);
+    } else if(filterTypeFromParams === 'id'){
+      setFilterType(filterTypeFromParams);
+      setShowFilterButton(false);
+      setShowPagination(false);
+      setId(idFromParams);
+    }
+    else{
+      setFilterType('');
+      setShowFilterButton(true);
+      setShowPagination(true);
+    }
+    if (currentPageFromParams != prevCurrentPageRef.current || itemsPerPageFromParams != prevItemsPerPageRef.current) {
+      prevCurrentPageRef.current = currentPageFromParams;
+      prevItemsPerPageRef.current = itemsPerPageFromParams;
+      setCurrentPage(currentPageFromParams);
+      setItemsPerPage(itemsPerPageFromParams);
+    }
+
+    customerTable(filterTypeFromParams, currentPageFromParams, itemsPerPageFromParams, idFromParams);
+
+  }, [searchParams]);
+
+
+    useEffect(() => {
+      if (currentPage != prevCurrentPageRef.current || itemsPerPage != prevItemsPerPageRef.current) {
+        prevCurrentPageRef.current = currentPage;
+        prevItemsPerPageRef.current = itemsPerPage;
+        setSearchParams({
+          filterType: searchParams.get('filterType'),
+          currentPage: currentPage,
+          itemsPerPage: itemsPerPage,
+        });
+      }
+
+    }, [currentPage, itemsPerPage, setSearchParams, searchParams]);
 
 
     return (
         <>
         <div className='content-area-customers'>
-          <AreaTop pageTitle={"Get All Customers"} pagePath={"Customer"} pageLink={`/admin/dashboard/${routeParams.id}`}/>
+        {loading && <Loader />}
+          <AreaTop pageTitle={"Get All Customers"} pagePath={"Customer"} pageLink={`/suraksha/admin/dashboard/${routeParams.id}`}/>
           <section className="content-area-table-customers">
             <div className="data-table-information">
               <h3 className="data-table-title">Customers</h3>
+              <div className="data-table-buttons">
                 {showFilterButton && (
                   <FilterButton setShowFilterButton={setShowFilterButton} showFilterButton={showFilterButton} filterOptions={filterOptions} setFilterType={setFilterType}/>
                 )}
@@ -188,6 +220,8 @@ export const GetCustomers = () => {
                     </div>
                   </div>
                 )}
+                <button className="form-submit-passbook" onClick={handleDownloadCustomersInCSV}>Download (CSV)</button>
+                </div>
             </div>
             <div className="data-table-diagram">
                 <Table

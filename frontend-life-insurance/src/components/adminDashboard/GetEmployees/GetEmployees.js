@@ -1,16 +1,18 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { useState, useEffect, useContext } from 'react';
 import { AreaTop } from '../../../sharedComponents/Title/Title';
 import { Table } from '../../../sharedComponents/Table/Table';
 import { PaginationContext } from '../../../context/PaginationContext';
 import './getEmployees.scss';
 import { ToastContainer } from 'react-toastify';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getAllActiveEmployees, getAllEmployees, getAllInactiveEmployees, getEmployeeById } from '../../../services/AdminServices';
 import { errorToast } from '../../../utils/helper/toast';
 import { FilterButton } from '../../../sharedComponents/FilterButton/FilterButton';
 import { covertIdDataIntoTable } from '../../../utils/helper/helperFunctions';
-import { validateCustomerId, validateFirstName } from '../../../utils/validations/Validations';
+import { validateCustomerId, validateEmployeeId, validateFirstName } from '../../../utils/validations/Validations';
+import { set } from 'date-fns';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const GetEmployees = () => {
 
@@ -27,11 +29,16 @@ export const GetEmployees = () => {
   const [showPagination, setShowPagination] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const { id: adminId } = useParams();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const filterOptions = [
     { label: 'Search by Employee Id', value: 'id' },
     { label: 'Search by Active', value: 'active' },
     { label: 'Search by Inactive', value: 'inactive' }
 ];
+
+const prevCurrentPageRef = useRef(currentPage);
+const prevItemsPerPageRef = useRef(itemsPerPage);
 
 const resetPagination = () => {
   setCurrentPage(1);
@@ -45,19 +52,14 @@ const resetPagination = () => {
       setShowPagination(false);
     }
     if(filterType === 'active'){
-      setSearchParams({filterType, active, currentPage, itemsPerPage});
+      setSearchParams({filterType, currentPage, itemsPerPage});
       setShowPagination(true);
     }
     if(filterType === 'inactive'){
-      setSearchParams({filterType, active, currentPage, itemsPerPage});
+      setSearchParams({filterType, currentPage, itemsPerPage});
       setShowPagination(true);
     }
-    if(filter === false) {
-      setFilter(true);
-    }
-    else{
-      employeeTable();
-    }
+    setShowFilterButton(false);
   }
   
   const handleReset = () => {
@@ -66,35 +68,34 @@ const resetPagination = () => {
     setActive('');
     setShowFilterButton(true);
     resetPagination();
-    setFilter(false);
     setShowPagination(true);
-    setSearchParams({});
+    setSearchParams({currentPage: 1, itemsPerPage: 10});
   };
 
   const actions = (employeeId) => [
-    { name: "Edit", url: `/admin/employee/${adminId}/edit/${employeeId}` },
-    { name: "Delete", url: `/admin/employee/${adminId}/delete/${employeeId}` }
+    { name: "Edit", url: `/suraksha/admin/employee/${adminId}/edit/${employeeId}` },
+    { name: "Delete", url: `/suraksha/admin/employee/${adminId}/delete/${employeeId}` }
   ];
   
 
-
-    const employeeTable = async () => {
+    const employeeTable = async (filterTypeFromParams, currentPageFromParams, itemsPerPageFromParams, idFromParams) => {
       try {
           let response = {};
+          setLoading(true);
 
-          if(filterType === 'active') {
-            response = await getAllActiveEmployees(currentPage, itemsPerPage);
+          if(filterTypeFromParams === 'active') {
+            response = await getAllActiveEmployees(currentPageFromParams, itemsPerPageFromParams);
           }
-          else if(filterType === 'inactive') {
-            response = await getAllInactiveEmployees(currentPage, itemsPerPage);
+          else if(filterTypeFromParams === 'inactive') {
+            response = await getAllInactiveEmployees(currentPageFromParams, itemsPerPageFromParams);
           }
-          else if(filterType === 'id') {
-            validateCustomerId(id);
-            const data = await getEmployeeById(id);
+          else if(filterTypeFromParams === 'id') {
+            validateEmployeeId(idFromParams);
+            const data = await getEmployeeById(idFromParams);
             response = covertIdDataIntoTable(data);
           }
           else {
-            response = await getAllEmployees(currentPage, itemsPerPage);
+            response = await getAllEmployees(currentPageFromParams, itemsPerPageFromParams);
           }
           
           setData(response);
@@ -107,68 +108,72 @@ const resetPagination = () => {
           } else {
               errorToast("An unexpected error occurred. Please try again later.");
           }
+      }finally{
+        setLoading(false);
       }
   };
 
 
 
-    // useEffect(() => {
-    //   const filterTypeParam = searchParams.get('filterType') || '';
-    //   const idParam = searchParams.get('id') || '';
-    //   const firstNameParam = searchParams.get('firstName') || '';
-    //   const currentPageParam = Number(searchParams.get('currentPage')) || 1;
-    //   const itemsPerPageParam = Number(searchParams.get('itemsPerPage')) || 10;
-    //   console.log(filterTypeParam, idParam, firstNameParam, currentPageParam, itemsPerPageParam);
-    //   if (filterTypeParam === 'id' || filterTypeParam === 'firstName') {
-    //     setFilterType(filterTypeParam);
-    //     setShowFilterButton(!filterTypeParam);
-    //     setFilter(true);
-    //     if (filterTypeParam === 'firstName') {
-    //       setFirstName(firstNameParam);
-    //       handlePageChange(currentPageParam);
-    //       handleItemsPerPageChange(itemsPerPageParam);
-    //     } else if (filterTypeParam === 'id') {
-    //       setId(idParam);
-    //       setShowPagination(false);
-    //       resetPagination();
-    //     }
-    //   } else {
-    //     setShowFilterButton(true);
-    //     setId('');
-    //     setFirstName('');
-    //     setFilterType('');
-    //     setFilter(false);
-    //     setShowPagination(true);
-    //     resetPagination();
-    //   }
-    // },[searchParams]);
+  useEffect(() => {
+    const filterTypeFromParams = searchParams.get('filterType') || '';
+    const currentPageFromParams = parseInt(searchParams.get('currentPage')) || 1;
+    const itemsPerPageFromParams = parseInt(searchParams.get('itemsPerPage')) || 10;
+    const idFromParams = searchParams.get('id') || '';
+
+    if (filterTypeFromParams === 'active' || filterTypeFromParams === 'inactive' ) {
+      setFilterType(filterTypeFromParams);
+      setShowFilterButton(false);
+      setShowPagination(true);
+    } else if(filterTypeFromParams === 'id'){
+      setFilterType(filterTypeFromParams);
+      setShowFilterButton(false);
+      setShowPagination(false);
+      setId(idFromParams);
+    }
+    else{
+      setFilterType('');
+      setShowFilterButton(true);
+      setShowPagination(true);
+    }
+    if (currentPageFromParams != prevCurrentPageRef.current || itemsPerPageFromParams != prevItemsPerPageRef.current) {
+      prevCurrentPageRef.current = currentPageFromParams;
+      prevItemsPerPageRef.current = itemsPerPageFromParams;
+      setCurrentPage(currentPageFromParams);
+      setItemsPerPage(itemsPerPageFromParams);
+    }
+
+    employeeTable(filterTypeFromParams, currentPageFromParams, itemsPerPageFromParams, idFromParams);
+
+  }, [searchParams]);
 
 
     useEffect(() => {
-      // const hasSearchParams = searchParams.toString() !== '';
+      if (currentPage != prevCurrentPageRef.current || itemsPerPage != prevItemsPerPageRef.current) {
+        prevCurrentPageRef.current = currentPage;
+        prevItemsPerPageRef.current = itemsPerPage;
+        setSearchParams({
+          filterType: searchParams.get('filterType'),
+          currentPage: currentPage,
+          itemsPerPage: itemsPerPage,
+        });
+      }
 
-      // if(!hasSearchParams) {
-      //   setShowFilterButton(true);
-      //   setId('');
-      //   setFirstName('');
-      //   setFilterType('');
-      //   setFilter(false);
-      //   setShowPagination(true);
-      // }
-      
-      // const timeoutId = setTimeout(() => {
-      //   customerTable();
-      // }, hasSearchParams ? 0: 0);
-      // return () => clearTimeout(timeoutId);
-      employeeTable();
-
-    }, [filter, currentPage, itemsPerPage, searchParams]);
+    }, [currentPage, itemsPerPage, setSearchParams, searchParams]);
 
 
   return (
     <>
         <div className='content-area-employees'>
-          <AreaTop pageTitle={"Get All Employees"} pagePath={"Employees"} pageLink={`/admin/dashboard/${routeParams.id}`}/>
+        {loading && <Loader />}
+        <div className='flex justify-between'>
+       
+        <AreaTop pageTitle={"Get All Employees"} pagePath={"Employees"} pageLink={`/suraksha/admin/dashboard/${routeParams.id}`}/>
+          <button type="button" className="form-submit-b rounded-full" onClick={()=> navigate(`/suraksha/admin/add-employees/${routeParams.id}`)}>
+              Add Employee
+          </button>
+        </div>
+          
           <section className="content-area-table-employees">
             <div className="data-table-information">
               <h3 className="data-table-title">Employees</h3>

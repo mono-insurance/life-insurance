@@ -43,17 +43,6 @@ public class TransactionPdfExporter {
         cell.setPhrase(new Phrase("Agent Commission", font));
         table.addCell(cell);
 
-        cell.setPhrase(new Phrase("Card Type", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Card Account Number", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Expiry Date", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Policy Account ID", font));
-        table.addCell(cell);
     }
 
     // Write the table data for the current Transactions table
@@ -83,9 +72,9 @@ public class TransactionPdfExporter {
 
 			document.add(p);
 
-			PdfPTable table = new PdfPTable(9);
+			PdfPTable table = new PdfPTable(5);
 			table.setWidthPercentage(100f);
-			table.setWidths(new float[] { 1.5f, 2.0f, 3.0f, 2.0f, 2.5f, 2.5f, 3.0f, 2.5f, 2.5f });
+			table.setWidths(new float[] { 1.5f, 2.0f, 3.0f, 2.0f, 2.5f});
 			table.setSpacingBefore(10);
 
 			writeTableHeader(table);

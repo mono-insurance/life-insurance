@@ -5,12 +5,14 @@ import { getPolicyById, fetchListOfActiveInsuranceCategories, fetchListOfAllDocu
 import { Dropdown, DropdownButton } from 'react-bootstrap';
 import { errorToast, successToast } from '../../../utils/helper/toast';
 import { ToastContainer } from 'react-toastify';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const DeletePolicy = () => {
   const { id, policyId } = useParams(); // Get policyId from the URL parameters
   const [investmentTypes, setInvestmentTypes] = useState([]);
   const [documents, setDocuments] = useState([]);
   const [imageSrc, setImageSrc] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [formState, setFormState] = useState({
     policyName: '',
     commissionNewRegistration: '',
@@ -22,7 +24,7 @@ export const DeletePolicy = () => {
     maxAge: '',
     minInvestmentAmount: '',
     maxInvestmentAmount: '',
-    eligibleGender: 'both',
+    eligibleGender: 'BOTH',
     insuranceTypeId: '',
     profitRatio: '',
     isActive: true,
@@ -33,6 +35,7 @@ export const DeletePolicy = () => {
   useEffect(() => {
     const fetchPolicyAndData = async () => {
       try {
+        setLoading(true);
         const policyResponse = await getPolicyById(policyId);
 
         setFormState({
@@ -62,7 +65,13 @@ export const DeletePolicy = () => {
         const imageUrl = URL.createObjectURL(image);
         setImageSrc(imageUrl);
       } catch (error) {
-        errorToast('Error fetching policy details or related data.');
+        if (error.response?.data?.message || error.specificMessage) {
+            errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+            errorToast("An unexpected error occurred. Please try again later.");
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -71,16 +80,24 @@ export const DeletePolicy = () => {
 
   const handleDelete = async () => {
     try {
+      setLoading(true);
       await deletePolicy(policyId);
-      successToast('Policy deleted successfully!');
+      successToast('Scheme deleted successfully!');
     } catch (error) {
-      errorToast('Failed to delete the policy. Please try again later.');
+      if (error.response?.data?.message || error.specificMessage) {
+          errorToast(error.response?.data?.message || error.specificMessage);
+      } else {
+          errorToast("An unexpected error occurred. Please try again later.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={`Delete Policy ${policyId}`} pagePath={"Delete-Policy"} pageLink={`/admin/get-policy/${id}`} />
+      {loading && <Loader />}
+      <AreaTop pageTitle={`Delete Scheme ${policyId}`} pagePath={"Delete-Scheme"} pageLink={`/suraksha/admin/get-policy/${id}`} />
       <section className="content-area-form">
         <form className="policy-form">
           <label className="form-label">

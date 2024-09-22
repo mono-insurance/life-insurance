@@ -4,8 +4,9 @@ import { errorToast, successToast } from '../../../utils/helper/toast';
 import { useParams } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { updatePolicy, getPolicyById, fetchListOfActiveInsuranceCategories, fetchListOfAllDocuments, getPolicyImage, uploadNewPolicyImage } from '../../../services/AdminServices';
-import { validateForm } from '../../../utils/validations/Validations';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
+import { validatePolicyForm } from '../../../utils/validations/Validations';
 
 export const UpdatePolicy = () => {
   const { id, policyId } = useParams(); // Get policyId from the URL parameters
@@ -15,6 +16,7 @@ export const UpdatePolicy = () => {
   const [newImageUploaded, setNewImageUploaded] = useState(false);
   const [file, setFile] = useState(null);
   const fileInputRef = createRef();
+  const [loading, setLoading] = useState(false);
   const [formState, setFormState] = useState({
     policyName: '',
     commissionNewRegistration: '',
@@ -26,7 +28,7 @@ export const UpdatePolicy = () => {
     maxAge: '',
     minInvestmentAmount: '',
     maxInvestmentAmount: '',
-    eligibleGender: 'both',
+    eligibleGender: 'BOTH',
     insuranceTypeId: '',
     profitRatio: '',
     isActive: true,
@@ -37,6 +39,7 @@ export const UpdatePolicy = () => {
   useEffect(() => {
     const fetchPolicyAndData = async () => {
       try {
+        setLoading(true);
         const policyResponse = await getPolicyById(policyId);
 
 
@@ -69,7 +72,13 @@ export const UpdatePolicy = () => {
         const imageUrl = URL.createObjectURL(image);
         setImageSrc(imageUrl);
       } catch (error) {
-        errorToast('Error fetching policy details or related data.');
+        if (error.response?.data?.message || error.specificMessage) {
+            errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+            errorToast("An unexpected error occurred. Please try again later.");
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -110,24 +119,25 @@ export const UpdatePolicy = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-    //   const formErrors = validateForm(formState);
+      setLoading(true);
+      const formErrors = validatePolicyForm(formState);
 
-    //   if (Object.keys(formErrors).length > 0) {
-    //     Object.values(formErrors).forEach((errorMessage) => {
-    //       errorToast(errorMessage);
-    //     });
-    //     return;
-    //   }
+      if (Object.keys(formErrors).length > 0) {
+        Object.values(formErrors).forEach((errorMessage) => {
+          errorToast(errorMessage);
+        });
+        return;
+      }
 
       // Update the policy with new details
       await updatePolicy(policyId, formState);
-      successToast("Policy updated successfully!");
+      successToast("Scheme updated successfully!");
 
       if (newImageUploaded && file) {
         console.log("coming here or not");
         try {
           await uploadNewPolicyImage(policyId, file);
-          successToast("Policy Image updated successfully!");
+          successToast("Scheme Image updated successfully!");
 
         } catch (imageError) {
           errorToast('Failed to upload new image.');
@@ -135,13 +145,20 @@ export const UpdatePolicy = () => {
         }
       }
     } catch (error) {
-      errorToast("An error occurred. Please try again.");
+      if (error.response?.data?.message || error.specificMessage) {
+          errorToast(error.response?.data?.message || error.specificMessage);
+      } else {
+          errorToast("An unexpected error occurred. Please try again later.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={`Update Policy ${policyId}`} pagePath={"Update-Policy"} pageLink={`/admin/get-policy/${id}`} />
+      {loading && <Loader />}
+      <AreaTop pageTitle={`Update Scheme ${policyId}`} pagePath={"Update-Scheme"} pageLink={`/suraksha/admin/get-policy/${id}`} />
       <section className="content-area-form">
         <form className="policy-form" onSubmit={handleSubmit}>
           <label className="form-label">

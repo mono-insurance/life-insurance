@@ -4,10 +4,12 @@ import { AreaTop } from '../../../sharedComponents/Title/Title';
 import { errorToast, successToast } from '../../../utils/helper/toast';
 import { getQueryById, deleteQuery } from '../../../services/AdminServices';
 import { ToastContainer } from 'react-toastify';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 
 export const DeleteQuery = () => {
   const { id, queryId } = useParams();
+  const [loading, setLoading] = useState(false);
   const [formState, setFormState] = useState({
     question: '',
     response: '',
@@ -19,6 +21,7 @@ export const DeleteQuery = () => {
   useEffect(() => {
     const fetchQueryDetails = async () => {
       try {
+        setLoading(true);
         const response = await getQueryById(queryId); // Fetch query by ID
         setFormState({
           question: response.question || '',
@@ -27,7 +30,13 @@ export const DeleteQuery = () => {
           customerId: response.customerId || '',
         });
       } catch (error) {
-        errorToast('Failed to load query details');
+        if (error.response?.data?.message || error.specificMessage) {
+            errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+            errorToast("An unexpected error occurred. Please try again later.");
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -38,20 +47,24 @@ export const DeleteQuery = () => {
   const handleDelete = async () => {
 
     try {
+      setLoading(true);
       await deleteQuery(queryId); // Delete query by ID
       successToast("Query deleted successfully!");
     } catch (error) {
       if (error.response?.data?.message || error.specificMessage) {
-        errorToast(error.response?.data?.message || error.specificMessage);
+          errorToast(error.response?.data?.message || error.specificMessage);
       } else {
-        errorToast("An unexpected error occurred. Please try again later.");
+          errorToast("An unexpected error occurred. Please try again later.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={`Delete Query ${queryId}`} pagePath={"Delete-Query"} pageLink={`/admin/queries/${id}`}/>
+      {loading && <Loader />}
+      <AreaTop pageTitle={`Delete Query ${queryId}`} pagePath={"Delete-Query"} pageLink={`/suraksha/admin/queries/${id}`}/>
       <section className="content-area-form">
         <form className="query-form">
           {/* Question Field - Read Only */}

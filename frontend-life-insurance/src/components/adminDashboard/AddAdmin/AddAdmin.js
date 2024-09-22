@@ -5,10 +5,12 @@ import { errorToast, successToast } from '../../../utils/helper/toast';
 import { ToastContainer } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { createNewAdmin } from '../../../services/AdminServices'; // You'll need to create this service
-import { validateForm } from '../../../utils/validations/Validations';
+import { validateAdminForm, validateForm } from '../../../utils/validations/Validations';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const AddAdmin = () => {
   const routeParams = useParams();
+  const [loading, setLoading] = useState(false);
   const [formState, setFormState] = useState({
     firstName: '',
     lastName: '',
@@ -29,7 +31,8 @@ export const AddAdmin = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const formErrors = validateForm(formState);
+      setLoading(true);
+      const formErrors = validateAdminForm(formState);
 
       if (Object.keys(formErrors).length > 0) {
         Object.values(formErrors).forEach((errorMessage) => {
@@ -38,7 +41,7 @@ export const AddAdmin = () => {
         return;
       }
 
-      await createNewAdmin(formState); // Make sure this service is defined in AdminServices
+      await createNewAdmin(formState);
 
       successToast("Admin created successfully!");
       setFormState({
@@ -57,12 +60,15 @@ export const AddAdmin = () => {
       } else {
           errorToast("An unexpected error occurred. Please try again later.");
       }
+    } finally{
+      setLoading(false);
     }
   };
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={"Create New Admin"} pagePath={"Create-Admin"} pageLink={`/admin/dashboard/${routeParams.id}`}/>
+      {loading && <Loader />}
+      <AreaTop pageTitle={"Create New Admin"} pagePath={"Create-Admin"} pageLink={`/suraksha/admin/dashboard/${routeParams.id}`}/>
       <section className="content-area-form">
         <form className="admin-form">
             <div className="form-row">

@@ -175,6 +175,7 @@ public class TransactionServiceImp implements TransactionService {
         		.mapToDouble(PolicyAccount::getAgentCommissionForRegistration)
         		.sum();
         	
+        	
         	return new BalancePagedResponse<CommissionDTO>(allCommissionDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast(), totalBalance);
         }
         else {
@@ -203,6 +204,7 @@ public class TransactionServiceImp implements TransactionService {
 	        		.mapToDouble(Transactions::getAgentCommission)
 	        		.sum();
 	
+	        
 	        return new BalancePagedResponse<CommissionDTO>(allCommissionDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast(), totalBalance);
         }
         else {

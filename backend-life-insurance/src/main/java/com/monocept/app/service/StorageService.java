@@ -3,6 +3,7 @@ package com.monocept.app.service;
 import com.monocept.app.dto.DocumentUploadedDTO;
 import com.monocept.app.entity.Customer;
 import com.monocept.app.entity.DocumentUploaded;
+import com.monocept.app.utils.PagedResponse;
 
 import org.springframework.web.multipart.MultipartFile;
 

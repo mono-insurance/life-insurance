@@ -6,6 +6,7 @@ import { ToastContainer } from 'react-toastify';
 import { getAllRegistrationCommissions, getAllInstallmentCommissions } from '../../../services/AdminServices';
 import { errorToast } from '../../../utils/helper/toast';
 import { useParams } from 'react-router-dom';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const Commission = () => {
   const [registrationData, setRegistrationData] = useState({});
@@ -14,27 +15,42 @@ export const Commission = () => {
   const [installmentPage, setInstallmentPage] = useState(1);
   const [registrationPageSize, setRegistrationPageSize] = useState(10);
   const [installmentPageSize, setInstallmentPageSize] = useState(10);
+  const [loading, setLoading] = useState(false);
   const [keysToBeIncluded] = useState(["agentId", "agentName", "amount", "policyAccountId"]);
   const routeParams = useParams();
 
   
   const fetchRegistrationCommissions = async () => {
     try {
+      setLoading(true);
       const response = await getAllRegistrationCommissions(registrationPage, registrationPageSize);
       setRegistrationData(response);
     } catch (error) {
-      errorToast(error.response?.data?.message || "Error fetching registration commissions.");
-    }
+      if (error.response?.data?.message || error.specificMessage) {
+        errorToast(error.response?.data?.message || error.specificMessage);
+      } else {
+          errorToast("An unexpected error occurred. Please try again later.");
+      }
+  }finally{
+    setLoading(false);
+  }
   };
 
   
   const fetchInstallmentCommissions = async () => {
     try {
+      setLoading(true);
       const response = await getAllInstallmentCommissions(installmentPage, installmentPageSize);
       setInstallmentData(response);
     } catch (error) {
-      errorToast(error.response?.data?.message || "Error fetching installment commissions.");
-    }
+      if (error.response?.data?.message || error.specificMessage) {
+        errorToast(error.response?.data?.message || error.specificMessage);
+      } else {
+          errorToast("An unexpected error occurred. Please try again later.");
+      }
+  }finally{
+    setLoading(false);
+  }
   };
 
   useEffect(() => {
@@ -47,7 +63,8 @@ export const Commission = () => {
 
   return (
     <div className='content-area-commissions'>
-      <AreaTop pageTitle={"Get All Commissions"} pagePath={"Claim"} pageLink={`/admin/dashboard/${routeParams.id}`} />
+      {loading && <Loader />}
+      <AreaTop pageTitle={"Get All Commissions"} pagePath={"Claim"} pageLink={`/suraksha/admin/dashboard/${routeParams.id}`} />
 
       
       <section className="content-area-table-commissions">

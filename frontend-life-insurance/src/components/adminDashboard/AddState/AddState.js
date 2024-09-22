@@ -5,9 +5,11 @@ import { errorToast, successToast } from '../../../utils/helper/toast';
 import { useParams } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { createNewState } from '../../../services/AdminServices';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const AddState = () => {
   const routeParams = useParams();
+  const [loading, setLoading] = useState(false);
   const [formState, setFormState] = useState({
     stateName: '',
     isActive: true,
@@ -24,6 +26,7 @@ export const AddState = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      setLoading(true);
       if (!formState.stateName.trim()) {
         errorToast("State name cannot be empty");
         return;
@@ -42,12 +45,15 @@ export const AddState = () => {
       } else {
           errorToast("An unexpected error occurred. Please try again later.");
       }
+    }finally{
+      setLoading(false);
     }
   };
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={"Create New State"} pagePath={"Create-State"} pageLink={`/admin/dashboard/${routeParams.id}`}/>
+      {loading && <Loader />}
+      <AreaTop pageTitle={"Create New State"} pagePath={"Create-State"} pageLink={`/suraksha/admin/get-state/${routeParams.id}`}/>
       <section className="content-area-form">
         <form className="state-form">
           <label className="form-label">

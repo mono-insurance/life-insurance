@@ -5,14 +5,16 @@ import { errorToast, successToast } from '../../../utils/helper/toast';
 import { ToastContainer } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { createNewPolicy, fetchListOfActiveInsuranceCategories, fetchListOfAllDocuments } from '../../../services/AdminServices';
-import { validateForm } from '../../../utils/validations/Validations';
+import { validateForm, validatePolicyForm } from '../../../utils/validations/Validations';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const AddPolicy = () => {
   const routeParams = useParams();
   
   const [investmentTypes, setInvestmentTypes] = useState([]);
   const [documents, setDocuments] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [formState, setFormState] = useState({
     policyName: '',
     commissionNewRegistration: '',
@@ -24,7 +26,7 @@ export const AddPolicy = () => {
     maxAge: '',
     minInvestmentAmount: '',
     maxInvestmentAmount: '',
-    eligibleGender: 'both',
+    eligibleGender: 'BOTH',
     insuranceTypeId: '',
     profitRatio: '',
     file: '',
@@ -37,14 +39,21 @@ export const AddPolicy = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const investmentTypesData = await fetchListOfActiveInsuranceCategories();
         const documentsNeededData = await fetchListOfAllDocuments();
         setInvestmentTypes(investmentTypesData);
         setDocuments(documentsNeededData);
       } catch (error) {
-        errorToast('Error fetching data');
+        if (error.response?.data?.message || error.specificMessage) {
+            errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+            errorToast("An unexpected error occurred. Please try again later.");
+        }
+      }finally{
+        setLoading(false);
       }
-    };
+    }
     fetchData();
   }, []);
 
@@ -77,17 +86,18 @@ export const AddPolicy = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      // const formErrors = validateForm(formState);
+      setLoading(true);
+      const formErrors = validatePolicyForm(formState);
 
-      // if (Object.keys(formErrors).length > 0) {
-      //   Object.values(formErrors).forEach((errorMessage) => {
-      //     errorToast(errorMessage);
-      //   });
-      //   return;
-      // }
+      if (Object.keys(formErrors).length > 0) {
+        Object.values(formErrors).forEach((errorMessage) => {
+          errorToast(errorMessage);
+        });
+        return;
+      }
 
       await createNewPolicy(formState);
-      successToast("Policy created successfully!");
+      successToast("Scheme created successfully!");
       
       setFormState({
         policyName: '',
@@ -100,7 +110,7 @@ export const AddPolicy = () => {
         maxAge: '',
         minInvestmentAmount: '',
         maxInvestmentAmount: '',
-        eligibleGender: 'both',
+        eligibleGender: 'BOTH',
         investmentTypeId: '',
         profitRatio: '',
         file: '',
@@ -109,13 +119,20 @@ export const AddPolicy = () => {
       });
 
     } catch (error) {
-      errorToast("An error occurred. Please try again.");
+      if (error.response?.data?.message || error.specificMessage) {
+          errorToast(error.response?.data?.message || error.specificMessage);
+      } else {
+          errorToast("An unexpected error occurred. Please try again later.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={"Create New Policy"} pagePath={"Create-Policy"} pageLink={`/admin/dashboard/${routeParams.id}`} />
+      {loading && <Loader />}
+      <AreaTop pageTitle={"Create New Scheme"} pagePath={"Create-Scheme"} pageLink={`/suraksha/admin/get-policy/${routeParams.id}`} />
       <section className="content-area-form">
         <form className="policy-form" onSubmit={handleSubmit}>
             <label className="form-label">

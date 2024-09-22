@@ -69,9 +69,9 @@ export const ViewPolicyAccount = () => {
           }
         }
 
-        const transactionsResponse = await fetchingTransactionsByPolicyAccountId(policyAccountId, currentPage, itemsPerPage);
-        const today = new Date();
-        const processedData = transactionsResponse.content.map((transaction) => {
+          const transactionsResponse = await fetchingTransactionsByPolicyAccountId(policyAccountId, currentPage, itemsPerPage);
+          const today = new Date();
+          const processedData = transactionsResponse.content.map((transaction) => {
           const transactionDate = new Date(transaction.transactionDate);
 
           // Pay column logic

@@ -5,11 +5,13 @@ import { getPolicyById, fetchListOfActiveInsuranceCategories, fetchListOfAllDocu
 import { Dropdown } from 'react-bootstrap';
 import { errorToast } from '../../../utils/helper/toast';
 import { ToastContainer } from 'react-toastify';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const ViewPolicy = () => {
   const { id, policyId } = useParams(); // Get policyId from the URL parameters
   const [investmentTypes, setInvestmentTypes] = useState([]);
   const [documents, setDocuments] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [imageSrc, setImageSrc] = useState(null);
   const [formState, setFormState] = useState({
     policyName: '',
@@ -22,7 +24,7 @@ export const ViewPolicy = () => {
     maxAge: '',
     minInvestmentAmount: '',
     maxInvestmentAmount: '',
-    eligibleGender: 'both',
+    eligibleGender: 'BOTH',
     insuranceTypeId: '',
     profitRatio: '',
     isActive: true,
@@ -33,6 +35,7 @@ export const ViewPolicy = () => {
   useEffect(() => {
     const fetchPolicyAndData = async () => {
       try {
+        setLoading(true);
         const policyResponse = await getPolicyById(policyId);
 
         setFormState({
@@ -62,16 +65,22 @@ export const ViewPolicy = () => {
         const imageUrl = URL.createObjectURL(image);
         setImageSrc(imageUrl);
       } catch (error) {
-        errorToast('Error fetching policy details or related data.');
+        if (error.response?.data?.message || error.specificMessage) {
+            errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+            errorToast("An unexpected error occurred. Please try again later.");
+        }
+      } finally {
+        setLoading(false);
       }
     };
-
     fetchPolicyAndData();
   }, [policyId]);
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={`View Policy ${policyId}`} pagePath={"View-Policy"} pageLink={`/admin/get-policy/${id}`} />
+      {loading && <Loader />}
+      <AreaTop pageTitle={`View Scheme ${policyId}`} pagePath={"View-Scheme"} pageLink={`/suraksha/admin/get-policy/${id}`} />
       <section className="content-area-form">
         <form className="policy-form">
           <label className="form-label">

@@ -1,14 +1,15 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { useState, useEffect, useContext } from 'react';
 import { AreaTop } from '../../../sharedComponents/Title/Title';
 import { Table } from '../../../sharedComponents/Table/Table';
 import { PaginationContext } from '../../../context/PaginationContext';
 import './getCity.scss';
 import { ToastContainer } from 'react-toastify';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getAllActiveCities, getAllCities, getAllInactiveCities } from '../../../services/AdminServices';
 import { errorToast } from '../../../utils/helper/toast';
 import { FilterButton } from '../../../sharedComponents/FilterButton/FilterButton';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 
 export const GetCity = () => {
@@ -26,63 +27,62 @@ export const GetCity = () => {
   const [showPagination, setShowPagination] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const { id: adminId } = useParams();
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const filterOptions = [
     { label: 'Search by Active', value: 'active' },
     { label: 'Search by Inactive', value: 'inactive' }
 ];
+
+const prevCurrentPageRef = useRef(currentPage);
+const prevItemsPerPageRef = useRef(itemsPerPage);
 
 const resetPagination = () => {
   setCurrentPage(1);
   setItemsPerPage(10);
 };
 
-  const handleSearch = () => {
-    resetPagination();
-    if(filterType === 'active'){
-      setSearchParams({filterType, active, currentPage, itemsPerPage});
-      setShowPagination(true);
-    }
-    if(filterType === 'inactive'){
-      setSearchParams({filterType, active, currentPage, itemsPerPage});
-      setShowPagination(true);
-    }
-    if(filter === false) {
-      setFilter(true);
-    }
-    else{
-      cityTable();
-    }
-  }
-  
-  const handleReset = () => {
-    setFilterType('');
-    setActive('');
-    setShowFilterButton(true);
-    resetPagination();
-    setFilter(false);
+const handleSearch = () => {
+  resetPagination();
+  if(filterType === 'active'){
+    setSearchParams({filterType, currentPage, itemsPerPage});
     setShowPagination(true);
-    setSearchParams({});
-  };
+  }
+  if(filterType === 'inactive'){
+    setSearchParams({filterType, currentPage, itemsPerPage});
+    setShowPagination(true);
+  }
+  setShowFilterButton(false);
+}
+
+const handleReset = () => {
+  setFilterType('');
+  setShowFilterButton(true);
+  resetPagination();
+  setShowPagination(true);
+  setSearchParams({currentPage: 1, itemsPerPage: 10});
+};
 
   const actions = (cityId) => [
-    { name: "Edit", url: `/admin/city/${adminId}/edit/${cityId}` },
-    { name: "Delete", url: `/admin/city/${adminId}/delete/${cityId}` }
+    { name: "Edit", url: `/suraksha/admin/city/${adminId}/edit/${cityId}` },
+    { name: "Delete", url: `/suraksha/admin/city/${adminId}/delete/${cityId}` }
   ];
   
 
 
-    const cityTable = async () => {
+    const cityTable = async (filterTypeFromParams, currentPageFromParams, itemsPerPageFromParams) => {
       try {
+        setLoading(true);
           let response = {};
 
-          if(filterType === 'active') {
-            response = await getAllActiveCities(currentPage, itemsPerPage);
+          if(filterTypeFromParams === 'active') {
+            response = await getAllActiveCities(currentPageFromParams, itemsPerPageFromParams);
           }
-          else if(filterType === 'inactive') {
-            response = await getAllInactiveCities(currentPage, itemsPerPage);
+          else if(filterTypeFromParams === 'inactive') {
+            response = await getAllInactiveCities(currentPageFromParams, itemsPerPageFromParams);
           }
           else {
-            response = await getAllCities(currentPage, itemsPerPage);
+            response = await getAllCities(currentPageFromParams, itemsPerPageFromParams);
           }
           
           setData(response);
@@ -95,62 +95,49 @@ const resetPagination = () => {
           } else {
               errorToast("An unexpected error occurred. Please try again later.");
           }
-      }
+      }finally{
+        setLoading(false);
+    }
   };
 
 
 
-    // useEffect(() => {
-    //   const filterTypeParam = searchParams.get('filterType') || '';
-    //   const idParam = searchParams.get('id') || '';
-    //   const firstNameParam = searchParams.get('firstName') || '';
-    //   const currentPageParam = Number(searchParams.get('currentPage')) || 1;
-    //   const itemsPerPageParam = Number(searchParams.get('itemsPerPage')) || 10;
-    //   console.log(filterTypeParam, idParam, firstNameParam, currentPageParam, itemsPerPageParam);
-    //   if (filterTypeParam === 'id' || filterTypeParam === 'firstName') {
-    //     setFilterType(filterTypeParam);
-    //     setShowFilterButton(!filterTypeParam);
-    //     setFilter(true);
-    //     if (filterTypeParam === 'firstName') {
-    //       setFirstName(firstNameParam);
-    //       handlePageChange(currentPageParam);
-    //       handleItemsPerPageChange(itemsPerPageParam);
-    //     } else if (filterTypeParam === 'id') {
-    //       setId(idParam);
-    //       setShowPagination(false);
-    //       resetPagination();
-    //     }
-    //   } else {
-    //     setShowFilterButton(true);
-    //     setId('');
-    //     setFirstName('');
-    //     setFilterType('');
-    //     setFilter(false);
-    //     setShowPagination(true);
-    //     resetPagination();
-    //   }
-    // },[searchParams]);
+  useEffect(() => {
+    const filterTypeFromParams = searchParams.get('filterType') || '';
+    const currentPageFromParams = parseInt(searchParams.get('currentPage')) || 1;
+    const itemsPerPageFromParams = parseInt(searchParams.get('itemsPerPage')) || 10;
+
+    if (filterTypeFromParams === 'active' || filterTypeFromParams === 'inactive') {
+      setFilterType(filterTypeFromParams);
+      setShowFilterButton(false);
+    }
+    else{
+      setFilterType('');
+      setShowFilterButton(true);
+    }
+    if (currentPageFromParams != prevCurrentPageRef.current || itemsPerPageFromParams != prevItemsPerPageRef.current) {
+      prevCurrentPageRef.current = currentPageFromParams;
+      prevItemsPerPageRef.current = itemsPerPageFromParams;
+      setCurrentPage(currentPageFromParams);
+      setItemsPerPage(itemsPerPageFromParams);
+    }
+
+    cityTable(filterTypeFromParams, currentPageFromParams, itemsPerPageFromParams);
+
+  }, [searchParams]);
 
 
-    useEffect(() => {
-      // const hasSearchParams = searchParams.toString() !== '';
-
-      // if(!hasSearchParams) {
-      //   setShowFilterButton(true);
-      //   setId('');
-      //   setFirstName('');
-      //   setFilterType('');
-      //   setFilter(false);
-      //   setShowPagination(true);
-      // }
-      
-      // const timeoutId = setTimeout(() => {
-      //   customerTable();
-      // }, hasSearchParams ? 0: 0);
-      // return () => clearTimeout(timeoutId);
-      cityTable();
-
-    }, [filter, currentPage, itemsPerPage, searchParams]);
+  useEffect(() => {
+    if (currentPage != prevCurrentPageRef.current || itemsPerPage != prevItemsPerPageRef.current) {
+      prevCurrentPageRef.current = currentPage;
+      prevItemsPerPageRef.current = itemsPerPage;
+      setSearchParams({
+        filterType: searchParams.get('filterType'),
+        currentPage: currentPage,
+        itemsPerPage: itemsPerPage,
+      });
+    }
+  }, [currentPage, itemsPerPage, setSearchParams, searchParams]);
 
 
 
@@ -158,7 +145,14 @@ const resetPagination = () => {
   return (
     <>
       <div className='content-area-city'>
-        <AreaTop pageTitle={"Get All Cities"} pagePath={"City"} pageLink={`/admin/dashboard/${routeParams.id}`}/>
+      {loading && <Loader />}
+      <div className='flex justify-between'>
+      <AreaTop pageTitle={"Get All Cities"} pagePath={"City"} pageLink={`/suraksha/admin/dashboard/${routeParams.id}`}/>
+          <button type="button" className="form-submit-b rounded-full" onClick={()=> navigate(`/suraksha/admin/add-city/${routeParams.id}`)}>
+              Add City
+          </button>
+        </div>
+       
         <section className="content-area-table-city">
           <div className="data-table-information">
             <h3 className="data-table-title">City</h3>

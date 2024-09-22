@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { Table } from '../../../sharedComponents/Table/Table';
 import { AreaTop } from '../../../sharedComponents/Title/Title';
 import { PaginationContext } from '../../../context/PaginationContext';
@@ -11,6 +11,7 @@ import { validateCustomerId } from '../../../utils/validations/Validations';
 import { ToastContainer } from 'react-toastify';
 import { errorToast } from '../../../utils/helper/toast';
 import './query.scss';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const Query = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,14 +24,17 @@ export const Query = () => {
   const [filter, setFilter] = useState(false);
   const [id, setId] = useState('');
   const [resolved, setResolved] = useState('');
-  const [showPagination, setShowPagination] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const { id: adminId } = useParams();
+  const [loading, setLoading] = useState(true);
   const filterOptions = [
     { label: 'Search by Customer Id', value: 'id' },
     { label: 'Search by Resolved', value: 'resolved' },
     { label: 'Search by Unresolved', value: 'unresolved' }
 ];
+
+const prevCurrentPageRef = useRef(currentPage);
+const prevItemsPerPageRef = useRef(itemsPerPage);
 
 const resetPagination = () => {
   setCurrentPage(1);
@@ -40,23 +44,15 @@ const resetPagination = () => {
   const handleSearch = () => {
     resetPagination();
     if(filterType === 'id'){
-      setSearchParams({filterType, id});
-      setShowPagination(false);
+      setSearchParams({filterType, id, currentPage, itemsPerPage});
     }
     if(filterType === 'resolved'){
-      setSearchParams({filterType, resolved, currentPage, itemsPerPage});
-      setShowPagination(true);
+      setSearchParams({filterType, currentPage, itemsPerPage});
     }
     if(filterType === 'unresolved'){
-      setSearchParams({filterType, resolved, currentPage, itemsPerPage});
-      setShowPagination(true);
+      setSearchParams({filterType, currentPage, itemsPerPage});
     }
-    if(filter === false) {
-      setFilter(true);
-    }
-    else{
-      queryTable();
-    }
+    setShowFilterButton(false);
   }
   
   const handleReset = () => {
@@ -65,108 +61,100 @@ const resetPagination = () => {
     setResolved('');
     setShowFilterButton(true);
     resetPagination();
-    setFilter(false);
-    setShowPagination(true);
-    setSearchParams({});
+    setSearchParams({currentPage: 1, itemsPerPage: 10});
   };
 
   const actions = (queryId) => [
-    { name: "Edit", url: `/admin/query/${adminId}/edit/${queryId}` },
-    { name: "Delete", url: `/admin/query/${adminId}/delete/${queryId}` }
+    { name: "Edit", url: `/suraksha/admin/query/${adminId}/edit/${queryId}` },
+    { name: "Delete", url: `/suraksha/admin/query/${adminId}/delete/${queryId}` }
   ];
   
 
 
-    const queryTable = async () => {
+    const queryTable = async (filterTypeFromParams, currentPageFromParams, itemsPerPageFromParams, idFromParams) => {
       try {
           let response = {};
-
-          if(filterType === 'resolved') {
-            response = await getAllResolvedQueries(currentPage, itemsPerPage);
+          setLoading(true);
+          if(filterTypeFromParams === 'resolved') {
+            response = await getAllResolvedQueries(currentPageFromParams, itemsPerPageFromParams);
           }
-          else if(filterType === 'unresolved') {
-            response = await getAllUnresolvedQueries(currentPage, itemsPerPage);
+          else if(filterTypeFromParams === 'unresolved') {
+            response = await getAllUnresolvedQueries(currentPageFromParams, itemsPerPageFromParams);
           }
-          else if(filterType === 'id') {
-            validateCustomerId(id);
-            const data = await getQueriesByCustomerId(id);
+          else if(filterTypeFromParams === 'id') {
+            validateCustomerId(idFromParams);
+            const data = await getQueriesByCustomerId(idFromParams, currentPageFromParams, itemsPerPageFromParams);
             response = covertIdDataIntoTable(data);
           }
           else {
-            response = await getAllQueries(currentPage, itemsPerPage);
+            response = await getAllQueries(currentPageFromParams, itemsPerPageFromParams);
           }
           
           setData(response);
           setKeysToBeIncluded(["queryId", "question", "response", "isResolved",  "customerId"]);
 
       } catch (error) {
-          setData([]);
-          if (error.response?.data?.message || error.specificMessage) {
-            errorToast(error.response?.data?.message || error.specificMessage);
-          } else {
-              errorToast("An unexpected error occurred. Please try again later.");
-          }
-      }
+        setData([]);
+        if (error.response?.data?.message || error.specificMessage) {
+          errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+            errorToast("An unexpected error occurred. Please try again later.");
+        }
+    }finally{
+      setLoading(false);
+    }
   };
 
 
 
-    // useEffect(() => {
-    //   const filterTypeParam = searchParams.get('filterType') || '';
-    //   const idParam = searchParams.get('id') || '';
-    //   const firstNameParam = searchParams.get('firstName') || '';
-    //   const currentPageParam = Number(searchParams.get('currentPage')) || 1;
-    //   const itemsPerPageParam = Number(searchParams.get('itemsPerPage')) || 10;
-    //   console.log(filterTypeParam, idParam, firstNameParam, currentPageParam, itemsPerPageParam);
-    //   if (filterTypeParam === 'id' || filterTypeParam === 'firstName') {
-    //     setFilterType(filterTypeParam);
-    //     setShowFilterButton(!filterTypeParam);
-    //     setFilter(true);
-    //     if (filterTypeParam === 'firstName') {
-    //       setFirstName(firstNameParam);
-    //       handlePageChange(currentPageParam);
-    //       handleItemsPerPageChange(itemsPerPageParam);
-    //     } else if (filterTypeParam === 'id') {
-    //       setId(idParam);
-    //       setShowPagination(false);
-    //       resetPagination();
-    //     }
-    //   } else {
-    //     setShowFilterButton(true);
-    //     setId('');
-    //     setFirstName('');
-    //     setFilterType('');
-    //     setFilter(false);
-    //     setShowPagination(true);
-    //     resetPagination();
-    //   }
-    // },[searchParams]);
+  useEffect(() => {
+    const filterTypeFromParams = searchParams.get('filterType') || '';
+    const currentPageFromParams = parseInt(searchParams.get('currentPage')) || 1;
+    const itemsPerPageFromParams = parseInt(searchParams.get('itemsPerPage')) || 10;
+    const idFromParams = searchParams.get('id') || '';
+
+    if (filterTypeFromParams === 'resolved' || filterTypeFromParams === 'unresolved') {
+      setFilterType(filterTypeFromParams);
+      setShowFilterButton(false);
+    } else if(filterTypeFromParams === 'id'){
+      setFilterType(filterTypeFromParams);
+      setShowFilterButton(false);
+      setId(idFromParams);
+    }
+    else{
+      setFilterType('');
+      setShowFilterButton(true);
+    }
+    if (currentPageFromParams != prevCurrentPageRef.current || itemsPerPageFromParams != prevItemsPerPageRef.current) {
+      prevCurrentPageRef.current = currentPageFromParams;
+      prevItemsPerPageRef.current = itemsPerPageFromParams;
+      setCurrentPage(currentPageFromParams);
+      setItemsPerPage(itemsPerPageFromParams);
+    }
+
+    queryTable(filterTypeFromParams, currentPageFromParams, itemsPerPageFromParams, idFromParams);
+
+  }, [searchParams]);
 
 
     useEffect(() => {
-      // const hasSearchParams = searchParams.toString() !== '';
+      if (currentPage != prevCurrentPageRef.current || itemsPerPage != prevItemsPerPageRef.current) {
+        prevCurrentPageRef.current = currentPage;
+        prevItemsPerPageRef.current = itemsPerPage;
+        setSearchParams({
+          filterType: searchParams.get('filterType'),
+          currentPage: currentPage,
+          itemsPerPage: itemsPerPage,
+        });
+      }
 
-      // if(!hasSearchParams) {
-      //   setShowFilterButton(true);
-      //   setId('');
-      //   setFirstName('');
-      //   setFilterType('');
-      //   setFilter(false);
-      //   setShowPagination(true);
-      // }
-      
-      // const timeoutId = setTimeout(() => {
-      //   customerTable();
-      // }, hasSearchParams ? 0: 0);
-      // return () => clearTimeout(timeoutId);
-      queryTable();
-
-    }, [filter, currentPage, itemsPerPage, searchParams]);
+    }, [currentPage, itemsPerPage, setSearchParams, searchParams]);
 
   return (
     <>
         <div className='content-area-query'>
-          <AreaTop pageTitle={"Get All Queries"} pagePath={"Query"} pageLink={`/admin/dashboard/${routeParams.id}`}/>
+        {loading && <Loader />}
+          <AreaTop pageTitle={"Get All Queries"} pagePath={"Query"} pageLink={`/suraksha/admin/dashboard/${routeParams.id}`}/>
           <section className="content-area-table-query">
             <div className="data-table-information">
               <h3 className="data-table-title">Queries</h3>
@@ -193,7 +181,6 @@ const resetPagination = () => {
                   keysToBeIncluded={keysToBeIncluded} 
                   includeButton={true}
                   handleButtonClick={actions}
-                  showPagination={showPagination}
                   currentPage={currentPage}
                   pageSize={itemsPerPage}
                   setPage={setCurrentPage}

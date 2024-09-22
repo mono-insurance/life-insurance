@@ -357,6 +357,7 @@ public class CustomerServiceImp implements CustomerService {
         int totalMonths = policyAccountDTO.getPolicyTerm() * 12;
         int numberOfPayments = totalMonths / policyAccountDTO.getPaymentTimeInMonths();
         Double balancePerPayment = policyAccountDTO.getInvestmentAmount() / numberOfPayments;
+        balancePerPayment= Double.valueOf(String.format("%.2f", balancePerPayment));
         policyAccount.setTimelyBalance(balancePerPayment);
         policyAccount.setTotalAmountPaid(balancePerPayment);
 
@@ -734,6 +735,62 @@ public class CustomerServiceImp implements CustomerService {
 		List<DocumentUploadedDTO> documentsDTO = dtoService.convertDocumentUploadedListToDTO(documents);
 		
 		return documentsDTO;
+	}
+
+	@Override
+	public PagedResponse<DocumentUploadedDTO> getAllDocuments(int page, int size, String sortBy, String direction) {
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        
+        Page<DocumentUploaded> pages = documentUploadedRepository.findAll(pageable);
+        List<DocumentUploaded> allEmployees = pages.getContent();
+        List<DocumentUploadedDTO> allEmployeesDTO = dtoService.convertDocumentUploadedListToDTO(allEmployees);
+
+        return new PagedResponse<DocumentUploadedDTO>(allEmployeesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+	@Override
+	public PagedResponse<DocumentUploadedDTO> getAllDisapprovedDocuments(int page, int size, String sortBy,
+			String direction) {
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        
+        
+        Page<DocumentUploaded> pages = documentUploadedRepository.findByIsApprovedFalse(pageable);
+        List<DocumentUploaded> allEmployees = pages.getContent();
+        List<DocumentUploadedDTO> allEmployeesDTO = dtoService.convertDocumentUploadedListToDTO(allEmployees);
+
+        return new PagedResponse<DocumentUploadedDTO>(allEmployeesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+	
+
+	@Override
+	public PagedResponse<DocumentUploadedDTO> getAlDocumentsByAgent(Long id, int page, int size, String sortBy,
+			String direction) {
+		
+		Agent agent = agentRepository.findById(id).orElseThrow(() -> new UserException("Agent not found"));
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        
+        Page<DocumentUploaded> pages = documentUploadedRepository.findByAgent(agent, pageable);
+        List<DocumentUploaded> allEmployees = pages.getContent();
+        List<DocumentUploadedDTO> allEmployeesDTO = dtoService.convertDocumentUploadedListToDTO(allEmployees);
+
+        return new PagedResponse<DocumentUploadedDTO>(allEmployeesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+	@Override
+	public PagedResponse<DocumentUploadedDTO> getAlDocumentsByCustomer(Long id, int page, int size, String sortBy,
+			String direction) {
+		Customer customer = customerRepository.findById(id).orElseThrow(() -> new UserException("customer not found"));
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        
+        Page<DocumentUploaded> pages = documentUploadedRepository.findByCustomer(customer, pageable);
+        List<DocumentUploaded> allEmployees = pages.getContent();
+        List<DocumentUploadedDTO> allEmployeesDTO = dtoService.convertDocumentUploadedListToDTO(allEmployees);
+
+        return new PagedResponse<DocumentUploadedDTO>(allEmployeesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
 	}
 
 

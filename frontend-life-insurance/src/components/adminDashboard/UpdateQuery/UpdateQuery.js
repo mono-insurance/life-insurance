@@ -5,9 +5,11 @@ import { errorToast, successToast } from '../../../utils/helper/toast';
 import { getQueryById, updateQuery } from '../../../services/AdminServices';
 import { ToastContainer } from 'react-toastify';
 import './updateQuery.scss';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const UpdateQuery = () => {
   const { id, queryId } = useParams();
+  const [loading, setLoading] = useState(false);
   const [formState, setFormState] = useState({
     question: '',
     response: '',
@@ -19,6 +21,7 @@ export const UpdateQuery = () => {
   useEffect(() => {
     const fetchQueryDetails = async () => {
       try {
+        setLoading(true);
         const response = await getQueryById(queryId); // Fetch query by ID
         setFormState({
           question: response.question || '',
@@ -27,7 +30,13 @@ export const UpdateQuery = () => {
           customerId: response.customerId || '',
         });
       } catch (error) {
-        errorToast('Failed to load query details');
+        if (error.response?.data?.message || error.specificMessage) {
+            errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+            errorToast("An unexpected error occurred. Please try again later.");
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -47,6 +56,13 @@ export const UpdateQuery = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      setLoading(true);
+
+      if (!formState.response.trim()) {
+        errorToast("Response cannot be empty");
+        return;
+      }
+
       await updateQuery(queryId, formState); // Update query by ID
 
       successToast("Query updated successfully!");
@@ -56,12 +72,15 @@ export const UpdateQuery = () => {
       } else {
           errorToast("An unexpected error occurred. Please try again later.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={`Update Query ${queryId}`} pagePath={"Update-Query"} pageLink={`/admin/queries/${id}`}/>
+      {loading && <Loader />}
+      <AreaTop pageTitle={`Update Query ${queryId}`} pagePath={"Update-Query"} pageLink={`/suraksha/admin/queries/${id}`}/>
       <section className="content-area-form">
         <form className="query-form" onSubmit={handleSubmit}>
           {/* Question Field - Read Only */}

@@ -47,6 +47,9 @@ public class AdminServiceImp implements AdminService {
     
     @Autowired
     private CustomerRepository customerRepository;
+    
+    @Autowired
+    private DocumentUploadedRepository documentUploadedRepository;
 
 
     @Autowired
@@ -99,7 +102,6 @@ public class AdminServiceImp implements AdminService {
 
         admin.getCredentials().setUsername(adminCreationDTO.getUsername());
         admin.getCredentials().setEmail(adminCreationDTO.getEmail());
-        admin.getCredentials().setPassword(passwordEncoder.encode(adminCreationDTO.getPassword()));
         admin.getCredentials().setMobileNumber(adminCreationDTO.getMobileNumber());
 
         Admin updatedAdmin = adminRepository.save(admin);
@@ -110,6 +112,15 @@ public class AdminServiceImp implements AdminService {
 
     @Override
     public AdminDTO makeAnotherAdmin(AdminCreationDTO adminCreationDTO) {
+    	
+    	if (credentialsRepository.existsByUsername(adminCreationDTO.getUsername())) {
+            throw new UserException("Username must be unique");
+        }
+
+        if (credentialsRepository.existsByEmail(adminCreationDTO.getEmail())) {
+            throw new UserException("Email must be unique");
+        }
+    	
         adminCreationDTO.setAdminId(0L);
 
         Admin admin = new Admin();
@@ -493,6 +504,31 @@ public class AdminServiceImp implements AdminService {
         List<UserDTO> allCredentialsDTO = dtoService.convertCredentialsListEntityToUserDTO(allCredentials);
 
         return new PagedResponse<UserDTO>(allCredentialsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+	@Override
+	public boolean approveDocuments(Long id) {
+		DocumentUploaded document = documentUploadedRepository.findById(id).orElseThrow(()->new UserException("Document not found"));
+		
+		document.setIsApproved(true);
+	    documentUploadedRepository.save(document); // Save the approved document
+
+	    // If the document is associated with an agent, check additional conditions
+	    if (document.getAgent() != null) {
+	        Agent agent = document.getAgent();
+
+	        // Check if all documents for the agent are approved
+	        List<DocumentUploaded> agentDocuments = documentUploadedRepository.findByAgent(agent);
+	        boolean allDocumentsApproved = agentDocuments.stream().allMatch(DocumentUploaded::getIsApproved);
+
+	        // If all documents are approved, set the agent's status to active
+	        if (allDocumentsApproved) {
+	            agent.setIsApproved(true);  // Assuming status represents whether the agent is active
+	            agentRepository.save(agent); // Save the updated agent status
+	        }
+	    }
+	    
+	    return true;
 	}
 
 

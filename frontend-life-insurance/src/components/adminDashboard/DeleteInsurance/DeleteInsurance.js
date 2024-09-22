@@ -4,9 +4,11 @@ import { AreaTop } from '../../../sharedComponents/Title/Title';
 import { errorToast, successToast } from '../../../utils/helper/toast';
 import { ToastContainer } from 'react-toastify';
 import { getInsuranceCategoryById, deleteInsuranceCategory } from '../../../services/AdminServices';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const DeleteInsurance = () => {
   const { id, insuranceId } = useParams();
+  const [loading, setLoading] = useState(false);
   const [formState, setFormState] = useState({
     insuranceCategory: '',
     isActive: true,
@@ -16,13 +18,20 @@ export const DeleteInsurance = () => {
   useEffect(() => {
     const fetchInsuranceCategory = async () => {
       try {
+        setLoading(true);
         const response = await getInsuranceCategoryById(insuranceId);
         setFormState({
           insuranceCategory: response.insuranceCategory || '',
           isActive: response.isActive,
         });
       } catch (error) {
-        errorToast('Failed to load insurance category details');
+        if (error.response?.data?.message || error.specificMessage) {
+            errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+            errorToast("An unexpected error occurred. Please try again later.");
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -32,19 +41,27 @@ export const DeleteInsurance = () => {
   // Handle delete action
   const handleDelete = async () => {
     try {
+      setLoading(true);
       await deleteInsuranceCategory(insuranceId);
       successToast("Insurance category deleted successfully!");
     } catch (error) {
-      errorToast("Failed to delete the insurance category. Please try again.");
+      if (error.response?.data?.message || error.specificMessage) {
+          errorToast(error.response?.data?.message || error.specificMessage);
+      } else {
+          errorToast("An unexpected error occurred. Please try again later.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className='content-area'>
+      {loading && <Loader />}
       <AreaTop 
         pageTitle={`Delete Insurance Category ${insuranceId}`} 
         pagePath={"Delete-Insurance"} 
-        pageLink={`/admin/get-insurance-categories/${id}`} 
+        pageLink={`/suraksha/admin/get-insurance-categories/${id}`} 
       />
       <section className="content-area-form">
         <form className="insurance-form">

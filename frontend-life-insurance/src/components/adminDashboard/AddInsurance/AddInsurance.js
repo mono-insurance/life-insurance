@@ -5,9 +5,11 @@ import { errorToast, successToast } from '../../../utils/helper/toast';
 import { useParams } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { createNewInsuranceCategory } from '../../../services/AdminServices';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const AddInsurance = () => {
   const routeParams = useParams();
+  const [loading, setLoading] = useState(false);
   const [formState, setFormState] = useState({
     insuranceCategory: '',
     isActive: true,
@@ -25,6 +27,7 @@ export const AddInsurance = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      setLoading(true);
       if (!formState.insuranceCategory.trim()) {
         errorToast("Insurance category name cannot be empty");
         return;
@@ -39,16 +42,19 @@ export const AddInsurance = () => {
       });
     } catch (error) {
       if (error.response?.data?.message || error.specificMessage) {
-        errorToast(error.response?.data?.message || error.specificMessage);
+          errorToast(error.response?.data?.message || error.specificMessage);
       } else {
-        errorToast("An unexpected error occurred. Please try again later.");
+          errorToast("An unexpected error occurred. Please try again later.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={"Create New Insurance Category"} pagePath={"Create-Insurance"} pageLink={`/admin/dashboard/${routeParams.id}`} />
+      {loading && <Loader />}
+      <AreaTop pageTitle={"Create New Insurance Category"} pagePath={"Create-Insurance"} pageLink={`/suraksha/admin/get-insurance-categories/${routeParams.id}`} />
       <section className="content-area-form">
         <form className="insurance-form" onSubmit={handleSubmit}>
           <label className="form-label">

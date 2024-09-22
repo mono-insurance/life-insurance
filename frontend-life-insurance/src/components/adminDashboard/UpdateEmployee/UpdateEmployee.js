@@ -4,10 +4,12 @@ import { errorToast, successToast } from '../../../utils/helper/toast';
 import { ToastContainer } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { fetchEmployeeById, updateEmployee } from '../../../services/AdminServices'; // You'll need to create/update this service
-import { validateForm } from '../../../utils/validations/Validations';
+import { validateUpdateEmployeeForm } from '../../../utils/validations/Validations';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const UpdateEmployee = () => {
-  const { id, employeeId } = useParams(); // Get employee ID from the URL parameters
+  const { id, employeeId } = useParams();
+  const [loading, setLoading] = useState(false);
   const [formState, setFormState] = useState({
     firstName: '',
     lastName: '',
@@ -24,11 +26,28 @@ export const UpdateEmployee = () => {
   useEffect(() => {
     const fetchEmployee = async () => {
       try {
+        setLoading(true);
         const employee = await fetchEmployeeById(employeeId); // Fetch existing employee details
-        setFormState(employee);
+        setFormState({
+          firstName: employee.firstName,
+          lastName: employee.lastName,
+          dateOfBirth: employee.dateOfBirth,
+          qualification: employee.qualification,
+          username: employee.username,
+          email: employee.email,
+          mobileNumber: employee.mobileNumber,
+          isActive: employee.isActive,
+          role: 'EMPLOYEE',
+        });
       } catch (error) {
-        errorToast('Error fetching employee details.');
-      }
+        if (error.response?.data?.message || error.specificMessage) {
+          errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+            errorToast("An unexpected error occurred. Please try again later.");
+        }
+    }finally{
+      setLoading(false);
+    }
     };
 
     fetchEmployee();
@@ -44,7 +63,8 @@ export const UpdateEmployee = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const formErrors = validateForm(formState);
+      setLoading(true);
+      const formErrors = validateUpdateEmployeeForm(formState, false);
 
       if (Object.keys(formErrors).length > 0) {
         Object.values(formErrors).forEach((errorMessage) => {
@@ -57,17 +77,21 @@ export const UpdateEmployee = () => {
 
       successToast('Employee updated successfully!');
     } catch (error) {
+      console.log(error);
       if (error.response?.data?.message || error.specificMessage) {
         errorToast(error.response?.data?.message || error.specificMessage);
       } else {
         errorToast('An unexpected error occurred. Please try again later.');
       }
+    }finally{
+      setLoading(false);
     }
   };
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={`Update Employee ${employeeId}`} pagePath={"Update-Employee"} pageLink={`/admin/get-employees/${id}`} />
+      {loading && <Loader />}
+      <AreaTop pageTitle={`Update Employee ${employeeId}`} pagePath={"Update-Employee"} pageLink={`/suraksha/admin/get-employees/${id}`} />
       <section className="content-area-form">
         <form className="employee-form">
           <div className="form-row">
@@ -133,13 +157,14 @@ export const UpdateEmployee = () => {
                 name="isActive" 
                 value={formState.isActive}
                 className="form-input"
+                onChange={handleChange}
                 >
                 <option value={true}>True</option>
                 <option value={false}>False</option>
                 </select>
             </label>
 
-          <button type="submit" className="form-submit" onClick={handleSubmit}>Update</button>
+          <button type="submit" className="form-submit" onClick={(e)=>handleSubmit(e)}>Update</button>
         </form>
       </section>
       <ToastContainer position="bottom-right" />

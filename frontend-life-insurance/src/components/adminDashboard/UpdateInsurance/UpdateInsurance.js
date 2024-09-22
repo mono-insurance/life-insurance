@@ -4,9 +4,11 @@ import { AreaTop } from '../../../sharedComponents/Title/Title';
 import { errorToast, successToast } from '../../../utils/helper/toast';
 import { ToastContainer } from 'react-toastify';
 import { getInsuranceCategoryById, updateInsuranceCategory } from '../../../services/AdminServices';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const UpdateInsurance = () => {
   const { id, insuranceId } = useParams();
+  const [loading, setLoading] = useState(false);
   const [formState, setFormState] = useState({
     insuranceCategory: '',
     isActive: true,
@@ -16,13 +18,20 @@ export const UpdateInsurance = () => {
   useEffect(() => {
     const fetchInsuranceCategory = async () => {
       try {
+        setLoading(true);
         const response = await getInsuranceCategoryById(insuranceId);
         setFormState({
           insuranceCategory: response.insuranceCategory || '',
           isActive: response.isActive,
         });
       } catch (error) {
-        errorToast('Failed to load insurance category details');
+        if (error.response?.data?.message || error.specificMessage) {
+            errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+            errorToast("An unexpected error occurred. Please try again later.");
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -42,6 +51,7 @@ export const UpdateInsurance = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      setLoading(true);
       if (!formState.insuranceCategory.trim()) {
         errorToast("Insurance category name cannot be empty");
         return;
@@ -51,16 +61,19 @@ export const UpdateInsurance = () => {
       successToast("Insurance category updated successfully!");
     } catch (error) {
       if (error.response?.data?.message || error.specificMessage) {
-        errorToast(error.response?.data?.message || error.specificMessage);
+          errorToast(error.response?.data?.message || error.specificMessage);
       } else {
-        errorToast("An unexpected error occurred. Please try again later.");
+          errorToast("An unexpected error occurred. Please try again later.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={`Update Insurance Category ${insuranceId}`} pagePath={"Update-Insurance"} pageLink={`/admin/get-insurance-categories/${id}`} />
+      {loading && <Loader />}
+      <AreaTop pageTitle={`Update Insurance Category ${insuranceId}`} pagePath={"Update-Insurance"} pageLink={`/suraksha/admin/get-insurance-categories/${id}`} />
       <section className="content-area-form">
         <form className="insurance-form" onSubmit={handleSubmit}>
           <label className="form-label">

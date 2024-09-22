@@ -4,9 +4,12 @@ import { AreaTop } from '../../../sharedComponents/Title/Title';
 import { errorToast, successToast } from '../../../utils/helper/toast';
 import { getStateById, deleteState } from '../../../services/AdminServices';
 import { ToastContainer } from 'react-toastify';
+import { set } from 'date-fns';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const DeleteState = () => {
   const { id, stateId } = useParams();
+  const [loading, setLoading] = useState(false);
   const [stateDetails, setStateDetails] = useState({
     stateName: '',
     isActive: true,
@@ -16,13 +19,20 @@ export const DeleteState = () => {
   useEffect(() => {
     const fetchStateDetails = async () => {
       try {
+        setLoading(true);
         const response = await getStateById(stateId);
         setStateDetails({
           stateName: response.stateName || '',
           isActive: response.isActive,
         });
       } catch (error) {
-        errorToast('Failed to load state details');
+        if (error.response?.data?.message || error.specificMessage) {
+            errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+            errorToast("An unexpected error occurred. Please try again later.");
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -32,6 +42,7 @@ export const DeleteState = () => {
   // Handle the state deletion
   const handleDelete = async () => {
     try {
+      setLoading(true);
       await deleteState(stateId); // Call delete API
       successToast("State deleted successfully!");
     } catch (error) {
@@ -40,15 +51,18 @@ export const DeleteState = () => {
       } else {
         errorToast("An unexpected error occurred. Please try again later.");
       }
+    }finally{
+      setLoading(false);
     }
   };
 
   return (
     <div className='content-area'>
+      {loading && <Loader />}
       <AreaTop 
         pageTitle={`Delete State ${stateId}`} 
         pagePath={"Delete-State"} 
-        pageLink={`/admin/get-state/${id}`} 
+        pageLink={`/suraksha/admin/get-state/${id}`} 
       />
       <section className="content-area-form">
         <form className="state-form">

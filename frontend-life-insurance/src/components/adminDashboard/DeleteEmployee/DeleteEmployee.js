@@ -4,9 +4,12 @@ import { errorToast, successToast } from '../../../utils/helper/toast';
 import { ToastContainer } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import { fetchEmployeeById, deleteEmployee } from '../../../services/AdminServices'; // Ensure these services are defined
+import { set } from 'date-fns';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const DeleteEmployee = () => {
   const { id, employeeId } = useParams();
+  const [loading, setLoading] = useState(false);
   const [employee, setEmployee] = useState({
     firstName: '',
     lastName: '',
@@ -23,11 +26,18 @@ export const DeleteEmployee = () => {
   useEffect(() => {
     const fetchEmployee = async () => {
       try {
+        setLoading(true);
         const fetchedEmployee = await fetchEmployeeById(employeeId);
         setEmployee(fetchedEmployee);
       } catch (error) {
-        errorToast('Error fetching employee details.');
-      }
+        if (error.response?.data?.message || error.specificMessage) {
+          errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+            errorToast("An unexpected error occurred. Please try again later.");
+        }
+    }finally{
+      setLoading(false);
+    }
     };
 
     fetchEmployee();
@@ -36,6 +46,7 @@ export const DeleteEmployee = () => {
   const handleDelete = async (event) => {
     event.preventDefault();
     try {
+      setLoading(true);
       await deleteEmployee(employeeId);
       successToast('Employee deleted successfully!');
     } catch (error) {
@@ -44,12 +55,15 @@ export const DeleteEmployee = () => {
       } else {
         errorToast('An unexpected error occurred. Please try again later.');
       }
+    }finally{
+      setLoading(false);
     }
   };
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={`Delete Employee ${employeeId}`} pagePath={"Delete-Employee"} pageLink={`/admin/get-employees/${id}`} />
+      {loading && <Loader />}
+      <AreaTop pageTitle={`Delete Employee ${employeeId}`} pagePath={"Delete-Employee"} pageLink={`/suraksha/admin/get-employees/${id}`} />
       <section className="content-area-form">
         <form className="employee-form">
               <div className="form-row">

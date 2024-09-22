@@ -195,6 +195,15 @@ public class AdminController {
 
     }
 
+    @Operation(summary = "By admin: approve document")
+    @PostMapping("/document/approve/{id}")
+    public ResponseEntity<Boolean> approveDocuments(@PathVariable(name="id") Long id) {
+
+        boolean isApproved = adminService.approveDocuments(id);
+
+        return new ResponseEntity<>(isApproved, HttpStatus.OK);
+
+    }
 
 
 }

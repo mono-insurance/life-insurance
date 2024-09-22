@@ -4,19 +4,22 @@ import { AreaTop } from '../../../sharedComponents/Title/Title';
 import { errorToast, successToast } from '../../../utils/helper/toast';
 import { getStateById, updateState } from '../../../services/AdminServices';
 import { ToastContainer } from 'react-toastify';
+import { set } from 'date-fns';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const UpdateState = () => {
   const { id, stateId } = useParams();
+  const [loading, setLoading] = useState(false);
   const [formState, setFormState] = useState({
     stateName: '',
     isActive: true,
   });
 
-  // Fetch the state details on component mount
   useEffect(() => {
     const fetchStateDetails = async () => {
       try {
-        const response = await getStateById(stateId); // Fetch state by ID
+        setLoading(true);
+        const response = await getStateById(stateId);
         setFormState({
           stateName: response.stateName || '',
           isActive: response.isActive,
@@ -24,14 +27,19 @@ export const UpdateState = () => {
         console.log(response);
         console.log(formState);
       } catch (error) {
-        errorToast('Failed to load state details');
+        if (error.response?.data?.message || error.specificMessage) {
+            errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+            errorToast("An unexpected error occurred. Please try again later.");
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchStateDetails();
   }, [stateId]);
 
-  // Handle form input changes
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormState({
@@ -40,10 +48,10 @@ export const UpdateState = () => {
     });
   };
 
-  // Handle form submission to update the state
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      setLoading(true);
       if (!formState.stateName.trim()) {
         errorToast("State name cannot be empty");
         return;
@@ -58,12 +66,15 @@ export const UpdateState = () => {
       } else {
           errorToast("An unexpected error occurred. Please try again later.");
       }
+    }finally{
+      setLoading(false);
     }
   };
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={`Update State ${stateId}`} pagePath={"Update-State"} pageLink={`/admin/get-state/${id}`}/>
+      {loading && <Loader />}
+      <AreaTop pageTitle={`Update State ${stateId}`} pagePath={"Update-State"} pageLink={`/suraksha/admin/get-state/${id}`}/>
       <section className="content-area-form">
         <form className="state-form" onSubmit={handleSubmit}>
           <label className="form-label">

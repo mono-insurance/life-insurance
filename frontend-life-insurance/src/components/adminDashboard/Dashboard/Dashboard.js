@@ -1,17 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { AreaTop } from '../../../sharedComponents/Title/Title'
 import { Card } from '../../../sharedComponents/Card/Card'
 import './dashboard.scss';
 import { errorToast } from '../../../utils/helper/toast';
 import { ToastContainer } from 'react-toastify';
 import { Table } from '../../../sharedComponents/Table/Table';
-import { PaginationContext } from '../../../context/PaginationContext';
 import { ProgressBar } from '../../../sharedComponents/ProgressBar/ProgresBar';
-import { useParams, useSearchParams } from 'react-router-dom';
-import { covertIdDataIntoTable, formatRoleForTable } from '../../../utils/helper/helperFunctions';
-import { getAllUsers, getAllUsersByCharacters, getNewUsers, getSystemStats, getUserById } from '../../../services/AdminServices';
-import { FilterButton } from '../../../sharedComponents/FilterButton/FilterButton';
-import { validateFirstName, validateUserId } from '../../../utils/validations/Validations';
+import { useParams } from 'react-router-dom';
+import { formatRoleForTable } from '../../../utils/helper/helperFunctions';
+import { getNewUsers, getSystemStats } from '../../../services/AdminServices';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const Dashboard = () => {
   const [counts, setCounts] = useState({});
@@ -20,11 +18,12 @@ export const Dashboard = () => {
   const [data, setData] = useState({});
   const [keysToBeIncluded, setKeysToBeIncluded] = useState([]);
   const routeParams = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [loading, setLoading] = useState(true);
 
 
     const userTable = async () => {
       try {
+        setLoading(true);
           let response = {};
           let formattedData =[]
           response = await getNewUsers(currentPage, itemsPerPage);
@@ -41,12 +40,13 @@ export const Dashboard = () => {
           setKeysToBeIncluded(["id", "firstName", "lastName", "username",  "email", "mobileNumber", "role"]);
 
       } catch (error) {
-          setData([]);
           if (error.response?.data?.message || error.specificMessage) {
             errorToast(error.response?.data?.message || error.specificMessage);
           } else {
               errorToast("An unexpected error occurred. Please try again later.");
           }
+      }finally{
+        setLoading(false);
       }
   };
 
@@ -83,6 +83,7 @@ export const Dashboard = () => {
     useEffect(() => {
       const fetchSystemCounts = async () => {
         try {
+          setLoading(true);
             const response = await getSystemStats();
             setCounts(response);
             console.log(response);
@@ -93,6 +94,8 @@ export const Dashboard = () => {
           } else {
               errorToast("An unexpected error occurred. Please try again later.");
           }
+        }finally{
+          setLoading(false);
         }
     };
     fetchSystemCounts();
@@ -100,29 +103,15 @@ export const Dashboard = () => {
 
 
     useEffect(() => {
-      // const hasSearchParams = searchParams.toString() !== '';
-      
-      // if(!hasSearchParams) {
-      //   setShowFilterButton(true);
-      //   setId('');
-      //   setFirstName('');
-      //   setFilterType('');
-      //   setFilter(false);
-      //   setShowPagination(true);
-      //   resetPagination();
-      // }
-      // const timeoutId = setTimeout(() => {
         userTable();
-      // }, hasSearchParams ? 0: 0);
-      // return () => clearTimeout(timeoutId);
-
-    }, [currentPage, itemsPerPage, searchParams]);
+    }, [currentPage, itemsPerPage]);
 
 
 
   return (
     <>
-      <AreaTop pageTitle={"Admin Dashboard"} pagePath={"Dashboard"} pageLink={`/admin/dashboard/${routeParams.id}`} />
+      <AreaTop pageTitle={"Admin Dashboard"} pagePath={"Dashboard"} pageLink={`/suraksha/admin/dashboard/${routeParams.id}`} />
+      {loading && <Loader />}
       <section className="content-area-cards">
         <Card
           colors={["#e4e8ef", "#4ce13f"]}

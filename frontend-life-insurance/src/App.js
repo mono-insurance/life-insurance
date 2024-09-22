@@ -63,12 +63,14 @@ import { Profile } from './components/customerDashboard/Profile/Profile';
 import { PaymentSuccess } from './components/customerDashboard/PaymentSuccess/PaymentSuccess';
 import { PaymentFailure } from './components/customerDashboard/PaymentFailure/PaymentFailure';
 import HomePage from './components/websiteStructure/HomePage/HomePage';
+import { PolicyAccounts } from './components/adminDashboard/PolicyAccounts/PolicyAccounts';
+import { Documents } from './components/adminDashboard/Documents/Documents';
 
 function App() {
 
   const { theme, toggleTheme } = useContext(ThemeContext);
   const location = useLocation();
-  const showButton = location.pathname.startsWith('/admin');
+  const showButton = location.pathname.startsWith('/suraksha/admin');
 
   useEffect(() => {
     if (theme === "dark") {
@@ -119,45 +121,53 @@ function App() {
               
               <Route element={<AdminDashboard />}>
 
-                <Route path='/admin/dashboard/:id' element={<Dashboard />}></Route>
-                <Route path='/admin/add-admin/:id' element={<AddAdmin />}></Route>
-                <Route path='/admin/add-employees/:id' element={<AddEmployees />}></Route>
-                <Route path='/admin/get-employees/:id' element={<GetEmployees />}></Route>
-                <Route path='/admin/add-agents/:id' element={<AddAgents />}></Route>
-                <Route path='/admin/get-agents/:id' element={<GetAgents />}></Route>
-                <Route path='/admin/add-customers/:id' element={<AddCustomers />}></Route>
-                <Route path='/admin/get-customers/:id' element={<GetCustomers />}></Route>
-                <Route path='/admin/add-state/:id' element={<AddState />}></Route>
-                <Route path='/admin/get-state/:id' element={<GetState />}></Route>
-                <Route path='/admin/add-city/:id' element={<AddCity />}></Route>
-                <Route path='/admin/get-city/:id' element={<GetCity />}></Route>
-                <Route path='/admin/add-insurance-categories/:id' element={<AddInsurance />}></Route>
-                <Route path='/admin/get-insurance-categories/:id' element={<GetInsurance />}></Route>
-                <Route path='/admin/add-policy/:id' element={<AddPolicy />}></Route>
-                <Route path='/admin/get-policy/:id' element={<GetPolicy />}></Route>
-                <Route path='/admin/commission/:id' element={<Commission />}></Route>
-                <Route path='/admin/claim/:id' element={<Claim />}></Route>
-                <Route path='/admin/requests/:id' element={<Requests />}></Route>
-                <Route path='/admin/transactions/:id' element={<Transactions />}></Route>
-                <Route path='/admin/feedback/:id' element={<Feedback />}></Route>
-                <Route path='/admin/queries/:id' element={<Query/>}></Route>
-                <Route path='/admin/tax-settings/:id' element={<TaxSettings />}></Route>
-                <Route path='/admin/insurance-settings/:id' element={<InsuranceSettings />}></Route>
-                <Route path='/admin/settings/:id' element={<Settings />}></Route>
-                <Route path='/admin/insurance-categories/:id/edit/:insuranceId' element={<UpdateInsurance />}></Route>
-                <Route path='/admin/insurance-categories/:id/delete/:insuranceId' element={<DeleteInsurance />}></Route>
-                <Route path='/admin/state/:id/edit/:stateId' element={<UpdateState />}></Route>
-                <Route path='/admin/state/:id/delete/:stateId' element={<DeleteState />}></Route>
-                <Route path='/admin/city/:id/edit/:cityId' element={<UpdateCity />}></Route>
-                <Route path='/admin/city/:id/delete/:cityId' element={<DeleteCity />}></Route>
-                <Route path='/admin/query/:id/edit/:queryId' element={<UpdateQuery />}></Route>
-                <Route path='/admin/query/:id/delete/:queryId' element={<DeleteQuery />}></Route>
-                <Route path='/admin/policy/:id/view/:policyId' element={<ViewPolicy />}></Route>
-                <Route path='/admin/policy/:id/edit/:policyId' element={<UpdatePolicy />}></Route>
-                <Route path='/admin/policy/:id/delete/:policyId' element={<DeletePolicy />}></Route>
-                <Route path='/admin/employee/:id/edit/:employeeId' element={<UpdateEmployee />}></Route>
-                <Route path='/admin/employee/:id/delete/:employeeId' element={<DeleteEmployee />}></Route>
-                <Route path='/admin/request/:id/view/:requestsId' element={<ViewOrUpdateRequests />}></Route>
+                <Route path='/suraksha/admin/dashboard/:id' element={<Dashboard />}></Route>
+                <Route path='/suraksha/admin/add-admin/:id' element={<AddAdmin />}></Route>
+                <Route path='/suraksha/admin/employee/:id/edit/:employeeId' element={<UpdateEmployee />}></Route>
+                <Route path='/suraksha/admin/employee/:id/delete/:employeeId' element={<DeleteEmployee />}></Route>
+                <Route path='/suraksha/admin/add-employees/:id' element={<AddEmployees />}></Route>
+                <Route path='/suraksha/admin/get-employees/:id' element={<GetEmployees />}></Route>
+                <Route path='/suraksha/admin/add-agents/:id' element={<AddAgents />}></Route>
+                <Route path='/suraksha/admin/add-state/:id' element={<AddState />}></Route>
+                <Route path='/suraksha/admin/get-state/:id' element={<GetState />}></Route>
+                <Route path='/suraksha/admin/state/:id/edit/:stateId' element={<UpdateState />}></Route>
+                <Route path='/suraksha/admin/state/:id/delete/:stateId' element={<DeleteState />}></Route>
+                <Route path='/suraksha/admin/add-city/:id' element={<AddCity />}></Route>
+                <Route path='/suraksha/admin/get-city/:id' element={<GetCity />}></Route>
+                <Route path='/suraksha/admin/city/:id/edit/:cityId' element={<UpdateCity />}></Route>
+                <Route path='/suraksha/admin/city/:id/delete/:cityId' element={<DeleteCity />}></Route>
+                <Route path='/suraksha/admin/add-insurance-categories/:id' element={<AddInsurance />}></Route>
+                <Route path='/suraksha/admin/get-insurance-categories/:id' element={<GetInsurance />}></Route>
+                <Route path='/suraksha/admin/insurance-categories/:id/edit/:insuranceId' element={<UpdateInsurance />}></Route>
+                <Route path='/suraksha/admin/insurance-categories/:id/delete/:insuranceId' element={<DeleteInsurance />}></Route>
+                <Route path='/suraksha/admin/add-policy/:id' element={<AddPolicy />}></Route>
+                <Route path='/suraksha/admin/get-policy/:id' element={<GetPolicy />}></Route>
+                <Route path='/suraksha/admin/policy/:id/view/:policyId' element={<ViewPolicy />}></Route>
+                <Route path='/suraksha/admin/policy/:id/edit/:policyId' element={<UpdatePolicy />}></Route>
+                <Route path='/suraksha/admin/policy/:id/delete/:policyId' element={<DeletePolicy />}></Route>
+                <Route path='/suraksha/admin/tax-settings/:id' element={<TaxSettings />}></Route>
+                <Route path='/suraksha/admin/insurance-settings/:id' element={<InsuranceSettings />}></Route>
+                <Route path='/suraksha/admin/feedback/:id' element={<Feedback />}></Route>
+                <Route path='/suraksha/admin/queries/:id' element={<Query/>}></Route>
+                <Route path='/suraksha/admin/query/:id/edit/:queryId' element={<UpdateQuery />}></Route>
+                <Route path='/suraksha/admin/query/:id/delete/:queryId' element={<DeleteQuery />}></Route>
+                <Route path='/suraksha/admin/commission/:id' element={<Commission />}></Route>
+                <Route path='/suraksha/admin/claim/:id' element={<Claim />}></Route>
+                <Route path='/suraksha/admin/requests/:id' element={<Requests />}></Route>
+                <Route path='/suraksha/admin/request/:id/view/:requestsId' element={<ViewOrUpdateRequests />}></Route>
+                <Route path='/suraksha/admin/transactions/:id' element={<Transactions />}></Route>
+                <Route path='/suraksha/admin/profile/:id' element={<Settings />}></Route>
+                <Route path='/suraksha/admin/policy-accounts/:id' element={<PolicyAccounts />}></Route>
+                <Route path='/suraksha/admin/documents/:id' element={<Documents />}></Route>
+
+                
+                
+                
+                <Route path='/suraksha/admin/get-agents/:id' element={<GetAgents />}></Route>
+                <Route path='/suraksha/admin/add-customers/:id' element={<AddCustomers />}></Route>
+                <Route path='/suraksha/admin/get-customers/:id' element={<GetCustomers />}></Route>
+                
+                
 
               </Route>
 

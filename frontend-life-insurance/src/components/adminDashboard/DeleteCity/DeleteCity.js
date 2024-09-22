@@ -4,9 +4,11 @@ import { errorToast, successToast } from '../../../utils/helper/toast';
 import { useParams } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { getCityById, deleteCityById, deleteCity } from '../../../services/AdminServices';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const DeleteCity = () => {
   const { id, cityId } = useParams(); // Get cityId from the URL parameters
+  const [loading, setLoading] = useState(false);
   const [cityDetails, setCityDetails] = useState({
     cityName: '',
     stateName: '',
@@ -17,14 +19,22 @@ export const DeleteCity = () => {
   useEffect(() => {
     const fetchCityData = async () => {
       try {
+        setLoading(true);
         const cityResponse = await getCityById(cityId);
+
         setCityDetails({
           cityName: cityResponse.cityName || '',
           stateName: cityResponse.stateName || '',
           isActive: cityResponse.isActive,
         });
       } catch (error) {
-        errorToast('Failed to fetch city details. Please try again later.');
+        if (error.response?.data?.message || error.specificMessage) {
+            errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+            errorToast("An unexpected error occurred. Please try again later.");
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -34,16 +44,24 @@ export const DeleteCity = () => {
   // Handle deletion of the city
   const handleDelete = async () => {
     try {
+      setLoading(true);
       await deleteCity(cityId);
       successToast('City deleted successfully!');
     } catch (error) {
-      errorToast('Failed to delete the city. Please try again later.');
+      if (error.response?.data?.message || error.specificMessage) {
+          errorToast(error.response?.data?.message || error.specificMessage);
+      } else {
+          errorToast("An unexpected error occurred. Please try again later.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={`Delete City ${cityId}`} pagePath={"Delete-City"} pageLink={`/admin/get-city/${id}`} />
+      {loading && <Loader />}
+      <AreaTop pageTitle={`Delete City ${cityId}`} pagePath={"Delete-City"} pageLink={`/suraksha/admin/get-city/${id}`} />
       <section className="content-area-form">
         <form className="city-form">
           <label className="form-label">

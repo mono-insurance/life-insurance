@@ -51,14 +51,32 @@ public class WithdrawalsPdfExporter {
     }
 
     private void writeTableData(PdfPTable table) {
-        for (WithdrawalRequests withdrawal : withdrawals) {
-            table.addCell(withdrawal.getRequestType());
+    	for (WithdrawalRequests withdrawal : withdrawals) {
+            table.addCell(withdrawal.getRequestType() != null ? withdrawal.getRequestType() : "");
             table.addCell(String.valueOf(withdrawal.getAmount()));
             table.addCell(String.valueOf(withdrawal.getIsWithdraw()));
             table.addCell(String.valueOf(withdrawal.getIsApproved()));
-            table.addCell(String.valueOf(withdrawal.getPolicyAccount().getPolicyAccountId()));
-            table.addCell(String.valueOf(withdrawal.getAgent().getAgentId()));
-            table.addCell(String.valueOf(withdrawal.getCustomer().getCustomerId()));
+
+            // Null check for PolicyAccount
+            if (withdrawal.getPolicyAccount() != null && withdrawal.getPolicyAccount().getPolicyAccountId() != null) {
+                table.addCell(String.valueOf(withdrawal.getPolicyAccount().getPolicyAccountId()));
+            } else {
+                table.addCell("");  // Add empty cell if PolicyAccount or PolicyAccountId is null
+            }
+
+            // Null check for Agent and AgentId
+            if (withdrawal.getAgent() != null && withdrawal.getAgent().getAgentId() != null) {
+                table.addCell(String.valueOf(withdrawal.getAgent().getAgentId()));
+            } else {
+                table.addCell("");  // Add empty cell if Agent or AgentId is null
+            }
+
+            // Null check for Customer and CustomerId
+            if (withdrawal.getCustomer() != null && withdrawal.getCustomer().getCustomerId() != null) {
+                table.addCell(String.valueOf(withdrawal.getCustomer().getCustomerId()));
+            } else {
+                table.addCell("");  // Add empty cell if Customer or CustomerId is null
+            }
         }
     }
 
@@ -77,7 +95,7 @@ public class WithdrawalsPdfExporter {
 
             document.add(p);
 
-            PdfPTable table = new PdfPTable(6);
+            PdfPTable table = new PdfPTable(7);
             table.setWidthPercentage(100f);
             table.setWidths(new float[] { 2.0f, 2.5f, 2.0f, 2.0f, 2.5f, 2.5f, 2.5f });
             table.setSpacingBefore(10);
@@ -91,6 +109,7 @@ public class WithdrawalsPdfExporter {
         }
 
         catch (DocumentException | IOException e) {
+        	System.out.println(e.getMessage());
             throw new UserException("Error while exporting pdf");
         }
 

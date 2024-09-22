@@ -5,10 +5,13 @@ import { errorToast, successToast } from '../../../utils/helper/toast';
 import { useParams } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { createNewCity, fetchStates, getListOfActiveStates } from '../../../services/AdminServices'; 
+import { Loader } from '../../../sharedComponents/Loader/Loader';
+import { set } from 'date-fns';
 
 export const AddCity = () => {
   const routeParams = useParams();
   const [states, setStates] = useState([]); // To hold the list of states
+  const [loading, setLoading] = useState(false);
   const [formState, setFormState] = useState({
     cityName: '',
     stateId: '',
@@ -19,10 +22,17 @@ export const AddCity = () => {
   useEffect(() => {
     const fetchStatesData = async () => {
       try {
+        setLoading(true);
         const response = await getListOfActiveStates(); // Fetch states from the server
         setStates(response); // Set the states in the state list
       } catch (error) {
-        errorToast("Failed to fetch states. Please try again later.");
+        if (error.response?.data?.message || error.specificMessage) {
+            errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+            errorToast("An unexpected error occurred. Please try again later.");
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -40,6 +50,7 @@ export const AddCity = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      setLoading(true);
       if (!formState.cityName.trim() || !formState.stateId) {
         errorToast("City name and state must be provided");
         return;
@@ -60,12 +71,15 @@ export const AddCity = () => {
       } else {
         errorToast("An unexpected error occurred. Please try again later.");
       }
+    }finally{
+      setLoading(false);
     }
   };
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={"Create New City"} pagePath={"Create-City"} pageLink={`/admin/dashboard/${routeParams.id}`} />
+      {loading && <Loader />}
+      <AreaTop pageTitle={"Create New City"} pagePath={"Create-City"} pageLink={`/suraksha/admin/get-city/${routeParams.id}`} />
       <section className="content-area-form">
         <form className="city-form" onSubmit={handleSubmit}>
           <label className="form-label">

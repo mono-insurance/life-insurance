@@ -1,16 +1,17 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { AreaTop } from '../../../sharedComponents/Title/Title';
 import { Table } from '../../../sharedComponents/Table/Table';
 import { PaginationContext } from '../../../context/PaginationContext';
 import './getInsurance.scss';
 import { ToastContainer } from 'react-toastify';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getAllActiveInsuranceCategories, getAllInactiveInsuranceCategories, getAllInsuranceCategories, getInsuranceCategoriesById } from '../../../services/AdminServices';
 import { errorToast } from '../../../utils/helper/toast';
 import { FilterButton } from '../../../sharedComponents/FilterButton/FilterButton';
 import { covertIdDataIntoTable } from '../../../utils/helper/helperFunctions';
-import { validateCustomerId } from '../../../utils/validations/Validations';
+import { validateCustomerId, validateTypeId } from '../../../utils/validations/Validations';
 import { useContext, useEffect, useState } from 'react';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 
 export const GetInsurance = () => {
@@ -28,17 +29,22 @@ export const GetInsurance = () => {
     const [showPagination, setShowPagination] = useState(true);
     const [searchParams, setSearchParams] = useSearchParams();
     const { id: adminId } = useParams();
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
     const filterOptions = [
       { label: 'Search by Type Id', value: 'id' },
       { label: 'Search by Active', value: 'active' },
       { label: 'Search by Inactive', value: 'inactive' }
   ];
 
+  const prevCurrentPageRef = useRef(currentPage);
+  const prevItemsPerPageRef = useRef(itemsPerPage);
+  
   const resetPagination = () => {
     setCurrentPage(1);
     setItemsPerPage(10);
   };
-
+  
     const handleSearch = () => {
       resetPagination();
       if(filterType === 'id'){
@@ -46,19 +52,14 @@ export const GetInsurance = () => {
         setShowPagination(false);
       }
       if(filterType === 'active'){
-        setSearchParams({filterType, active, currentPage, itemsPerPage});
+        setSearchParams({filterType, currentPage, itemsPerPage});
         setShowPagination(true);
       }
       if(filterType === 'inactive'){
-        setSearchParams({filterType, active, currentPage, itemsPerPage});
+        setSearchParams({filterType, currentPage, itemsPerPage});
         setShowPagination(true);
       }
-      if(filter === false) {
-        setFilter(true);
-      }
-      else{
-        insuranceCategoriesTable();
-      }
+      setShowFilterButton(false);
     }
     
     const handleReset = () => {
@@ -67,35 +68,34 @@ export const GetInsurance = () => {
       setActive('');
       setShowFilterButton(true);
       resetPagination();
-      setFilter(false);
       setShowPagination(true);
-      setSearchParams({});
+      setSearchParams({currentPage: 1, itemsPerPage: 10});
     };
   
     const actions = (insuranceId) => [
-      { name: "Edit", url: `/admin/insurance-categories/${adminId}/edit/${insuranceId}` },
-      { name: "Delete", url: `/admin/insurance-categories/${adminId}/delete/${insuranceId}` }
+      { name: "Edit", url: `/suraksha/admin/insurance-categories/${adminId}/edit/${insuranceId}` },
+      { name: "Delete", url: `/suraksha/admin/insurance-categories/${adminId}/delete/${insuranceId}` }
     ];
     
   
   
-      const insuranceCategoriesTable = async () => {
+      const insuranceCategoriesTable = async (filterTypeFromParams, currentPageFromParams, itemsPerPageFromParams, idFromParams) => {
         try {
             let response = {};
-
-            if(filterType === 'active') {
-              response = await getAllActiveInsuranceCategories(currentPage, itemsPerPage);
+            setLoading(true);
+            if(filterTypeFromParams === 'active') {
+              response = await getAllActiveInsuranceCategories(currentPageFromParams, itemsPerPageFromParams);
             }
-            else if(filterType === 'inactive') {
-              response = await getAllInactiveInsuranceCategories(currentPage, itemsPerPage);
+            else if(filterTypeFromParams === 'inactive') {
+              response = await getAllInactiveInsuranceCategories(currentPageFromParams, itemsPerPageFromParams);
             }
-            else if(filterType === 'id') {
-              validateCustomerId(id);
-              const data = await getInsuranceCategoriesById(id);
+            else if(filterTypeFromParams === 'id') {
+              validateTypeId(id);
+              const data = await getInsuranceCategoriesById(idFromParams);
               response = covertIdDataIntoTable(data);
             }
             else {
-              response = await getAllInsuranceCategories(currentPage, itemsPerPage);
+              response = await getAllInsuranceCategories(currentPageFromParams, itemsPerPageFromParams);
             }
             
             setData(response);
@@ -108,68 +108,70 @@ export const GetInsurance = () => {
             } else {
                 errorToast("An unexpected error occurred. Please try again later.");
             }
+        }finally{
+          setLoading(false);
         }
     };
   
   
+    useEffect(() => {
+      const filterTypeFromParams = searchParams.get('filterType') || '';
+      const currentPageFromParams = parseInt(searchParams.get('currentPage')) || 1;
+      const itemsPerPageFromParams = parseInt(searchParams.get('itemsPerPage')) || 10;
+      const idFromParams = searchParams.get('id') || '';
   
-      // useEffect(() => {
-      //   const filterTypeParam = searchParams.get('filterType') || '';
-      //   const idParam = searchParams.get('id') || '';
-      //   const firstNameParam = searchParams.get('firstName') || '';
-      //   const currentPageParam = Number(searchParams.get('currentPage')) || 1;
-      //   const itemsPerPageParam = Number(searchParams.get('itemsPerPage')) || 10;
-      //   console.log(filterTypeParam, idParam, firstNameParam, currentPageParam, itemsPerPageParam);
-      //   if (filterTypeParam === 'id' || filterTypeParam === 'firstName') {
-      //     setFilterType(filterTypeParam);
-      //     setShowFilterButton(!filterTypeParam);
-      //     setFilter(true);
-      //     if (filterTypeParam === 'firstName') {
-      //       setFirstName(firstNameParam);
-      //       handlePageChange(currentPageParam);
-      //       handleItemsPerPageChange(itemsPerPageParam);
-      //     } else if (filterTypeParam === 'id') {
-      //       setId(idParam);
-      //       setShowPagination(false);
-      //       resetPagination();
-      //     }
-      //   } else {
-      //     setShowFilterButton(true);
-      //     setId('');
-      //     setFirstName('');
-      //     setFilterType('');
-      //     setFilter(false);
-      //     setShowPagination(true);
-      //     resetPagination();
-      //   }
-      // },[searchParams]);
+      if (filterTypeFromParams === 'active' || filterTypeFromParams === 'inactive' ) {
+        setFilterType(filterTypeFromParams);
+        setShowFilterButton(false);
+        setShowPagination(true);
+      } else if(filterTypeFromParams === 'id'){
+        setFilterType(filterTypeFromParams);
+        setShowFilterButton(false);
+        setShowPagination(false);
+        setId(idFromParams);
+      }
+      else{
+        setFilterType('');
+        setShowFilterButton(true);
+        setShowPagination(true);
+      }
+      if (currentPageFromParams != prevCurrentPageRef.current || itemsPerPageFromParams != prevItemsPerPageRef.current) {
+        prevCurrentPageRef.current = currentPageFromParams;
+        prevItemsPerPageRef.current = itemsPerPageFromParams;
+        setCurrentPage(currentPageFromParams);
+        setItemsPerPage(itemsPerPageFromParams);
+      }
+  
+      insuranceCategoriesTable(filterTypeFromParams, currentPageFromParams, itemsPerPageFromParams, idFromParams);
+  
+    }, [searchParams]);
   
   
       useEffect(() => {
-        // const hasSearchParams = searchParams.toString() !== '';
+        if (currentPage != prevCurrentPageRef.current || itemsPerPage != prevItemsPerPageRef.current) {
+          prevCurrentPageRef.current = currentPage;
+          prevItemsPerPageRef.current = itemsPerPage;
+          setSearchParams({
+            filterType: searchParams.get('filterType'),
+            currentPage: currentPage,
+            itemsPerPage: itemsPerPage,
+          });
+        }
   
-        // if(!hasSearchParams) {
-        //   setShowFilterButton(true);
-        //   setId('');
-        //   setFirstName('');
-        //   setFilterType('');
-        //   setFilter(false);
-        //   setShowPagination(true);
-        // }
-        
-        // const timeoutId = setTimeout(() => {
-        //   customerTable();
-        // }, hasSearchParams ? 0: 0);
-        // return () => clearTimeout(timeoutId);
-        insuranceCategoriesTable();
-  
-      }, [filter, currentPage, itemsPerPage, searchParams]);
+      }, [currentPage, itemsPerPage, setSearchParams, searchParams]);
 
 
   return (
     <>
         <div className='content-area-insurance'>
-          <AreaTop pageTitle={"Get All Insurance Categories"} pagePath={"Insurance-Categories"} pageLink={`/admin/dashboard/${routeParams.id}`}/>
+        {loading && <Loader />}
+        <div className='flex justify-between'>
+        <AreaTop pageTitle={"Get All Insurance Categories"} pagePath={"Insurance-Categories"} pageLink={`/suraksha/admin/dashboard/${routeParams.id}`}/>
+          <button type="button" className="form-submit-b rounded-full" onClick={()=> navigate(`/suraksha/admin/add-insurance-categories/${routeParams.id}`)}>
+              Add Insurance
+          </button>
+        </div>
+         
           <section className="content-area-table-insurance">
             <div className="data-table-information">
               <h3 className="data-table-title">Insurance Categories</h3>

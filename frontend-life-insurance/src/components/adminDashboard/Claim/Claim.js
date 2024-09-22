@@ -8,30 +8,33 @@ import { ToastContainer } from 'react-toastify';
 import { getAllClaims } from '../../../services/AdminServices';
 import { errorToast } from '../../../utils/helper/toast';
 import { useParams } from 'react-router-dom';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const Claim = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [data, setData] = useState({});
+  const [loading, setLoading] = useState(false);
   const [keysToBeIncluded, setKeysToBeIncluded] = useState([]);
   const routeParams = useParams();
 
   const claimTable = async () => {
     try {
-        
+      setLoading(true);
         const response = await getAllClaims(currentPage, itemsPerPage);
         
         setData(response);
         setKeysToBeIncluded(["withdrawalRequestsId", "requestType", "customerId", "agentId", "amount"]);
 
     } catch (error) {
-        setData([]);
-        if (error.response?.data?.message || error.specificMessage) {
-          errorToast(error.response?.data?.message || error.specificMessage);
-        } else {
-            errorToast("An unexpected error occurred. Please try again later.");
-        }
-    }
+      if (error.response?.data?.message || error.specificMessage) {
+        errorToast(error.response?.data?.message || error.specificMessage);
+      } else {
+          errorToast("An unexpected error occurred. Please try again later.");
+      }
+  }finally{
+    setLoading(false);
+  }
 };
 
 
@@ -42,7 +45,8 @@ export const Claim = () => {
   return (
   <>
       <div className='content-area-claim'>
-        <AreaTop pageTitle={"Get All Claims"} pagePath={"Claim"} pageLink={`/admin/dashboard/${routeParams.id}`}/>
+      {loading && <Loader />}
+        <AreaTop pageTitle={"Get All Claims"} pagePath={"Claim"} pageLink={`/suraksha/admin/dashboard/${routeParams.id}`}/>
         <section className="content-area-table-claim">
           <div className="data-table-information">
             <h3 className="data-table-title">Claim</h3>

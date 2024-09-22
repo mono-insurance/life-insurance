@@ -71,6 +71,24 @@ public class AuthServiceImp implements AuthService{
 //	        if (user.getCustomer() != null && !user.getCustomer().isActive()) {
 //	            throw new UserException("Your account is inactive. Please contact Admin to make it active.");
 //	        }
+		    if(credentials.getCustomer() != null) {
+		    	if(!credentials.getCustomer().getIsActive()) {
+		    		throw new UserException("Can't Login!. You are inactive");
+		    	}
+		    }
+		    if(credentials.getAgent() != null) {
+		    	if(!credentials.getCustomer().getIsActive()) {
+		    		throw new UserException("Can't Login!. You are inactive");
+		    	}
+		    	else if(!credentials.getAgent().getIsApproved()) {
+		    		throw new UserException("Can't Login!. Your profile is for under review. Login After verification");
+		    	}
+		    }
+	        if(credentials.getEmployee() != null) {
+	        	if(!credentials.getEmployee().getIsActive()) {
+		    		throw new UserException("Can't Login!. You are inactive");
+		    	}
+	        }
 	        
 	        String token = jwtTokenProvider.generateToken(authentication);
 	        

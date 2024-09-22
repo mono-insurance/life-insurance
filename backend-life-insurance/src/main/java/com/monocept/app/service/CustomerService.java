@@ -55,4 +55,14 @@ public interface CustomerService {
 
 	void createInstallmentPayment(InstallmentDTO installmentDTO);
 
+	PagedResponse<DocumentUploadedDTO> getAllDocuments(int page, int size, String sortBy, String direction);
+
+	PagedResponse<DocumentUploadedDTO> getAllDisapprovedDocuments(int page, int size, String sortBy, String direction);
+
+	PagedResponse<DocumentUploadedDTO> getAlDocumentsByAgent(Long id, int page, int size, String sortBy,
+			String direction);
+
+	PagedResponse<DocumentUploadedDTO> getAlDocumentsByCustomer(Long id, int page, int size, String sortBy,
+			String direction);
+
 }
