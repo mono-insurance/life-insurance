@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { errorToast } from '../utils/helper/toast';
 import { AxiosError, NotFoundError } from '../utils/errors/APIError';
+import { useNavigate } from 'react-router-dom';
 
 export const verifyAdmin = async ({ adminId }) => {
     const token = localStorage.getItem('auth');
@@ -27,7 +28,7 @@ export const verifyAgent = async ({ agentId }) => {
     const token = localStorage.getItem('auth');
 
     if (!token) {
-        throw new NotFoundError('Unauthorized access. You are not an admin.');
+        throw new NotFoundError('Unauthorized access. You are not an agent.');
     }
 
     try {
@@ -144,8 +145,8 @@ export const register = async (formData) => {
 export const SendOtp = async (usernameOrEmail) => {
     try {
         const response = await axios.post(`http://localhost:8080/public/api/auth/change-password-request/${usernameOrEmail}`, {},
-         {
-        }).catch((error) => { throw new AxiosError(error.response.data.message) });
+            {
+            }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
         return response;
 
@@ -154,11 +155,11 @@ export const SendOtp = async (usernameOrEmail) => {
         throw error;
     }
 }
-export const VerifyOpt = async (otp,usernameOrEmail) => {
+export const VerifyOpt = async (otp, usernameOrEmail) => {
     try {
         const response = await axios.post(`http://localhost:8080/public/api/auth/otp-confirmation/${usernameOrEmail}/${otp}`, {},
-         {
-        }).catch((error) => { throw new AxiosError(error.response.data.message) });
+            {
+            }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
         return response;
 
@@ -169,9 +170,9 @@ export const VerifyOpt = async (otp,usernameOrEmail) => {
 }
 export const PasswordResetRequest = async (formData) => {
     try {
-        const response = await axios.post(`http://localhost:8080/public/api/auth/password-reset`,formData,
-         {
-        }).catch((error) => { throw new AxiosError(error.response.data.message) });
+        const response = await axios.post(`http://localhost:8080/public/api/auth/password-reset`, formData,
+            {
+            }).catch((error) => { throw new AxiosError(error.response.data.message) });
 
         return response;
 

@@ -21,13 +21,29 @@ const Navbar = () => {
         localStorage.removeItem("id")
         navigate("/");
         setToken('')
+        setRole('')
     };
+    const handleLogin = () => {
+        navigate("/login");
+    }
+    const handleRegister = () => {
+        navigate("/register")
+    }
     return (
         <header>
             <nav className={iconActive ? "nav-active" : ""}>
-                {role === "Customer" &&
-                    <h2 className="nav-logo">
-                        <NavLink to={`/customer/settings/${userId}`}>Profile</NavLink>
+                {role != null &&
+                    <h2 className="absolute top-3 left-5">
+                        {role == "Customer" ?
+                            <NavLink to={`/customer/settings/${userId}`}>Profile</NavLink>
+                            : role == "Employee" ?
+                                <NavLink to={`/employee/dashboard/${userId}`}>Dashboard</NavLink>
+                                : role == "Agent" ?
+                                    <NavLink to={`/agent/dashboard/${userId}`}>Dashboard</NavLink>
+                                    : <NavLink to={`/admin/dashboard/${userId}`}>Dashboard</NavLink>
+                        }
+
+
                     </h2>
                 }
 
@@ -69,33 +85,20 @@ const Navbar = () => {
 
 
                     {!token ? (
-                        <>
-                            <li>
-                                <NavLink
-                                    className="btn"
-                                    to={"/login"}
-                                >
-                                    Login
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink
-                                    className="btn"
-                                    to={"/register"}
-                                >
-                                    Register
-                                </NavLink>
-                            </li>
-                        </>
+                        <div className="absolute top-3 right-12 flex gap-2">
+                            <button className="btn btn-primary" onClick={handleLogin}>
+                                Login
+                            </button>
+                            <button className="btn btn-secondary" onClick={handleRegister}>
+                                Register
+                            </button>
+                        </div>
                     ) : (
-                        <li>
-                            <span
-                                className="btn"
-                                onClick={logoutFunc}
-                            >
+                        <div className="absolute top-3 right-12">
+                            <button className="btn btn-danger" onClick={logoutFunc}>
                                 Logout
-                            </span>
-                        </li>
+                            </button>
+                        </div>
                     )}
                 </ul>
             </nav>

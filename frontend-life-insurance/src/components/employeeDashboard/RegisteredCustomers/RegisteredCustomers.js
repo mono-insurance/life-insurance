@@ -1,118 +1,178 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { AreaTop } from '../../../sharedComponents/Title/Title'
-import { errorToast, successToast } from '../../../utils/helper/toast';
-import { NotFoundError } from '../../../utils/errors/APIError';
-import { PaginationContext } from '../../../context/PaginationContext';
+import { AreaTop } from '../../../sharedComponents/Title/Title';
 import { Table } from '../../../sharedComponents/Table/Table';
-import './RegisteredCustomers.scss'
-import { useParams } from 'react-router-dom';
-import { allRegisteredCustomers, approveCustomerProfile } from '../../../services/EmployeeServices';
-import { validateCustomerId } from '../../../utils/validations/Validations';
-import { Toast } from 'react-bootstrap';
+import { PaginationContext } from '../../../context/PaginationContext';
+import './getCustomers.scss';
 import { ToastContainer } from 'react-toastify';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { errorToast, successToast } from '../../../utils/helper/toast';
+import { FilterButton } from '../../../sharedComponents/FilterButton/FilterButton';
+import { covertIdDataIntoTable } from '../../../services/SharedServices';
+import { validateCustomerId, validateFirstName } from '../../../utils/validations/Validations';
+import { allRegisteredCustomers, approveCustomerProfile } from '../../../services/EmployeeServices';
 
 export const RegisteredCustomers = () => {
-    const [newlyActivated, setNewlyActivated] = useState(false);
-    const [activatedData, setActivatedData] = useState('');
-    const [data, setData] = useState([]);
-    const [showActiveCustomers, setShowActiveCustomers] = useState(false);
-    const [showInactiveCustomers, setShowInactiveCustomers] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [data, setData] = useState({});
     const [keysToBeIncluded, setKeysToBeIncluded] = useState([]);
-    const { currentPage, itemsPerPage, resetPagination } = useContext(PaginationContext);
-    const [customerId, setCustomerId] = useState('');
     const routeParams = useParams();
+    const [showFilterButton, setShowFilterButton] = useState(true);
+    const [filterType, setFilterType] = useState('');
+    const [filter, setFilter] = useState(false);
+    const [id, setId] = useState('');
+    const [active, setActive] = useState('');
+    const [showPagination, setShowPagination] = useState(true);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [customerId, setCustomerId] = useState(null)
+    const filterOptions = [
+        { label: 'Search by Active', value: 'active' },
+        { label: 'Search by Inactive', value: 'inactive' }
+    ];
 
 
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            validateCustomerId(customerId);
-            const isApproved = true;
-            await approveCustomerProfile(customerId, isApproved);
-            fetchRegisteredCustomers()
-            successToast("Customer has been activated successfully!");
-            setCustomerId('');
+    const resetPagination = () => {
+        setCurrentPage(1);
+        setItemsPerPage(10);
+    };
+
+    const handleSearch = () => {
+        resetPagination();
+        if (filterType === 'id') {
+            setSearchParams({ filterType, id });
+            setShowPagination(false);
         }
-        catch (error) {
-            if (error.response?.data?.message || error.specificMessage) {
-                errorToast(error.response?.data?.message || error.specificMessage);
-            } else {
-                errorToast("An error occurred while Activating customer.");
-            }
+        if (filterType === 'active') {
+            setSearchParams({ filterType, active, currentPage, itemsPerPage });
+            setShowPagination(true);
+        }
+        if (filterType === 'inactive') {
+            setSearchParams({ filterType, active, currentPage, itemsPerPage });
+            setShowPagination(true);
+        }
+        if (filter === false) {
+            setFilter(true);
+        }
+        else {
+            customerTable();
         }
     }
 
-    const fetchRegisteredCustomers = async () => {
-        try {
-            const formData = {
-                pageNo: 0,
-                size: 10,
-                sort: 'ASC',
-            }
-            const response = await allRegisteredCustomers(formData);
-            console.log("in active customer click", response?.data.content ?? [])
-            setData(response?.data ?? []);
-            console.log("data in response", data)
+    const handleReset = () => {
+        setFilterType('');
+        setId('');
+        setActive('');
+        setShowFilterButton(true);
+        resetPagination();
+        setFilter(false);
+        setShowPagination(true);
+        setSearchParams({});
+    };
 
-            setKeysToBeIncluded(["customerId", "firstName", "dateOfBirth", "nomineeName", "nomineeRelation"]);
-            setShowActiveCustomers(true);
-            setShowInactiveCustomers(false);
-        }
-        catch (error) {
+    const actions = (customerId) => [
+        { name: "View", url: `/employee/${routeParams.id}/customer/settings/${customerId}` }
+    ]
+
+
+
+    const customerTable = async () => {
+        try {
+            let response = {};
+           const formData = {
+                page: currentPage,
+                size: itemsPerPage
+            }
+
+            if (filterType === 'active') {
+                response = await allRegisteredCustomers(formData);
+            }
+            else if (filterType === 'inactive') {
+                response = await allRegisteredCustomers(formData);
+            }
+            else {
+                response = await allRegisteredCustomers(formData);
+            }
+
+            setData(response);
+            setKeysToBeIncluded(["customerId", "firstName", "lastName", "gender", "dateOfBirth", "isApproved"]);
+
+        } catch (error) {
             setData([]);
             if (error.response?.data?.message || error.specificMessage) {
                 errorToast(error.response?.data?.message || error.specificMessage);
             } else {
-                errorToast("An error occurred while Activating customers.");
+                errorToast("An unexpected error occurred. Please try again later.");
             }
         }
-    }
+    };
+
     useEffect(() => {
-        fetchRegisteredCustomers();
-    }, [currentPage, itemsPerPage]);
+        customerTable();
+
+    }, [filter, currentPage, itemsPerPage, searchParams]);
+
+    const handleActivateCustomer = async (e) => {
+        e.preventDefault()
+        console.log("in handleDeleteCustomer")
+        console.log("custeomr id s", customerId)
+        await approveCustomerProfile(customerId)
+        customerTable()
+    }
 
 
     return (
-        <div className='content-area'>
-            <AreaTop pageTitle={"Registered Customers"} pagePath={"new-Customers"} pageLink={`/admin/dashboard/${routeParams.id}`} />
-            <section className='content-area-form'>
-                <div className="admin-form">
-                    <div className="data-info">
-                        <h3 className="data-table-title">New Registered Customers</h3>
-                    </div>
-                    <div className='activate-form'>
-                        <form>
-                            <input type="number" name="customerId" value={customerId} onChange={(e) => setCustomerId(e.target.value)} className="form-input-form" placeholder='Enter Customer ID' required />
-                            <button type="submit" className="form-submit-form" onClick={(event) => handleFormSubmit(event)}>Approve Customer</button>
-                        </form>
-                    </div>
+        <>
+            <div className='content-area-customers'>
+                <AreaTop pageTitle={"Get All Registered Customers"} pagePath={"Customer"} pageLink={`/employee/dashboard/${routeParams.id}`} />
+                <section className="content-area-table-customers">
 
+                    <div className="admin-form">
+                        <div className='activate-form' hidden={filterType == '' || filterType == 'inactive'}>
+                            <form>
+                                <input type="number" name="customerId" value={customerId} onChange={(e) => setCustomerId(e.target.value)} className="form-input-form" placeholder='Enter Customer ID' required />
+                                <button type="submit" className="form-submit-form" onClick={(event) => handleActivateCustomer(event)}>Approve Customer </button>
 
-                    {newlyActivated && (
-                        <div className="deactivate-success">
-                            {activatedData}
+                            </form>
                         </div>
-                    )}
+                    </div>
 
-                </div>
-            </section>
-
-            {(showActiveCustomers || showInactiveCustomers) && (
-                <section className="content-area-table">
-                    <div className="data-table-info">
-                        <h3 className="data-table-title">Registered Customers</h3>
+                    <div className="data-table-information">
+                        <h3 className="data-table-title">Customers</h3>
+                        {showFilterButton && (
+                            <FilterButton setShowFilterButton={setShowFilterButton} showFilterButton={showFilterButton} filterOptions={filterOptions} setFilterType={setFilterType} />
+                        )}
+                        {(filterType === 'active' || filterType === 'inactive' || filterType === 'id') && (
+                            <div className="filter-container">
+                                {filterType === 'id' && (
+                                    <div className="filter">
+                                        <input type="number" placeholder="Enter Customer Id" className="form-input" name={id} value={id} onChange={(e) => setId(e.target.value)} />
+                                    </div>
+                                )}
+                                <div className="filter-buttons">
+                                    <button className="form-submit-b" onClick={handleSearch}>Search</button>
+                                    <button className="form-submit-b" onClick={handleReset}>Clear</button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <div className="data-table-diagram">
                         <Table
                             data={data}
                             keysToBeIncluded={keysToBeIncluded}
-                            includeButton={false}
-                            handleButtonClick={null}
+                            includeButton={true}
+                            handleButtonClick={actions}
+                            showPagination={showPagination}
+                            currentPage={currentPage}
+                            pageSize={itemsPerPage}
+                            setPage={setCurrentPage}
+                            setPageSize={setItemsPerPage}
                         />
                     </div>
                 </section>
-            )}
+
+            </div>
             <ToastContainer position="bottom-right" />
-        </div>
+        </>
+
     )
 }

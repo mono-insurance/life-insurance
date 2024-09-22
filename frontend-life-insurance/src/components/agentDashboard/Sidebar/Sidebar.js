@@ -33,8 +33,10 @@ export const Sidebar = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('auth');
+        localStorage.removeItem('role')
+        localStorage.removeItem('id')
         resetSidebar();
-        window.location.href = '/auth/login';
+        window.location.href = '/login';
     };
 
     // closing the navbar when clicked outside the sidebar area
@@ -109,6 +111,14 @@ export const Sidebar = () => {
                                     <MdOutlineCurrencyExchange size={18} />
                                 </span>
                                 <span className="menu-link-text">customers</span>
+                            </NavLink>
+                        </li>
+                        <li className={`menu-item ${activeMenu === 'accounts' ? 'active' : ''}`}>
+                            <NavLink to={`/agent/accounts/${routeParams.aid}`} className="menu-link" onClick={() => handleMenuClick('accounts')}>
+                                <span className="menu-link-icon">
+                                    <MdOutlineCurrencyExchange size={18} />
+                                </span>
+                                <span className="menu-link-text">policy accounts</span>
                             </NavLink>
                         </li>
                         <li className={`menu-item ${activeMenu === 'commissions' ? 'active' : ''}`}>

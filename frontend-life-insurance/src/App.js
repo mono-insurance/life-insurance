@@ -91,6 +91,8 @@ import { EmpQuery } from './components/employeeDashboard/Query/Query';
 import Home from './pages/Home';
 import PerformTransaction from './components/customerDashboard/PerformTransaction/PerformTransaction';
 import FailedTransaction from './components/customerDashboard/PerformTransaction/FailedTransaction';
+import { AgentCustomerProfile } from './components/agentDashboard/CustomerProfile/AgentCustomerProfile';
+import SingleDocument from './components/employeeDashboard/AllDocuments/SingleDocument';
 function App() {
 
   const { theme, toggleTheme } = useContext(ThemeContext);
@@ -135,9 +137,10 @@ function App() {
           <Route path='/admin/add-employees/:id' element={<AddEmployees />}></Route>
           <Route path='/admin/get-employees/:id' element={<GetEmployees />}></Route>
           <Route path='/admin/add-agents/:id' element={<AddAgents />}></Route>
-          <Route path='/admin/get-agents/:id' element={<GetAgents />}></Route>
+          <Route path='/admin/get-agents/:id' element={<AllAgents />}></Route>
           <Route path='/admin/add-customers/:id' element={<AddCustomers />}></Route>
-          <Route path='/admin/get-customers/:id' element={<AllCustomers />}></Route>
+          <Route path='/admin/get-customers/:id' element={<GetCustomers />}></Route>
+          <Route path='/admin/:id/customer/settings/:cid' element={<CustomerProfile />}></Route>
           <Route path='/admin/add-state/:id' element={<AddState />}></Route>
           <Route path='/admin/get-state/:id' element={<GetState />}></Route>
           <Route path='/admin/add-city/:id' element={<AddCity />}></Route>
@@ -165,6 +168,8 @@ function App() {
           <Route path='/admin/query/:id/edit/:queryId' element={<UpdateQuery />}></Route>
           <Route path='/admin/query/:id/delete/:queryId' element={<DeleteQuery />}></Route>
 
+          <Route path='/admin/:id/customer/settings/:customerId' element={<AgentCustomerProfile />}></Route>
+
         </Route>
         <Route element={<Agent />}>
           <Route path='/agent/dashboard/:aid' element={< AgentDashboard />}></Route>
@@ -175,6 +180,8 @@ function App() {
           <Route path='/agent/balance/:aid' element={<AgentBalance />}></Route>
           <Route path='/agent/email/:aid' element={<AgentEmails />}></Route>
           <Route path='/agent/profile/:aid' element={<AgentProfile />}></Route>
+          <Route path='/agent/policy-account/:aid/view/:policyAccountId' element={<ViewPolicyAccount />}></Route>
+          <Route path='/agent/:aid/customer/settings/:customerId' element={<AgentCustomerProfile />}></Route>
 
         </Route>
         <Route element={<Employee />}>
@@ -183,11 +190,14 @@ function App() {
           <Route path='/employee/customers/:id' element={<AllCustomers />}></Route>
           <Route path='/employee/agents/:id' element={<AllAgents />}></Route>
           <Route path='/employee/accounts/:id' element={<AllAccounts />}></Route>
+          <Route path='/employee/policy-account/:id/view/:policyAccountId' element={<ViewPolicyAccount />}></Route>
+
           <Route path='/employee/registered-customers/:id' element={<RegisteredCustomers />}></Route>
           <Route path='/employee/all-documents/:id' element={<AllDocuments />}></Route>
+          <Route path='/employee/:id/document/:documentId' element={<SingleDocument />}></Route>
           <Route path='/employee/commissions/:id' element={<AllCommissions />}></Route>
           <Route path='/employee/transactions/:id' element={<AllTransactions />}></Route>
-          <Route path='/employee/:id/customer/settings/:eid' element={<CustomerProfile />}></Route>
+          <Route path='/employee/:id/customer/settings/:customerId' element={<AgentCustomerProfile />}></Route>
           <Route path='/employee/:id/agent/profile/:aid' element={<AgentProfile />}></Route>
           <Route path='/employee/get-state/:id' element={<GetEmpState />}></Route>
           <Route path='/employee/get-city/:id' element={<GetEmpCity />}></Route>
