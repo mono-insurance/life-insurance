@@ -149,4 +149,6 @@ public interface DtoService {
 	CommissionDTO convertTransactionEntityToCommissionDTO(Transactions transactions);
 
 	PageResult convertTransactionsToPage(List<Transactions> transactions, int pageNo, String sort, String sortBy, String sortDirection, int size);
+
+	DocumentUploadedDTO convertDocumentUploadedToDTO(DocumentUploaded documentUploaded);
 }

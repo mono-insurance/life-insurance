@@ -52,9 +52,9 @@ public class EmployeeController {
             @RequestParam(name = "startsWith", defaultValue = "a") String firstName,
             @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
-        PagedResponse<CustomerDTO> policyAccounts = customerService.getAllCustomersStartswith(page, size,sort, firstName, direction);
+        PagedResponse<CustomerDTO> customersStartswith = customerService.getAllCustomersStartswith(page, size,sort, firstName, direction);
 
-        return new ResponseEntity<>(policyAccounts, HttpStatus.OK);
+        return new ResponseEntity<>(customersStartswith, HttpStatus.OK);
 
     }
 
@@ -227,6 +227,27 @@ public class EmployeeController {
 
         return new ResponseEntity<>(customers, HttpStatus.OK);
     }
+    @Operation(summary = "By Admin: Get All not approved docs")
+    @GetMapping("/document/all")
+    public ResponseEntity<PagedResponse<DocumentUploadedDTO>> getAllDocuments(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size,
+            @RequestParam(name = "sortBy", defaultValue = "documentId") String sortBy,
+            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
+
+        PagedResponse<DocumentUploadedDTO> customers = employeeService.getAllDocuments(page, size, sortBy, direction);
+
+        return new ResponseEntity<>(customers, HttpStatus.OK);
+    }
+    @Operation(summary = "By Admin: Get All not approved docs")
+    @GetMapping("/document/{documentId}")
+    public ResponseEntity<PagedResponse<DocumentUploadedDTO>> getDocumentById(
+            @PathVariable("documentId")Long documentId) {
+
+        PagedResponse<DocumentUploadedDTO> customers = employeeService.getDocumentById(documentId);
+
+        return new ResponseEntity<>(customers, HttpStatus.OK);
+    }
 
     @Operation(summary = "By Admin: Get All not approved docs")
     @GetMapping("/document/approved")
@@ -252,52 +273,35 @@ public class EmployeeController {
 
     @Operation(summary = "By Admin,emp: Get agents")
     @GetMapping("/agents")
-    ResponseEntity<PagedResponse<AgentDTO>> getAllAgents(@RequestParam(name = "pageNo", defaultValue = "0") int pageNo, @RequestParam(name = "size", defaultValue = "10") int size, @RequestParam(name = "sort", defaultValue = "ASC") String sort, @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy, @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
-        PagedResponse<AgentDTO> allAgents = agentService.getAllAgents(pageNo, size, sort, sortBy, sortDirection);
+    ResponseEntity<PagedResponse<AgentDTO>> getAllAgents(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "10") int size, @RequestParam(name = "sort", defaultValue = "ASC") String sort, @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy, @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
+        PagedResponse<AgentDTO> allAgents = agentService.getAllAgents(page, size, sort, sortBy, sortDirection);
         return new ResponseEntity<>(allAgents, HttpStatus.OK);
     }
 
-    @Operation(summary = "By Admin,emp: Get All active customers")
-    @GetMapping("/active-customers")
-    ResponseEntity<PagedResponse<CustomerDTO>> getAllActiveCustomers(
-            @RequestParam(name = "pageNo", defaultValue = "0")
-            int pageNo, @RequestParam(name = "size", defaultValue = "10") int size,
-            @RequestParam(name = "sort", defaultValue = "ASC") String sort,
-            @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy,
-            @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
-        PagedResponse<CustomerDTO> allCustomers = customerService.getAllActiveCustomers(pageNo, size, sort, sortBy, sortDirection);
-        return new ResponseEntity<>(allCustomers, HttpStatus.OK);
-    }
+
 
     @Operation(summary = "By Admin,emp: Get All active customers")
     @GetMapping("/active-agents")
     ResponseEntity<PagedResponse<AgentDTO>> getAllActiveAgents(
-            @RequestParam(name = "pageNo", defaultValue = "0")
-            int pageNo, @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "page", defaultValue = "0")
+            int page, @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sort", defaultValue = "ASC") String sort,
             @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
-        PagedResponse<AgentDTO> allActiveAgents = agentService.getAllActiveAgents(pageNo, size, sort, sortBy, sortDirection);
+        PagedResponse<AgentDTO> allActiveAgents = agentService.getAllActiveAgents(page, size, sort, sortBy, sortDirection);
         return new ResponseEntity<>(allActiveAgents, HttpStatus.OK);
     }
 
     @Operation(summary = "By Admin,emp: Get All active customers")
     @GetMapping("/inactive-agents")
     ResponseEntity<PagedResponse<AgentDTO>> getAllInActiveAgents(
-            @RequestParam(name = "pageNo", defaultValue = "0")
-            int pageNo, @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "page", defaultValue = "0")
+            int page, @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sort", defaultValue = "ASC") String sort,
             @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
-        PagedResponse<AgentDTO> allActiveAgents = agentService.getAllInActiveAgents(pageNo, size, sort, sortBy, sortDirection);
+        PagedResponse<AgentDTO> allActiveAgents = agentService.getAllInActiveAgents(page, size, sort, sortBy, sortDirection);
         return new ResponseEntity<>(allActiveAgents, HttpStatus.OK);
-    }
-
-    @Operation(summary = "By Admin,emp: Get All inactive customers")
-    @GetMapping("/inactive-customers")
-    ResponseEntity<PagedResponse<CustomerDTO>> getAllInActiveCustomers(@RequestParam(name = "pageNo", defaultValue = "0") int pageNo, @RequestParam(name = "size", defaultValue = "10") int size, @RequestParam(name = "sort", defaultValue = "ASC") String sort, @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy, @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
-        PagedResponse<CustomerDTO> allCustomers = customerService.getAllInActiveCustomers(pageNo, size, sort, sortBy, sortDirection);
-        return new ResponseEntity<>(allCustomers, HttpStatus.OK);
     }
 
     @Operation(summary = "By Admin,emp: delete agents")
@@ -306,11 +310,23 @@ public class EmployeeController {
         Boolean isSuccess = agentService.deleteAgent(agentId);
         return new ResponseEntity<>(isSuccess, HttpStatus.OK);
     }
+    @Operation(summary = "By Admin,emp: delete policyaccount")
+    @DeleteMapping("/policy-account/{pid}")
+    ResponseEntity<Boolean> policyAccount(@PathVariable("pid") Long policyAccount) {
+        Boolean isSuccess = employeeService.deletePolicyAccount(policyAccount);
+        return new ResponseEntity<>(isSuccess, HttpStatus.OK);
+    }
 
     @Operation(summary = "By Admin,emp: activate agents")
     @PostMapping("/activate-agent/{aid}")
     ResponseEntity<Boolean> activateAgent(@PathVariable("aid") Long agentId) {
         Boolean isSuccess = agentService.activateAgent(agentId);
+        return new ResponseEntity<>(isSuccess, HttpStatus.OK);
+    }
+    @Operation(summary = "By Admin,emp: activate agents")
+    @PutMapping("/activate-policy-account/{aid}")
+    ResponseEntity<Boolean> activatePolicyAccount(@PathVariable("aid") Long policyAccountId) {
+        Boolean isSuccess = employeeService.activatePolicyAccount(policyAccountId);
         return new ResponseEntity<>(isSuccess, HttpStatus.OK);
     }
 
@@ -437,73 +453,34 @@ public class EmployeeController {
     }
 
 
-    @Operation(summary = "By Admin: Get All Transactions")
-    @GetMapping("/transactions")
-    public ResponseEntity<PagedResponse<TransactionsDTO>> getAllTransactions(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "transactionId") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction) {
-
-        PagedResponse<TransactionsDTO> transactions = employeeService.getAllTransactions(page, size, sortBy, direction);
-
-        return new ResponseEntity<PagedResponse<TransactionsDTO>>(transactions, HttpStatus.OK);
-
-    }
 
 
-    @Operation(summary = "By Admin: Get All Transactions by Customer Policy Account")
-    @GetMapping("/transactions/policy-account/{id}")
-    public ResponseEntity<PagedResponse<TransactionsDTO>> getAllTransactionsByPolicyAccount(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "transactionId") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction, @PathVariable(name = "id") Long id) {
 
-        PagedResponse<TransactionsDTO> transactions = employeeService.getAllTransactionsByPolicyAccount(page, size, sortBy, direction, id);
 
-        return new ResponseEntity<PagedResponse<TransactionsDTO>>(transactions, HttpStatus.OK);
-
-    }
 
     @Operation(summary = "By Admin,emp: Get All policyClaims by Customer")
     @GetMapping("/policy-claims-request")
     ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllPolicyClaimsRequest(
-            @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
+            @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sort", defaultValue = "ASC") String sort,
             @RequestParam(name = "sortBy", defaultValue = "amount") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
-        PagedResponse<WithdrawalRequestsDTO> allPolicyClaims = customerService.getAllPolicyClaimsRequest(pageNo, size, sort, sortBy, sortDirection, 0L);
+        PagedResponse<WithdrawalRequestsDTO> allPolicyClaims = customerService.getAllPolicyClaimsRequest(page, size, sort, sortBy, sortDirection, 0L);
         return new ResponseEntity<>(allPolicyClaims, HttpStatus.OK);
     }
 
     @Operation(summary = "By Admin,Emp: Get All PolicyClaims that are approved")
     @GetMapping("/policy-claims-approved")
     ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllPolicyClaimsApproved(
-            @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
+            @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sort", defaultValue = "ASC") String sort,
             @RequestParam(name = "sortBy", defaultValue = "amount") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
-        PagedResponse<WithdrawalRequestsDTO> allPolicyClaims = customerService.getAllPolicyClaimsApproved(pageNo, size, sort, sortBy, sortDirection);
+        PagedResponse<WithdrawalRequestsDTO> allPolicyClaims = customerService.getAllPolicyClaimsApproved(page, size, sort, sortBy, sortDirection);
         return new ResponseEntity<>(allPolicyClaims, HttpStatus.OK);
     }
-
-
-    @Operation(summary = "By Admin: Get All Transactions by Customer")
-    @GetMapping("/transactions/customer/{id}")
-    public ResponseEntity<PagedResponse<TransactionsDTO>> getAllTransactionsByCustomer(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "transactionId") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction, @PathVariable(name = "id") Long id) {
-
-        PagedResponse<TransactionsDTO> transactions = employeeService.getAllTransactionsByCustomer(page, size, sortBy, direction, id);
-
-        return new ResponseEntity<PagedResponse<TransactionsDTO>>(transactions, HttpStatus.OK);
-
-    }
-
-
-    @Operation(summary = "By Admin: Get All the Transactions between Start date and End Date")
-    @GetMapping("/transactions/date")
-    public ResponseEntity<PagedResponse<TransactionsDTO>> getAllTransactionsBetweenDate(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "id") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction, @RequestParam(name = "startDate") LocalDate startDate, @RequestParam(name = "endDate") LocalDate endDate) {
-
-        PagedResponse<TransactionsDTO> transactions = employeeService.getAllTransactionsBetweenDate(page, size, sortBy, direction, startDate, endDate);
-
-        return new ResponseEntity<PagedResponse<TransactionsDTO>>(transactions, HttpStatus.OK);
-
-    }
-
 
     @Operation(summary = "By Admin: Get All feedback")
     @GetMapping("/feedback")

@@ -6,10 +6,13 @@ import com.monocept.app.entity.PolicyAccount;
 
 import java.util.List;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -35,4 +38,16 @@ public interface PolicyAccountRepository extends JpaRepository<PolicyAccount,Lon
 
     Long countByIsActiveTrue();
 
+    Page<PolicyAccount> findAllByIsActiveTrue(Pageable pageable);
+
+    Page<PolicyAccount> findAllByIsActiveFalse(Pageable pageable);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE PolicyAccount p set p.isActive=false where p.policyAccountId=:policyAccountId")
+    int deletePolicyAccount(@Param("policyAccountId") Long policyAccount);
+    @Modifying
+    @Transactional
+    @Query("UPDATE PolicyAccount p set p.isActive=true where p.policyAccountId=:policyAccountId")
+    int activatePolicyAccount(Long policyAccountId);
 }

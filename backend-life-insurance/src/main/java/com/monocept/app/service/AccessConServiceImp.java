@@ -130,11 +130,26 @@ public class AccessConServiceImp implements AccessConService{
     public void checkCustomerAccess(Long customerId) {
         String role=getUserRole();
         CustomUserDetails customUserDetails=checkUserAccess();
-        if(!((role.equals("CUSTOMER") && customUserDetails.getId().equals(customerId)) ||
+        if(role.equals("AGENT")){
+            isHisCustomer(customerId);
+        }
+        else if(!((role.equals("CUSTOMER") && customUserDetails.getId().equals(customerId)) ||
                 role.equals("EMPLOYEE")|| role.equals("ADMIN"))){
             throw new RoleAccessException("you don't have access to this document");
         }
     }
+
+        private void isHisCustomer(Long customerId) {
+            CustomUserDetails customUserDetails = checkUserAccess();
+            Agent agent = findAgent(customUserDetails.getId());
+
+            boolean isSuccess = agent.getPolicyAccounts().stream().anyMatch(account ->
+                    account.getCustomer().getCustomerId().equals(customerId)
+            );
+            if (!isSuccess) {
+                throw new UserException("this is not your customer");
+            }
+        }
 
     @Override
     public void checkPolicyAccountAccess(Long id) {

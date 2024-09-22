@@ -91,4 +91,5 @@ public class Customer {
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference
 	private List<WithdrawalRequests> withdrawalRequests;
+
 }

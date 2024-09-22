@@ -54,5 +54,8 @@ public class PolicyAccountDTO {
     private Long customerId;
 
     private Long agentId;
+    private String customerName;
+
+    private String agentName;
 
 }
