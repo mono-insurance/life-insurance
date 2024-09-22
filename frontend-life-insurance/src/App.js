@@ -161,8 +161,6 @@ function App() {
 
               </Route>
 
-              <Route path="*" element={<Navigate to="/suraksha/login" replace />} />
-
             </Routes>
           
             {showButton && (
