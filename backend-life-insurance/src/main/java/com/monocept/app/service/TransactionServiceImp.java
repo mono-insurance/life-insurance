@@ -110,7 +110,7 @@ public class TransactionServiceImp implements TransactionService {
                 Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Transactions> pages = transactionsRepository.findByPolicyAccount(policyAccount, pageable);
+        Page<Transactions> pages = transactionsRepository.findAllByPolicyAccount(policyAccount, pageable);
         List<Transactions> allTransactions = pages.getContent();
         List<TransactionsDTO> allTransactionsDTO = dtoService.convertTransactionListEntityToDTO(allTransactions);
 

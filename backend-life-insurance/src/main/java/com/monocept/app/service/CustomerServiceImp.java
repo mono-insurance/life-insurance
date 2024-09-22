@@ -34,6 +34,10 @@ import com.monocept.app.repository.StateRepository;
 
 import com.monocept.app.repository.TransactionsRepository;
 import com.monocept.app.repository.WithdrawalRequestsRepository;
+import com.monocept.app.utils.*;
+
+import java.time.LocalDate;
+import java.util.*;
 import com.monocept.app.utils.DocumentType;
 import com.monocept.app.utils.GenderType;
 import com.monocept.app.utils.GlobalSettings;
@@ -44,7 +48,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -373,13 +376,13 @@ public class CustomerServiceImp implements CustomerService {
             agent = agentRepository.findById(policyAccountDTO.getAgentId())
                     .orElseThrow(() -> new UserException("Agent not found"));
 
-            if (customer.getAddress().getState().getStateId().equals(agent.getAddress().getState().getStateId())) {
+            if (Objects.equals(customer.getAddress().getState().getStateId(), agent.getAddress().getState().getStateId())) {
                 policyAccount.setAgent(agent);
                 Double commission = ((policy.getCommissionNewRegistration() / 100) * policyAccountDTO.getInvestmentAmount());
-
                 policyAccount.setAgentCommissionForRegistration(commission);
             } else {
-                policyAccount.setAgent(null);
+                agent=null;
+                policyAccount.setAgent(agent);
             }
         }
 
@@ -644,12 +647,36 @@ public class CustomerServiceImp implements CustomerService {
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNo, size, sorting);
-        Page<Customer> customerPage = customerRepository.findAllByIsActiveTrueAndIsApprovedTrue(pageable);
-        List<Customer> customers = customerPage.getContent();
-        List<CustomerDTO> customerDTOS = dtoService.convertCustomersToDto(customers);
-        return new PagedResponse<>(customerDTOS, customerPage.getNumber(),
-                customerPage.getSize(), customerPage.getTotalElements(), customerPage.getTotalPages(),
-                customerPage.isLast());
+        String role= accessConService.getUserRole();
+        if(role.equals("EMPLOYEE") || role.equals("ADMIN")){
+            Page<Customer> page=customerRepository.findAllByIsActiveTrueAndIsApprovedTrue(pageable);
+            List<Customer> customers=page.getContent();
+            List<CustomerDTO> customerDTOS=dtoService.convertCustomersToDto(customers);
+            return new PagedResponse<>(customerDTOS,page.getNumber(),page.getSize(),
+                    page.getTotalElements(),page.getTotalPages(),page.isLast());
+        }
+        CustomUserDetails customerService=accessConService.checkUserAccess();
+        Agent agent = findAgentById(customerService.getId());
+        List<PolicyAccount> policyAccounts=agent.getPolicyAccounts();
+        Set<Long> ids = new HashSet<>();
+        List<Customer> customerList=new ArrayList<>();
+        for (PolicyAccount policyAccount : policyAccounts) {
+            if(!ids.contains(policyAccount.getCustomer().getCustomerId())){
+                customerList.add(policyAccount.getCustomer());
+                ids.add(policyAccount.getCustomer().getCustomerId());
+            }
+        }
+        PageResult pageResult = dtoService.convertCustomersToPage(customerList, pageNo, sort, sortBy, sortDirection, size);
+        List<CustomerDTO> customerDto = dtoService.convertCustomersToDto(pageResult.getContent());
+        int end = pageResult.getTotalElements();
+        return new PagedResponse<>(
+                customerDto,
+                pageNo,
+                size,
+                customerList.size(),
+                (customerList.size() + size - 1) / size,
+                end == customerList.size()
+        );
     }
 
     @Override
@@ -679,18 +706,42 @@ public class CustomerServiceImp implements CustomerService {
     }
 
     @Override
-    public PagedResponse<CustomerDTO> getAllInActiveCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection) {
-        accessConService.checkEmployeeAccess();
+    public PagedResponse<CustomerDTO> getAllInActiveCustomers(int pageNo, int size, String sort, String sortBy,
+                                                              String sortDirection) {
         Sort sorting = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name())
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNo, size, sorting);
-        Page<Customer> customerPage = customerRepository.findAllByIsActiveFalseAndIsApprovedTrue(pageable);
-        List<Customer> customers = customerPage.getContent();
-        List<CustomerDTO> customerDTOS = dtoService.convertCustomersToDto(customers);
-        return new PagedResponse<>(customerDTOS, customerPage.getNumber(),
-                customerPage.getSize(), customerPage.getTotalElements(), customerPage.getTotalPages(),
-                customerPage.isLast());
+        String role= accessConService.getUserRole();
+        if(role.equals("EMPLOYEE") || role.equals("ADMIN")){
+            Page<Customer> page=customerRepository.findAllByIsActiveFalseAndIsApprovedTrue(pageable);
+            List<Customer> customers=page.getContent();
+            List<CustomerDTO> customerDTOS=dtoService.convertCustomersToDto(customers);
+            return new PagedResponse<>(customerDTOS,page.getNumber(),page.getSize(),
+                    page.getTotalElements(),page.getTotalPages(),page.isLast());
+        }
+        CustomUserDetails customUserDetails=accessConService.checkUserAccess();
+        Agent agent = findAgentById(customUserDetails.getId());
+        List<PolicyAccount> policyAccounts=agent.getPolicyAccounts();
+        Set<Long> ids = new HashSet<>();
+        List<Customer> customerList=new ArrayList<>();
+        for (PolicyAccount policyAccount : policyAccounts) {
+            if(!ids.contains(policyAccount.getCustomer().getCustomerId())){
+                customerList.add(policyAccount.getCustomer());
+                ids.add(policyAccount.getCustomer().getCustomerId());
+            }
+        }
+        PageResult pageResult = dtoService.convertCustomersToPage(customerList, pageNo, sort, sortBy, sortDirection, size);
+        List<CustomerDTO> customerDto = dtoService.convertCustomersToDto(pageResult.getContent());
+        int end = pageResult.getTotalElements();
+        return new PagedResponse<>(
+                customerDto,
+                pageNo,
+                size,
+                customerList.size(),
+                (customerList.size() + size - 1) / size,
+                end == customerList.size()
+        );
     }
 
 	@Override

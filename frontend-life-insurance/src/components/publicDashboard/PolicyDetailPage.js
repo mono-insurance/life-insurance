@@ -13,22 +13,23 @@ const PoliciesPage = () => {
     const [error, setError] = useState(null)
 
     const handleBuyPolicy = async (policyId) => {
-        const token = localStorage.getItem('auth');
-        if (!token) navigate('/login');
-        try {
-            const response = await IsEligible(policyId);
-            if (response.status != 200) {
-                setError(response.data.message)
-                setIsEligible(false)
-            }
-            else {
-                setIsEligible(true)
-            }
-        }
-        catch (err) {
-            setError("you are not eligible")
-            errorToast("you are not eligible")
-        }
+        setIsEligible(true)
+        // const token = localStorage.getItem('auth');
+        // if (!token) navigate('/login');
+        // try {
+        //     const response = await IsEligible(policyId);
+        //     if (response.status != 200) {
+        //         setError(response.data.message)
+        //         setIsEligible(false)
+        //     }
+        //     else {
+        //         setIsEligible(true)
+        //     }
+        // }
+        // catch (err) {
+        //     setError("you are not eligible")
+        //     errorToast("you are not eligible")
+        // }
 
     };
 
@@ -101,7 +102,7 @@ const PoliciesPage = () => {
                             <h3 className="text-lg font-semibold mb-2 text-gray-800">Documents Needed</h3>
                             <ul className="list-disc list-inside text-gray-700">
                                 {policy.documentsNeeded.map(doc => (
-                                    <li key={doc.documentId}>{doc.documentType}</li>
+                                    <li>{doc}</li>
                                 ))}
                             </ul>
                         </div>
@@ -115,7 +116,7 @@ const PoliciesPage = () => {
                         onClick={() => handleBuyPolicy(policy.policyId)}
                         className="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out"
                     >
-                        Check Eligiblity
+                        Start Purchase
                     </button>
                 </div>
 

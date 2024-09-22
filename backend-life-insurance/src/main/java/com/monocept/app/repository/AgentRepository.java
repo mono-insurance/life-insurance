@@ -25,4 +25,5 @@ public interface AgentRepository extends JpaRepository<Agent,Long> {
     Page<Agent> findAlByIsActiveTrue(Pageable pageable);
 
     Page<Agent> findAllByIsApprovedFalse(Pageable pageable);
+
 }

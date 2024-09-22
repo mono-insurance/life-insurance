@@ -45,4 +45,6 @@ public interface CustomerRepository extends JpaRepository<Customer,Long> {
     Page<Customer> findAllByIsActiveFalseAndIsApprovedTrue(Pageable pageable);
 
     Page<Customer> findAllByFirstName(Pageable pageable, String firstName);
+
+    Page<Customer> findAllByIsApprovedTrue(Pageable pageable);
 }
