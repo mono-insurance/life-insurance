@@ -30,6 +30,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthServiceImp implements AuthService{
 
+	@Autowired
+    private PasswordEncoder passwordEncoder;
 
     private AuthenticationManager authenticationManager;
     private JwtTokenProvider jwtTokenProvider;
@@ -38,8 +40,6 @@ public class AuthServiceImp implements AuthService{
     private CustomerRepository customerRepository;
     private AccessConService accessConService;
 	private final PasswordRepository passwordRepository;
-	@Autowired
-	private PasswordEncoder passwordEncoder;
 
 
     public AuthServiceImp(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider,
@@ -105,19 +105,19 @@ public class AuthServiceImp implements AuthService{
     }
 
     @Override
-    public LoginResponseDTO updatePassword(String password) {
-//        CustomUserDetails userDetails=accessConService.checkUserAccess();
-//        System.out.println("username in update password"+userDetails.getUsername());
-//        Credentials credential=authRepository.findByUsername(userDetails.getUsername());
-//
-//        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-//        String encodedPassword = passwordEncoder.encode(password);
-//
-//        credential.setPassword(encodedPassword);
-//        authRepository.save(credential);
-//        LoginDTO loginDTO=new LoginDTO(String.valueOf(userDetails.getUsername()),password);
-//        return loginUser(loginDTO);
-    	return null;
+    public String updatePassword(Long id, String oldPassword, String newPassword) {
+    	Credentials credentials = authRepository.findById(id).orElseThrow(()->new UserException("User not found"));
+    	
+    	if (!passwordEncoder.matches(oldPassword, credentials.getPassword())) {
+            throw new RuntimeException("Old password does not match");  // Handle invalid old password error
+        }
+    	
+    	String encodedNewPassword = passwordEncoder.encode(newPassword);
+    	
+    	credentials.setPassword(encodedNewPassword);
+    	authRepository.save(credentials);
+    	
+    	return "Password Updated Successfully! Need to login again";
     }
 
 	@Override
@@ -248,6 +248,19 @@ public class AuthServiceImp implements AuthService{
 		}
 
 		return otp.toString();
-
+	}
+	public Long isCustomerId(String token) {
+		Claims claims = Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody();
+		
+		Long tokenUserId = claims.get("id", Long.class);
+		String role = claims.get("role", String.class);
+	    System.out.println("Role: " + role);
+	    if( "ROLE_CUSTOMER".equals(role)) {
+	    	return tokenUserId;
+	    }
+	    else return 0L;
 	}
 }

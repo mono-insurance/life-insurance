@@ -1,36 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useOutletContext, useParams } from 'react-router-dom';
 import { AreaTop } from '../../../sharedComponents/Title/Title';
 import { errorToast, successToast } from '../../../utils/helper/toast';
 import { ToastContainer } from 'react-toastify';
 import { getQueryById } from '../../../services/AdminServices';
 import { updateQueryByCustomerEnd } from '../../../services/CustomerServices';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const UpdateCustomerQuery = () => {
-  const { id, queryId } = useParams(); // `id` refers to customerId and `queryId` to the query being updated
+  const {queryId } = useParams();
+  const {customerId} = useOutletContext();
+  const [loading, setLoading] = useState(true);
+  
   const [formState, setFormState] = useState({
     question: '',
     isResolved: false,
-    customerId: id, // Using customerId from route parameters
+    customerId: customerId,
   });
 
-  // Fetch query details on component mount
   useEffect(() => {
     const fetchQueryDetails = async () => {
       try {
-        const response = await getQueryById(queryId); // Fetch query by ID
+        setLoading(true);
+        const response = await getQueryById(queryId); 
         setFormState({
           question: response.question || '',
           isResolved: response.isResolved,
           customerId: response.customerId,
         });
       } catch (error) {
-        errorToast('Failed to load query details');
+        if (error.response?.data?.message || error.specificMessage) {
+          errorToast(error.response?.data?.message || error.specificMessage);
+        } else {
+          errorToast("An unexpected error occurred. Please try again later.");
+        }
+      }
+      finally {
+        setLoading(false);
       }
     };
 
-    fetchQueryDetails();
-  }, [queryId, id]);
+    if(customerId){
+      fetchQueryDetails();
+    }
+  }, [queryId, customerId]);
 
 
   const handleChange = (event) => {
@@ -41,10 +54,13 @@ export const UpdateCustomerQuery = () => {
     });
   };
 
+  
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      setLoading(true);
       if (!formState.question.trim()) {
         errorToast("Question field cannot be empty");
         return;
@@ -60,11 +76,17 @@ export const UpdateCustomerQuery = () => {
         errorToast("An unexpected error occurred. Please try again later.");
       }
     }
+    finally {
+      setLoading(false);
+    }
   };
+
+
 
   return (
     <div className='content-area'>
-      <AreaTop pageTitle={`Update Query ${queryId}`} pagePath={"Update-Query"} pageLink={`/customer/query/${id}`} />
+      {loading && <Loader />}
+      <AreaTop pageTitle={`Update Query ${queryId}`} pagePath={"Update-Query"} pageLink={'/suraksha/customer/query?filterType=your-unresolved-query'} />
       <section className="content-area-form">
         <form className="query-form" onSubmit={handleSubmit}>
           <label className="form-label">

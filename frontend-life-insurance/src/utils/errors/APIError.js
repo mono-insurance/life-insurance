@@ -36,3 +36,10 @@ export class UserError extends CustomError {
         super(500, "Axios Error", specificMessage)
     }
 }
+
+
+export class SurakshaError extends CustomError {
+    constructor(specificMessage) {
+        super(500, "Axios Error", specificMessage)
+    }
+}

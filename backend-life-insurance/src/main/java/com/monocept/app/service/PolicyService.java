@@ -1,5 +1,7 @@
 package com.monocept.app.service;
 
+import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import com.monocept.app.dto.PolicyDTO;
@@ -22,4 +24,7 @@ public interface PolicyService {
 	PagedResponse<PolicyDTO> getAllInactivePolicies(int page, int size, String sortBy, String direction);
 
     Boolean isCustomerEligible(Long policyId);
+	List<PolicyDTO> getListOfAllActivePolicies();
+
+	List<PolicyDTO> getListOfAllActivePoliciesByInsurance(Long id);
 }

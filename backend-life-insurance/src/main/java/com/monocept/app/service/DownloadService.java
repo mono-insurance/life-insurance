@@ -24,4 +24,6 @@ public interface DownloadService {
 
 	List<WithdrawalRequests> getWithdrawals();
 
+	Transactions getTransaction(Long id);
+
 }

@@ -8,7 +8,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { deleteUser, getAllActiveCustomers, getAllCustomers, getAllInactiveCustomers, getCustomerById } from '../../../services/AdminServices';
 import { errorToast, successToast } from '../../../utils/helper/toast';
 import { FilterButton } from '../../../sharedComponents/FilterButton/FilterButton';
-import { covertIdDataIntoTable } from '../../../services/SharedServices';
+import { covertIdDataIntoTable } from '../../../utils/helper/helperFunctions';
 import { validateCustomerId, validateFirstName } from '../../../utils/validations/Validations';
 
 

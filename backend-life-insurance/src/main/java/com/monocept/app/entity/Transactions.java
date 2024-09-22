@@ -1,6 +1,7 @@
 package com.monocept.app.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -54,14 +55,28 @@ public class Transactions {
 	private String status;
 	
 	
+	@Column(name = "late_charges")
+	private Boolean lateCharges;
+	
+	@Column(name = "total_amount_paid")
+	private Double totalAmountPaid;
+	
+	@Column(name = "transaction_paid_date")
+	private LocalDateTime transactionPaidDate;
+	
+	
 	@Column(name = "agent_commission")
 	private Double agentCommission;
+	
 	
 	
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "policy_account_id", nullable = false)
     @JsonBackReference
     private PolicyAccount policyAccount;
+	
+	@JoinColumn(name = "transaction_identification")
+	private String transactionIdentification;
 	
 	
 }

@@ -1,7 +1,9 @@
 package com.monocept.app.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -31,4 +33,16 @@ public class TransactionsDTO {
     private Long policyAccountId;
     
     private Long serialNo;
+    
+    private String transactionIdentification;
+    
+
+	private Boolean lateCharges;
+	
+
+	private Double totalAmountPaid;
+	
+
+	private LocalDateTime transactionPaidDate;
+	
 }

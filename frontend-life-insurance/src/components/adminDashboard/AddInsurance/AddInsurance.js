@@ -15,6 +15,7 @@ export const AddInsurance = () => {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
+    console.log("name:", name, "value:", value);
     setFormState({
       ...formState,
       [name]: value,
@@ -54,7 +55,7 @@ export const AddInsurance = () => {
             Insurance Category Name:<span className="text-danger"> *</span>
             <input 
               type="text" 
-              name="categoryName" 
+              name="insuranceCategory" 
               value={formState.insuranceCategory}
               onChange={handleChange} 
               className="form-input" 

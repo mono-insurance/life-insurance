@@ -27,5 +27,7 @@ public interface CityService {
 
 	List<CityDTO> getListOfAllActiveCitiesByState(String stateName);
 
+	List<CityDTO> getListOfAllActiveCitiesByStateId(Long id);
+
 
 }

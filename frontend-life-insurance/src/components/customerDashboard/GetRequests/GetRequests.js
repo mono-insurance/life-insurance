@@ -1,26 +1,27 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AreaTop } from '../../../sharedComponents/Title/Title';
-import { PaginationContext } from '../../../context/PaginationContext';
 import './getRequests.scss';
 import { ToastContainer } from 'react-toastify';
-import { errorToast } from '../../../utils/helper/toast';
-import { useParams, useSearchParams } from 'react-router-dom';
-import { getAllApprovedRequestsByCustomer } from '../../../services/CustomerServices';
+import { errorToast, successToast } from '../../../utils/helper/toast';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { getAllApprovedRequestsByCustomer, updateWithdrawRequestToTrue } from '../../../services/CustomerServices';
 import { Pagination } from '../../../sharedComponents/Table/Pagination/Pagination';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 export const GetRequests = () => {
+  const {customerId} = useOutletContext();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [data, setData] = useState({});
-  const routeParams = useParams();
   const [showPagination, setShowPagination] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [loading, setLoading] = useState(true);
 
 
   const fetchRequests = async () => {
     try {
-
-      const response = await getAllApprovedRequestsByCustomer(currentPage, itemsPerPage, routeParams.id);
+      setLoading(true);
+      const response = await getAllApprovedRequestsByCustomer(currentPage, itemsPerPage, customerId);
       console.log(response);
       setData(response);
 
@@ -31,17 +32,42 @@ export const GetRequests = () => {
       } else {
         errorToast("An unexpected error occurred. Please try again later.");
       }
+    }finally{
+      setLoading(false);
     }
   };
 
+  const handleWithdrawClick = async (withdrawalId) => {
+    try {
+      setLoading(true);
+      await updateWithdrawRequestToTrue(withdrawalId);
+
+      successToast("Request withdrawn successfully!");
+
+      fetchRequests();
+    } catch (error) {
+      if (error.response?.data?.message || error.specificMessage) {
+        errorToast(error.response?.data?.message || error.specificMessage);
+      } else {
+        errorToast("An unexpected error occurred. Please try again later.");
+      }
+    }finally{
+      setLoading(false);
+    }
+    
+  }
+
   useEffect(() => {
-    fetchRequests();
+    if(customerId){
+      fetchRequests();
+    }
   }, [currentPage, itemsPerPage, searchParams]);
 
   return (
     <>
       <div className='content-area-request'>
-        <AreaTop pageTitle={"Get Approved Requests"} pagePath={"Requests"} pageLink={`/customer/policy-account/${routeParams.id}`} />
+        {loading && <Loader />}
+        <AreaTop pageTitle={"Get Approved Requests"} pagePath={"Requests"} pageLink={`/suraksha/insurances`} />
         <section className="content-area-list-request">
           <div className="data-table-information">
             <h3 className="data-table-title">All Approved Requests</h3>
@@ -50,7 +76,7 @@ export const GetRequests = () => {
             {data && data.content && data.content.length > 0 ? (
               <>
                 {data.content.map((request, index) => (
-                  <div key={index} className="request-item">
+                  <div key={index} className="request-item border-gray-100 shadow-lg">
                     <div className="request-text">
                       <p className="request-id"><strong>Request Type:</strong> {request.requestType}</p>
                       <p className="amount"><strong>Amount:</strong> {request.amount}</p>
@@ -60,7 +86,7 @@ export const GetRequests = () => {
                       {request.isWithdraw ? (
                         <p className="withdraw-status">Withdrawn</p>
                       ) : (
-                        <button className="withdraw-button">Withdraw</button>
+                        <button className="withdraw-button" onClick={()=>handleWithdrawClick(request.withdrawalRequestsId)}>Withdraw</button>
                       )}
                     </div>
                   </div>

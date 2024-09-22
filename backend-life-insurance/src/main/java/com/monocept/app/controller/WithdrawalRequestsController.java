@@ -191,5 +191,14 @@ public class WithdrawalRequestsController {
         WithdrawalRequestsDTO requests = withdrawalRequestsService.getWithdrawalRequestsById(id);
         return new ResponseEntity<>(requests, HttpStatus.OK);
     }
+	
+	
+	@Operation(summary = "By Customer: Update a withdrawal request")
+    @PostMapping("/customer/withdraw/{id}")
+    public ResponseEntity<WithdrawalRequestsDTO> updateWithdrawalRequestForCustomer(@PathVariable(name="id") Long id) {
+		 
+        WithdrawalRequestsDTO createdRequest = withdrawalRequestsService.updateWithdrawalRequestForCustomer(id);
+        return new ResponseEntity<>(createdRequest, HttpStatus.OK);
+    }
 
 }

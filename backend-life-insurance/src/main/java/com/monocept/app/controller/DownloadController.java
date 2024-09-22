@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.monocept.app.entity.Transactions;
 import com.monocept.app.entity.WithdrawalRequests;
 import com.monocept.app.service.DownloadService;
+import com.monocept.app.service.ReceiptPdfExporter;
 import com.monocept.app.service.TransactionPdfExporter;
 import com.monocept.app.service.WithdrawalsPdfExporter;
 
@@ -152,6 +153,27 @@ public class DownloadController {
         List<WithdrawalRequests> withdrawals = downloadService.getWithdrawals();
         
         WithdrawalsPdfExporter exporter = new WithdrawalsPdfExporter(withdrawals);
+        exporter.export(response);
+
+	    return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	
+	@Operation(summary = "By Customer: Download Receipt in pDF format")
+	@GetMapping("/receipt/pdf/{id}")
+	public ResponseEntity<String> exportReceiptToPDF(HttpServletResponse response, @PathVariable(name ="id") Long id) {
+
+		response.setContentType("application/pdf");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        String currentDateTime = dateFormatter.format(new Date());
+         
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=users_" + currentDateTime + ".pdf";
+        response.setHeader(headerKey, headerValue);
+	    
+        Transactions transaction = downloadService.getTransaction(id);
+        
+        ReceiptPdfExporter exporter = new ReceiptPdfExporter(transaction);
         exporter.export(response);
 
 	    return new ResponseEntity<>(HttpStatus.OK);
