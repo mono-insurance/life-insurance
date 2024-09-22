@@ -48,11 +48,7 @@ const prevItemsPerPageRef = useRef(itemsPerPage);
         setSearchParams({filterType, id});
         setShowPagination(false);
       }
-      if(filterType === 'active'){
-        setSearchParams({filterType, currentPage, itemsPerPage});
-        setShowPagination(true);
-      }
-      if(filterType === 'inactive'){
+      if(filterType === 'active' || filterType === 'inactive'){
         setSearchParams({filterType, currentPage, itemsPerPage});
         setShowPagination(true);
       }
@@ -69,30 +65,24 @@ const prevItemsPerPageRef = useRef(itemsPerPage);
       setSearchParams({currentPage: 1, itemsPerPage: 10});
     };
   
-    const actions = (id) => [
-      { name: "Edit", url: `/customer/edit/${id}` },
-      { name: "Delete", url: `/customer/delete/${id}` }
-    ];
-    
   
-  
-      const customerTable = async () => {
+      const customerTable = async (filterTypeFromParams, currentPageFromParams, itemsPerPageFromParams, idFromParams) => {
         try {
             let response = {};
             setLoading(true);
-            if(filterType === 'active') {
-              response = await getAllActiveCustomers(currentPage, itemsPerPage);
+            if(filterTypeFromParams === 'active') {
+              response = await getAllActiveCustomers(currentPageFromParams, itemsPerPageFromParams);
             }
-            else if(filterType === 'inactive') {
-              response = await getAllInactiveCustomers(currentPage, itemsPerPage);
+            else if(filterTypeFromParams === 'inactive') {
+              response = await getAllInactiveCustomers(currentPageFromParams, itemsPerPageFromParams);
             }
-            else if(filterType === 'id') {
-              validateCustomerId(id);
-              const data = await getCustomerById(id);
+            else if(filterTypeFromParams === 'id') {
+              validateCustomerId(idFromParams);
+              const data = await getCustomerById(idFromParams);
               response = covertIdDataIntoTable(data);
             }
             else {
-              response = await getAllCustomers(currentPage, itemsPerPage);
+              response = await getAllCustomers(currentPageFromParams, itemsPerPageFromParams);
             }
             
             setData(response);

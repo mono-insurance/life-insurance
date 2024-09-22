@@ -99,20 +99,22 @@ public class DownloadServiceImp implements DownloadService{
 	    	
 	      for (PolicyAccount policyAccount : policyAccounts) {
 	        List<String> data = Arrays.asList(
-                  String.valueOf(policyAccount.getPolicyAccountId()),
-                  String.valueOf(policyAccount.getCreatedDate()),
-                  String.valueOf(policyAccount.getMaturedDate()),
-                  String.valueOf(policyAccount.getIsActive()),
-                  String.valueOf(policyAccount.getPolicyTerm()),
-                  String.valueOf(policyAccount.getPaymentTimeInMonths()),
-                  String.valueOf(policyAccount.getTimelyBalance()),
-                  String.valueOf(policyAccount.getInvestmentAmount()),
-                  String.valueOf(policyAccount.getTotalAmountPaid()),
-                  String.valueOf(policyAccount.getClaimAmount()),
-                  String.valueOf(policyAccount.getAgentCommissionForRegistration()),
-                  (policyAccount.getCustomer().getFirstName()+" "+policyAccount.getCustomer().getLastName()),
-                  (policyAccount.getAgent().getFirstName()+" "+policyAccount.getAgent().getLastName()), 
-                  String.valueOf(policyAccount.getPolicy().getPolicyId())
+	        		String.valueOf(policyAccount.getPolicyAccountId()),
+	        		String.valueOf(policyAccount.getCreatedDate()),
+	        		String.valueOf(policyAccount.getMaturedDate()),
+	        		String.valueOf(policyAccount.getIsActive()),
+	        		String.valueOf(policyAccount.getPolicyTerm()),
+	        		String.valueOf(policyAccount.getPaymentTimeInMonths()),
+	        		String.valueOf(policyAccount.getTimelyBalance()),
+	        		String.valueOf(policyAccount.getInvestmentAmount()),
+	        		String.valueOf(policyAccount.getTotalAmountPaid()),
+	        		String.valueOf(policyAccount.getClaimAmount()),
+	        		String.valueOf(policyAccount.getAgentCommissionForRegistration()),
+	        		(policyAccount.getCustomer().getFirstName() + " " + policyAccount.getCustomer().getLastName()),
+	        		(policyAccount.getAgent() != null ? 
+	        		    (policyAccount.getAgent().getFirstName() + " " + policyAccount.getAgent().getLastName()) : " "), 
+	        		String.valueOf(policyAccount.getPolicy().getPolicyId())
+
 	            );
 
 	        csvPrinter.printRecord(data);

@@ -1133,5 +1133,12 @@ public class DtoServiceImp implements DtoService {
                 .map(this::convertDocumentUploadedToDTO)
                 .collect(Collectors.toList());
 	}
+
+	@Override
+	public List<AgentDTO> convertAgentListEntityToDTO(List<Agent> agents) {
+		return agents.stream()
+                .map(this::convertAgentToAgentDto)
+                .collect(Collectors.toList());
+	}
 	
 }

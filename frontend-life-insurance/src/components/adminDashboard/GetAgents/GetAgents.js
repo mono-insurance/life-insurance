@@ -1,16 +1,16 @@
 import React from 'react'
 import { AreaTop } from '../../../sharedComponents/Title/Title';
 import { Table } from '../../../sharedComponents/Table/Table';
-import { PaginationContext } from '../../../context/PaginationContext';
 import './getAgents.scss';
 import { ToastContainer } from 'react-toastify';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { getAllActiveAgents, getAllAgents, getAllInactiveAgents, getAgentsById } from '../../../services/AdminServices';
+import { getAllActiveAgents, getAllAgents, getAllInactiveAgents, getAgentsById, downloadAgentsInCSV} from '../../../services/AdminServices';
 import { errorToast } from '../../../utils/helper/toast';
 import { FilterButton } from '../../../sharedComponents/FilterButton/FilterButton';
 import { covertIdDataIntoTable } from '../../../utils/helper/helperFunctions';
-import { validateCustomerId } from '../../../utils/validations/Validations';
-import { useContext, useEffect, useState } from 'react';
+import { validateAgentId } from '../../../utils/validations/Validations';
+import {  useEffect, useState, useRef } from 'react';
+import { Loader } from '../../../sharedComponents/Loader/Loader';
 
 
 export const GetAgents = () => {
@@ -27,75 +27,64 @@ export const GetAgents = () => {
   const [active, setActive] = useState('');
   const [showPagination, setShowPagination] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [loading, setLoading] = useState(true);
   const filterOptions = [
     { label: 'Search by Agent Id', value: 'id' },
     { label: 'Search by Active', value: 'active' },
     { label: 'Search by Inactive', value: 'inactive' }
 ];
 
-const resetPagination = () => {
-  setCurrentPage(1);
-  setItemsPerPage(10);
-};
+const prevCurrentPageRef = useRef(currentPage);
+const prevItemsPerPageRef = useRef(itemsPerPage);
 
-  const handleSearch = () => {
-    resetPagination();
-    if(filterType === 'id'){
-      setSearchParams({filterType, id});
-      setShowPagination(false);
-    }
-    if(filterType === 'active'){
-      setSearchParams({filterType, active, currentPage, itemsPerPage});
-      setShowPagination(true);
-    }
-    if(filterType === 'inactive'){
-      setSearchParams({filterType, active, currentPage, itemsPerPage});
-      setShowPagination(true);
-    }
-    if(filter === false) {
-      setFilter(true);
-    }
-    else{
-      agentTable();
-    }
-  }
-  
-  const handleReset = () => {
-    setFilterType('');
-    setId('');
-    setActive('');
-    setShowFilterButton(true);
-    resetPagination();
-    setFilter(false);
-    setShowPagination(true);
-    setSearchParams({});
+
+  const resetPagination = () => {
+    setCurrentPage(1);
+    setItemsPerPage(10);
   };
-
-  const actions = (id) => [
-    { name: "View", url: `/agent/view/${id}` },
-    { name: "Edit", url: `/agent/edit/${id}` },
-    { name: "Delete", url: `/agent/delete/${id}` }
-  ];
   
+    const handleSearch = () => {
+      resetPagination();
+      if(filterType === 'id'){
+        setSearchParams({filterType, id});
+        setShowPagination(false);
+      }
+      if(filterType === 'active' || filterType === 'inactive'){
+        setSearchParams({filterType, currentPage, itemsPerPage});
+        setShowPagination(true);
+      }
+      setShowFilterButton(false);
+    }
+    
+    const handleReset = () => {
+      setFilterType('');
+      setId('');
+      setActive('');
+      setShowFilterButton(true);
+      resetPagination();
+      setShowPagination(true);
+      setSearchParams({currentPage: 1, itemsPerPage: 10});
+    };
 
 
-    const agentTable = async () => {
+
+    const agentTable = async (filterTypeFromParams, currentPageFromParams, itemsPerPageFromParams, idFromParams) => {
       try {
           let response = {};
-
-          if(filterType === 'active') {
-            response = await getAllActiveAgents(currentPage, itemsPerPage);
+          setLoading(true);
+          if(filterTypeFromParams === 'active') {
+            response = await getAllActiveAgents(currentPageFromParams, itemsPerPageFromParams);
           }
-          else if(filterType === 'inactive') {
-            response = await getAllInactiveAgents(currentPage, itemsPerPage);
+          else if(filterTypeFromParams === 'inactive') {
+            response = await getAllInactiveAgents(currentPageFromParams, itemsPerPageFromParams);
           }
-          else if(filterType === 'id') {
-            validateCustomerId(id);
-            const data = await getAgentsById(id);
+          else if(filterTypeFromParams === 'id') {
+            validateAgentId(idFromParams);
+            const data = await getAgentsById(idFromParams);
             response = covertIdDataIntoTable(data);
           }
           else {
-            response = await getAllAgents(currentPage, itemsPerPage);
+            response = await getAllAgents(currentPageFromParams, itemsPerPageFromParams);
           }
           
           setData(response);
@@ -108,71 +97,100 @@ const resetPagination = () => {
           } else {
               errorToast("An unexpected error occurred. Please try again later.");
           }
+      }finally{
+        setLoading(false); 
       }
   };
 
 
 
-    // useEffect(() => {
-    //   const filterTypeParam = searchParams.get('filterType') || '';
-    //   const idParam = searchParams.get('id') || '';
-    //   const firstNameParam = searchParams.get('firstName') || '';
-    //   const currentPageParam = Number(searchParams.get('currentPage')) || 1;
-    //   const itemsPerPageParam = Number(searchParams.get('itemsPerPage')) || 10;
-    //   console.log(filterTypeParam, idParam, firstNameParam, currentPageParam, itemsPerPageParam);
-    //   if (filterTypeParam === 'id' || filterTypeParam === 'firstName') {
-    //     setFilterType(filterTypeParam);
-    //     setShowFilterButton(!filterTypeParam);
-    //     setFilter(true);
-    //     if (filterTypeParam === 'firstName') {
-    //       setFirstName(firstNameParam);
-    //       handlePageChange(currentPageParam);
-    //       handleItemsPerPageChange(itemsPerPageParam);
-    //     } else if (filterTypeParam === 'id') {
-    //       setId(idParam);
-    //       setShowPagination(false);
-    //       resetPagination();
-    //     }
-    //   } else {
-    //     setShowFilterButton(true);
-    //     setId('');
-    //     setFirstName('');
-    //     setFilterType('');
-    //     setFilter(false);
-    //     setShowPagination(true);
-    //     resetPagination();
-    //   }
-    // },[searchParams]);
+  useEffect(() => {
+    const filterTypeFromParams = searchParams.get('filterType') || '';
+    const currentPageFromParams = parseInt(searchParams.get('currentPage')) || 1;
+    const itemsPerPageFromParams = parseInt(searchParams.get('itemsPerPage')) || 10;
+    const idFromParams = searchParams.get('id') || '';
+
+    if (filterTypeFromParams === 'active' || filterTypeFromParams === 'inactive' ) {
+      setFilterType(filterTypeFromParams);
+      setShowFilterButton(false);
+      setShowPagination(true);
+    } else if(filterTypeFromParams === 'id'){
+      setFilterType(filterTypeFromParams);
+      setShowFilterButton(false);
+      setShowPagination(false);
+      setId(idFromParams);
+    }
+    else{
+      setFilterType('');
+      setShowFilterButton(true);
+      setShowPagination(true);
+    }
+    if (currentPageFromParams != prevCurrentPageRef.current || itemsPerPageFromParams != prevItemsPerPageRef.current) {
+      prevCurrentPageRef.current = currentPageFromParams;
+      prevItemsPerPageRef.current = itemsPerPageFromParams;
+      setCurrentPage(currentPageFromParams);
+      setItemsPerPage(itemsPerPageFromParams);
+    }
+
+    agentTable(filterTypeFromParams, currentPageFromParams, itemsPerPageFromParams, idFromParams);
+
+  }, [searchParams]);
 
 
     useEffect(() => {
-      // const hasSearchParams = searchParams.toString() !== '';
+      if (currentPage != prevCurrentPageRef.current || itemsPerPage != prevItemsPerPageRef.current) {
+        prevCurrentPageRef.current = currentPage;
+        prevItemsPerPageRef.current = itemsPerPage;
+        setSearchParams({
+          filterType: searchParams.get('filterType'),
+          currentPage: currentPage,
+          itemsPerPage: itemsPerPage,
+        });
+      }
 
-      // if(!hasSearchParams) {
-      //   setShowFilterButton(true);
-      //   setId('');
-      //   setFirstName('');
-      //   setFilterType('');
-      //   setFilter(false);
-      //   setShowPagination(true);
-      // }
-      
-      // const timeoutId = setTimeout(() => {
-      //   customerTable();
-      // }, hasSearchParams ? 0: 0);
-      // return () => clearTimeout(timeoutId);
-      agentTable();
+    }, [currentPage, itemsPerPage, setSearchParams, searchParams]);
 
-    }, [filter, currentPage, itemsPerPage, searchParams]);
+
+    const handleDownloadAgentsInCSV = async (event) => {
+      event.preventDefault();
+      try {
+        setLoading(true);
+    
+        const response = await downloadAgentsInCSV(); 
+        
+        const csvBlob = new Blob([response], { type: 'text/csv' });
+    
+        const csvUrl = URL.createObjectURL(csvBlob);
+    
+        const link = document.createElement('a');
+        link.href = csvUrl;
+    
+        link.setAttribute('download', 'requests.csv');
+    
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    
+      } catch (error) {
+        console.log(error);
+        const errorMessage = error.response?.data?.message || error.specificMessage || 'An unexpected error occurred. Please try again later.';
+        errorToast(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
 
 
   return (
     <>
         <div className='content-area-agents'>
+        {loading && <Loader />}
           <AreaTop pageTitle={"Get All Agents"} pagePath={"Agent"} pageLink={`/suraksha/admin/dashboard/${routeParams.id}`}/>
           <section className="content-area-table-agents">
             <div className="data-table-information">
               <h3 className="data-table-title">Agents</h3>
+              <div className="data-table-buttons">
                 {showFilterButton && (
                   <FilterButton setShowFilterButton={setShowFilterButton} showFilterButton={showFilterButton} filterOptions={filterOptions} setFilterType={setFilterType}/>
                 )}
@@ -189,6 +207,8 @@ const resetPagination = () => {
                     </div>
                   </div>
                 )}
+                <button className="form-submit-passbook" onClick={handleDownloadAgentsInCSV}>Download (CSV)</button>
+                </div>
             </div>
             <div className="data-table-diagram">
                 <Table

@@ -36,6 +36,7 @@ import {
   MdOutlineArrowDropDown,
   MdOutlineArrowDropUp,
   MdOutlineDocumentScanner,
+  MdOutlineAccountCircle,
 } from "react-icons/md";
 import { NavLink, useParams } from "react-router-dom";
 import { ThemeContext } from "../../../context/ThemeContext";
@@ -336,7 +337,7 @@ export const Sidebar = () => {
             <li className={`menu-item ${activeMenu === 'policy-accounts' ? 'active' : ''}`}>
               <NavLink to={`/suraksha/admin/policy-accounts/${routeParams.id}`} className="menu-link" onClick={() => handleMenuClick('policy-accounts')}>
                 <span className="menu-link-icon">
-                  <MdOutlineQuestionMark size={18} />
+                  <MdOutlineAccountCircle size={18} />
                 </span>
                 <span className="menu-link-text">Policy Accounts</span>
               </NavLink>

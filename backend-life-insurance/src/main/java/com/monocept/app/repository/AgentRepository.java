@@ -2,6 +2,9 @@ package com.monocept.app.repository;
 
 import com.monocept.app.entity.Agent;
 import jakarta.transaction.Transactional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,5 +21,9 @@ public interface AgentRepository extends JpaRepository<Agent,Long> {
 	long countByIsActiveTrue();
 
 	long countByIsActiveFalse();
+
+	Page<Agent> findByIsActiveTrue(Pageable pageable);
+
+	Page<Agent> findByIsActiveFalse(Pageable pageable);
 
 }

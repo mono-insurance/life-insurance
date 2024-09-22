@@ -147,4 +147,6 @@ public interface DtoService {
 
 	List<DocumentUploadedDTO> convertDocumentUploadedListToDTO(List<DocumentUploaded> documents);
 
+	List<AgentDTO> convertAgentListEntityToDTO(List<Agent> agents);
+
 }

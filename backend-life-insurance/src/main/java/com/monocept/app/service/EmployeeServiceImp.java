@@ -508,4 +508,80 @@ public class EmployeeServiceImp implements EmployeeService {
     }
 
 
+	@Override
+	public PagedResponse<PolicyAccountDTO> getAllPolicyAccount(int page, int size, String sortBy, String direction) {
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+
+        Page<PolicyAccount> pages = policyAccountRepository.findAll(pageable);
+        List<PolicyAccount> allFeedbacks = pages.getContent();
+        List<PolicyAccountDTO> allFeedbacksDTO = dtoService.convertPolicyAccountListEntityToDTO(allFeedbacks);
+
+        return new PagedResponse<PolicyAccountDTO>(allFeedbacksDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+
+	@Override
+	public PagedResponse<PolicyAccountDTO> getAllPolicyAccountByCustomer(int page, int size, String sortBy,
+			String direction, Long id) {
+		Customer customer = customerRepository.findById(id).orElseThrow(() -> new UserException("Customer not found"));
+		
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+
+        Page<PolicyAccount> pages = policyAccountRepository.findByCustomer(customer, pageable);
+        List<PolicyAccount> allFeedbacks = pages.getContent();
+        List<PolicyAccountDTO> allFeedbacksDTO = dtoService.convertPolicyAccountListEntityToDTO(allFeedbacks);
+
+        return new PagedResponse<PolicyAccountDTO>(allFeedbacksDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+
+	@Override
+	public PagedResponse<PolicyAccountDTO> getAllPolicyAccountByAgent(int page, int size, String sortBy,
+			String direction, Long id) {
+		Agent agent = agentRepository.findById(id).orElseThrow(() -> new UserException("Customer not found"));
+		
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+
+        Page<PolicyAccount> pages = policyAccountRepository.findByAgent(agent, pageable);
+        List<PolicyAccount> allFeedbacks = pages.getContent();
+        List<PolicyAccountDTO> allFeedbacksDTO = dtoService.convertPolicyAccountListEntityToDTO(allFeedbacks);
+
+        return new PagedResponse<PolicyAccountDTO>(allFeedbacksDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+
+	@Override
+	public PagedResponse<AgentDTO> getAllActiveAgent(int page, int size, String sortBy, String direction) {
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+
+        Page<Agent> pages = agentRepository.findByIsActiveTrue(pageable);
+        List<Agent> allFeedbacks = pages.getContent();
+        List<AgentDTO> allFeedbacksDTO = dtoService.convertAgentListEntityToDTO(allFeedbacks);
+
+        return new PagedResponse<AgentDTO>(allFeedbacksDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+
+	@Override
+	public PagedResponse<AgentDTO> getAllInactiveAgent(int page, int size, String sortBy, String direction) {
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+
+        Page<Agent> pages = agentRepository.findByIsActiveFalse(pageable);
+        List<Agent> allFeedbacks = pages.getContent();
+        List<AgentDTO> allFeedbacksDTO = dtoService.convertAgentListEntityToDTO(allFeedbacks);
+
+        return new PagedResponse<AgentDTO>(allFeedbacksDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+
 }

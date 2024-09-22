@@ -428,5 +428,62 @@ public class EmployeeController {
         return new ResponseEntity<PagedResponse<FeedbackDTO>>(queries, HttpStatus.OK);
 
     }
+    
+
+
+
+    @Operation(summary = "By Admin: Get All Policy Accounts")
+    @GetMapping("/policy-account/view")
+    public ResponseEntity<PagedResponse<PolicyAccountDTO>> getAllPolicyAccount(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "policyAccountId") String sortBy, @RequestParam(name = "direction", defaultValue = "desc") String direction) {
+
+        PagedResponse<PolicyAccountDTO> policyAccounts = employeeService.getAllPolicyAccount(page, size, sortBy, direction);
+
+        return new ResponseEntity<PagedResponse<PolicyAccountDTO>>(policyAccounts, HttpStatus.OK);
+
+    }
+    
+    
+    @Operation(summary = "By Admin: Get All agent policy account")
+    @GetMapping("/policy-account/customer/{id}")
+    public ResponseEntity<PagedResponse<PolicyAccountDTO>> getAllPolicyAccountByCustomer(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "policyAccountId") String sortBy, @RequestParam(name = "direction", defaultValue = "desc") String direction, @PathVariable(name = "id") Long id) {
+
+        PagedResponse<PolicyAccountDTO> policyAccounts = employeeService.getAllPolicyAccountByCustomer(page, size, sortBy, direction, id);
+
+        return new ResponseEntity<PagedResponse<PolicyAccountDTO>>(policyAccounts, HttpStatus.OK);
+
+    }
+
+
+    @Operation(summary = "By Admin: Get All customer Policy Account")
+    @GetMapping("/policy-account/agent/{id}")
+    public ResponseEntity<PagedResponse<PolicyAccountDTO>> getAllPolicyAccountByAgent(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "policyAccountId") String sortBy, @RequestParam(name = "direction", defaultValue = "desc") String direction, @PathVariable(name = "id") Long id) {
+
+        PagedResponse<PolicyAccountDTO> policyAccounts = employeeService.getAllPolicyAccountByAgent(page, size, sortBy, direction, id);
+
+        return new ResponseEntity<PagedResponse<PolicyAccountDTO>>(policyAccounts, HttpStatus.OK);
+
+    }
+    
+    
+    @Operation(summary = "By Admin: Get All active agent")
+    @GetMapping("/agent/active/true")
+    public ResponseEntity<PagedResponse<AgentDTO>> getAllActiveAgent(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "agentId") String sortBy, @RequestParam(name = "direction", defaultValue = "desc") String direction) {
+
+        PagedResponse<AgentDTO> policyAccounts = employeeService.getAllActiveAgent(page, size, sortBy, direction);
+
+        return new ResponseEntity<PagedResponse<AgentDTO>>(policyAccounts, HttpStatus.OK);
+
+    }
+    
+    
+    @Operation(summary = "By Admin: Get All inactive agent")
+    @GetMapping("/agent/active/false")
+    public ResponseEntity<PagedResponse<AgentDTO>> getAllInactiveAgent(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "agentId") String sortBy, @RequestParam(name = "direction", defaultValue = "desc") String direction) {
+
+        PagedResponse<AgentDTO> policyAccounts = employeeService.getAllInactiveAgent(page, size, sortBy, direction);
+
+        return new ResponseEntity<PagedResponse<AgentDTO>>(policyAccounts, HttpStatus.OK);
+
+    }
 
 }

@@ -61,4 +61,16 @@ public interface EmployeeService {
 
 	EmployeeCreationDTO getEmployeeById(Long id);
 
+	PagedResponse<PolicyAccountDTO> getAllPolicyAccount(int page, int size, String sortBy, String direction);
+
+	PagedResponse<PolicyAccountDTO> getAllPolicyAccountByCustomer(int page, int size, String sortBy, String direction,
+			Long id);
+
+	PagedResponse<PolicyAccountDTO> getAllPolicyAccountByAgent(int page, int size, String sortBy, String direction,
+			Long id);
+
+	PagedResponse<AgentDTO> getAllActiveAgent(int page, int size, String sortBy, String direction);
+
+	PagedResponse<AgentDTO> getAllInactiveAgent(int page, int size, String sortBy, String direction);
+
 }
