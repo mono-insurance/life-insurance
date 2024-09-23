@@ -346,10 +346,10 @@ public class CustomerServiceImp implements CustomerService {
         
         
         checkEligibility(customer, policy, policyAccountDTO);
-
+        System.out.println("yaha aaya kya------------------------------------------------------->");
         policyAccountDTO.setPolicyAccountId(0L);
         PolicyAccount policyAccount = dtoService.convertPolicyAccountDtoToPolicyAccount(policyAccountDTO);
-
+        System.out.println("and yaha aaya kya------------------------------------------------------->");
         LocalDate maturedDate = LocalDate.now().plusYears(policyAccountDTO.getPolicyTerm());
         policyAccount.setMaturedDate(maturedDate);
         policyAccount.setIsActive(true);
@@ -455,11 +455,14 @@ public class CustomerServiceImp implements CustomerService {
         List<DocumentNeeded> requiredDocuments = policy.getDocumentsNeeded();
         List<DocumentUploaded> customerDocuments = customer.getDocuments();
 
+        
+        System.out.println("yaha");
         for (DocumentNeeded requiredDocument : requiredDocuments) {
             boolean documentApproved = customerDocuments.stream()
-                    .filter(doc -> doc.getDocumentId().equals(requiredDocument.getDocumentId()))
+                    .filter(doc -> doc.getDocumentType().equals(requiredDocument.getDocumentType()))
                     .anyMatch(DocumentUploaded::getIsApproved);
 
+            
             if (!documentApproved) {
                 throw new UserException("Customer does not have all required approved documents for the policy");
             }

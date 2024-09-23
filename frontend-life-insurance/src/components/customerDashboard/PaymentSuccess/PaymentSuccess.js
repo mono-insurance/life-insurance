@@ -1,45 +1,52 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
    MdOutlineCheckCircle,
 } from 'react-icons/md';
 import { verifyPaymentIntent } from '../../../services/CustomerServices';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutlet, useOutletContext } from 'react-router-dom';
 import { Loader } from '../../../sharedComponents/Loader/Loader';
 import { ToastContainer } from 'react-toastify';
 import { errorToast } from '../../../utils/helper/toast';
 
 export const PaymentSuccess = () => {
-    const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const customerId = useOutletContext();
+  const verifiedRef = useRef(false); // useRef to ensure request is sent only once
 
-    const verifyPayment = async (sessionId) => {
-        try {
+  const verifyPayment = async (sessionId) => {
+      try {
           setLoading(true);
           console.log(sessionId);
           await verifyPaymentIntent(sessionId);
-
+          verifiedRef.current = true;
+          // Clear the session_id from the URL
           const newUrl = window.location.origin + window.location.pathname;
           window.history.replaceState(null, '', newUrl);
 
-        } catch (error) {
-            if (error.response?.data?.message || error.specificMessage) {
+          // Mark as verified
+          
+      } catch (error) {
+          console.log(error);
+          if (error.response?.data?.message || error.specificMessage) {
               errorToast(error.response?.data?.message || error.specificMessage);
-            } else {
+          } else {
               errorToast("An unexpected error occurred. Please try again later.");
-            }
-          }finally{
-            setLoading(false);
           }
-      };
-    
-      useEffect(() => {
-        const queryParams = new URLSearchParams(window.location.search);
-        const sessionId = queryParams.get('session_id');
-    
-        if (sessionId) {
+      } finally {
+          setLoading(false);
+      }
+  };
+
+  useEffect(() => {
+      const queryParams = new URLSearchParams(window.location.search);
+      const sessionId = queryParams.get('session_id');
+
+      // Only call verifyPayment if not already verified
+      if (customerId && sessionId && !verifiedRef.current) {
           verifyPayment(sessionId);
-        }
-      }, []);
+      }
+  }, [customerId]);
 
 
   return (

@@ -3,8 +3,6 @@ package com.monocept.app.controller;
 import com.monocept.app.dto.*;
 import com.monocept.app.dto.JWTAuthResponse;
 import com.monocept.app.dto.LoginDTO;
-import com.monocept.app.dto.LoginResponseDTO;
-import com.monocept.app.dto.RegistrationDTO;
 import com.monocept.app.service.AgentService;
 import com.monocept.app.service.AuthService;
 import com.monocept.app.service.CustomerService;

@@ -41,6 +41,7 @@ public class StripeContoller {
 	        Session session = stripeService.generateSession(requestData);
 	        return ResponseEntity.ok(session.getUrl());
 	    } catch (Exception e) {
+	    	System.out.println(requestData);
 	    	System.out.println("coming here?");
 	    	
 	        return ResponseEntity.badRequest().body("Failed to create checkout session: " + e.getMessage());

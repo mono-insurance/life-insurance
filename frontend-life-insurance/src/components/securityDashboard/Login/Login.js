@@ -83,6 +83,7 @@ export const Login = () => {
                 </div>
                 <button className='bg-indigo-500 text-white w-full py-2 rounded-md text-base' type="submit" onClick={handleSubmit}>Login</button>
                 <p>Register account?<span onClick={()=> navigate('/suraksha/register')}className='text-indigo-500 cursor-pointer underline'>Click here</span></p>
+                <p>Forget Password?<span onClick={()=> navigate('/suraksha/password-reset')}className='text-indigo-500 cursor-pointer underline'>Click here</span></p>
             </div>  
         </form>
         <ToastContainer position="bottom-right"/>

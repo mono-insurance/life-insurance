@@ -65,6 +65,7 @@ import { PaymentFailure } from './components/customerDashboard/PaymentFailure/Pa
 import HomePage from './components/websiteStructure/HomePage/HomePage';
 import { PolicyAccounts } from './components/adminDashboard/PolicyAccounts/PolicyAccounts';
 import { Documents } from './components/adminDashboard/Documents/Documents';
+import PasswordReset from './components/securityDashboard/PasswordReset/PasswordReset';
 
 function App() {
 
@@ -110,6 +111,7 @@ function App() {
 
             <Route path='/suraksha/login' element={<Login/>}></Route>
             <Route path='/suraksha/register' element={<Register/>}></Route>
+            <Route path='/suraksha/password-reset' element={<PasswordReset />}></Route>
 
           </Route>
 
@@ -159,15 +161,9 @@ function App() {
                 <Route path='/suraksha/admin/profile/:id' element={<Settings />}></Route>
                 <Route path='/suraksha/admin/policy-accounts/:id' element={<PolicyAccounts />}></Route>
                 <Route path='/suraksha/admin/documents/:id' element={<Documents />}></Route>
-
-                
-                
-                
                 <Route path='/suraksha/admin/get-agents/:id' element={<GetAgents />}></Route>
                 <Route path='/suraksha/admin/add-customers/:id' element={<AddCustomers />}></Route>
                 <Route path='/suraksha/admin/get-customers/:id' element={<GetCustomers />}></Route>
-                
-                
 
               </Route>
 

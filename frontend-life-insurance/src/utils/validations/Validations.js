@@ -555,6 +555,29 @@ export const validateAdminProfileForm = (formState) => {
 
 
 
+export const validateUsernameOrEmail = (usernameOrEmail) => {
+  if (validator.isEmpty(usernameOrEmail)) {
+    throw new SurakshaError('Username or Email is required.');
+  } else if (!validator.isEmail(usernameOrEmail) && !validator.isAlphanumeric(usernameOrEmail)) {
+    throw new SurakshaError('Please enter a valid email or username.');
+  }
+};
+
+
+
+// Validator function for passwords
+export const validatePassword = (newPassword, confirmPassword) => {
+  if (!validator.isStrongPassword(newPassword, { minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 })) {
+    throw new SurakshaError('A strong Password is required.');
+  }
+  if (newPassword !== confirmPassword) {
+    throw new SurakshaError('Passwords do not match.');
+  }
+};
+
+
+
+
 export const validateForm = (formState) => {
   const errors = {};
 

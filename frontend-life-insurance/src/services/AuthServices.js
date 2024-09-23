@@ -131,6 +131,54 @@ export const profilePasswordUpdate = async (formData) => {
 
 
 
+export const SendOtp = async (usernameOrEmail) => {
+    try {
+        const response = await axios.post(`http://localhost:8080/public/api/auth/change-password-request/${usernameOrEmail}`, {},{
+            }).catch((error) => { throw new AxiosError(error.response.data.message) });
+
+        return response;
+
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+
+
+export const VerifyOpt = async (otp, usernameOrEmail) => {
+    try {
+        const response = await axios.post(`http://localhost:8080/public/api/auth/otp-confirmation/${usernameOrEmail}/${otp}`, {},{
+            }).catch((error) => { throw new AxiosError(error.response.data.message) });
+
+        return response;
+
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+
+
+
+export const PasswordResetRequest = async (formData) => {
+    try {
+        const response = await axios.post(`http://localhost:8080/public/api/auth/password-reset`, formData,{
+            }).catch((error) => { throw new AxiosError(error.response.data.message) });
+
+        return response;
+
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+
+
+
+
 export const customerRequestActivation = async (usernameOrEmail, password, customerId) => {
     try {
         const response = await axios.post(`http://localhost:8080/api/auth/request-activation/${customerId}`, {

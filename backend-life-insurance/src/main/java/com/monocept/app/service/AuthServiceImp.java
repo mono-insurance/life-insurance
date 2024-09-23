@@ -77,7 +77,7 @@ public class AuthServiceImp implements AuthService{
 		    	}
 		    }
 		    if(credentials.getAgent() != null) {
-		    	if(!credentials.getCustomer().getIsActive()) {
+		    	if(!credentials.getAgent().getIsActive()) {
 		    		throw new UserException("Can't Login!. You are inactive");
 		    	}
 		    	else if(!credentials.getAgent().getIsApproved()) {
