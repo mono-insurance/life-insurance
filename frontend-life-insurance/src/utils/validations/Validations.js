@@ -139,7 +139,7 @@ export const validateAddressInfoForm = (formAddressInfo) => {
 export const validateLoginForm = (email, password) => {
   const errors = {};
 
-  if (validator.isEmpty(email) || !validator.isEmail(email)) {
+  if (validator.isEmpty(email)) {
     errors.email = 'A valid Email is required';
   }
 
@@ -481,15 +481,6 @@ export const validatePolicyForm = (formState) => {
     errors.profitRatio = "Profit ratio must be a positive number";
   }
 
-  // Validate if file is provided
-  if (!formState.file) {
-    errors.file = "Policy document file is required";
-  }
-
-  // Check if at least one document is needed
-  if (!formState.documentsNeeded.length) {
-    errors.documentsNeeded = "At least one document is required";
-  }
 
 
   return errors;

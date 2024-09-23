@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -193,6 +194,112 @@ public class EmployeeServiceImp implements EmployeeService {
         return new PagedResponse<EmployeeDTO>(allEmployeesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
     }
 
+    @Override
+    public DashBoardDTO employeeDashboard() {
+        Long accounts = (long) policyAccountRepository.count();
+        Long activeAccountsCount = policyAccountRepository.countByIsActiveTrue();
+        Long inactiveAccounts = accounts - activeAccountsCount;
+
+        Long withdrawals = (long) withdrawalRequestsRepository.count();
+        Long approvedWithdrawals = withdrawalRequestsRepository.countByIsApprovedTrue();
+        Long notApprovedWithdrawals = withdrawals - approvedWithdrawals;
+
+        Long agents = (long) agentRepository.count();
+        Long activeAgents = agentRepository.countByIsActiveTrue();
+        Long inActiveAgents = agentRepository.countByIsActiveFalse();
+
+        Long commission = (long) withdrawalRequestsRepository.countByAgentMappedAndNotByCustomer();
+        Long approvedCommissions = withdrawalRequestsRepository.countByAgentMappedAndNotByCustomerAndIsApprovedTrue();
+        Long notApprovedCommissions = commission - approvedCommissions;
+
+        long customers = (long) customerRepository.count();
+        Long activeCustomers = customerRepository.countByIsActiveTrue();
+        Long notApprovedCustomers = customerRepository.countByIsApprovedFalse();
+        Long inActiveCustomers = customerRepository.countByIsActiveFalse();
+
+        return new DashBoardDTO(accounts, activeAccountsCount, inactiveAccounts, withdrawals, approvedWithdrawals, notApprovedWithdrawals,
+                agents, activeAgents, inActiveAgents, commission, approvedCommissions, notApprovedCommissions, customers, activeCustomers,
+                inActiveCustomers, notApprovedCustomers);
+
+    }
+
+    @Override
+    public PagedResponse<CustomerDTO> getAllRegisteredCustomers(int page, int size, String sortBy, String direction) {
+        Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+
+        Page<Customer> pages = customerRepository.findAllByIsApprovedFalse(pageable);
+        List<Customer> allCustomers = pages.getContent();
+        List<CustomerDTO> allCustomerDTO = dtoService.convertCustomersToDto(allCustomers);
+
+        return new PagedResponse<>(allCustomerDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+
+    }
+
+    @Override
+    public PagedResponse<DocumentUploadedDTO> getAllNotApprovedDocuments(int page, int size, String sortBy, String direction) {
+
+        Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+
+        Page<DocumentUploaded> pages = documentUploadedRepository.findAllByIsApprovedFalse(pageable);
+        List<DocumentUploaded> allDocuments = pages.getContent();
+        List<DocumentUploadedDTO> allDocumentDTO = dtoService.convertDocumentsToDTO(allDocuments);
+
+        return new PagedResponse<>(allDocumentDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+
+    }
+
+    @Override
+    public PagedResponse<DocumentUploadedDTO> getAllApprovedDocuments(int page, int size, String sortBy, String direction) {
+        Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+
+        Page<DocumentUploaded> pages = documentUploadedRepository.findAllByIsApprovedTrue(pageable);
+        List<DocumentUploaded> allDocuments = pages.getContent();
+        List<DocumentUploadedDTO> allDocumentDTO = dtoService.convertDocumentsToDTO(allDocuments);
+        return new PagedResponse<>(allDocumentDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+
+    }
+
+    @Override
+    public PagedResponse<DocumentUploadedDTO> getAllDocuments(int page, int size, String sortBy, String direction) {
+        Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+
+        Page<DocumentUploaded> pages = documentUploadedRepository.findAll(pageable);
+        List<DocumentUploaded> allDocuments = pages.getContent();
+        List<DocumentUploadedDTO> allDocumentDTO = dtoService.convertDocumentsToDTO(allDocuments);
+        return new PagedResponse<>(allDocumentDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+
+    }
+
+    @Override
+    public PagedResponse<DocumentUploadedDTO> getDocumentById(Long documentId) {
+        DocumentUploaded documentUploaded=documentUploadedRepository.findById(documentId).
+                orElseThrow(()->new UserException("document not found"));
+        DocumentUploadedDTO documentUploadedDTO=dtoService.convertDocumentUploadedToDTO(documentUploaded);
+        List<DocumentUploadedDTO> documentUploadedDTOS=new ArrayList<>();
+        documentUploadedDTOS.add(documentUploadedDTO);
+        return new PagedResponse<>(documentUploadedDTOS,1,1,1,1,true);
+    }
+
+    @Override
+    public Boolean deletePolicyAccount(Long policyAccount) {
+        int count=policyAccountRepository.deletePolicyAccount(policyAccount);
+        return count==1;
+    }
+
+    @Override
+    public Boolean activatePolicyAccount(Long policyAccountId) {
+        int count=policyAccountRepository.activatePolicyAccount(policyAccountId);
+        return count==1;
+    }
+
 
     @Override
     public EmployeeDTO getEmployeeProfile(Long empId) {
@@ -210,7 +317,8 @@ public class EmployeeServiceImp implements EmployeeService {
         accessConService.checkEmployeeAdminAccess(employeeDTO.getEmployeeId());
         Employee employee = findEmpById(employeeDTO.getEmployeeId());
         updateEmployee(employee, employeeDTO);
-        employee=employeeRepository.save(employee);
+
+        employee = employeeRepository.save(employee);
         return dtoService.convertEmployeeToDTO(employee);
     }
 
@@ -582,6 +690,5 @@ public class EmployeeServiceImp implements EmployeeService {
 
         return new PagedResponse<AgentDTO>(allFeedbacksDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
 	}
-
 
 }

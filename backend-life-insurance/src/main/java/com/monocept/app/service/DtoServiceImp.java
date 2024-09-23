@@ -6,7 +6,7 @@ import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.CityRepository;
 import com.monocept.app.repository.StateRepository;
 import com.monocept.app.utils.DocumentType;
-import com.monocept.app.utils.GenderType;
+import com.monocept.app.repository.AddressRepository;
 import com.monocept.app.utils.NomineeRelation;
 import com.monocept.app.utils.PageResult;
 import com.monocept.app.repository.RoleRepository;
@@ -25,14 +25,16 @@ public class DtoServiceImp implements DtoService {
 
     private final StateRepository stateRepository;
     private final CityRepository cityRepository;
-    
-    @Autowired
-    private StorageService storageService;
 
-    public DtoServiceImp(StateRepository stateRepository, CityRepository cityRepository) {
+
+    private final StorageService storageService;
+    private final AddressRepository addressRepository;
+    public DtoServiceImp(StateRepository stateRepository, CityRepository cityRepository, StorageService storageService, AddressRepository addressRepository) {
         this.stateRepository = stateRepository;
         this.cityRepository = cityRepository;
 
+        this.storageService = storageService;
+        this.addressRepository = addressRepository;
     }
 
     @Override
@@ -75,6 +77,9 @@ public class DtoServiceImp implements DtoService {
         agentDTO.setAddress(addressDTO);
         CredentialsResponseDTO credentialsResponseDTO = convertToCredentialsDTO(agent.getCredentials());
         agentDTO.setCredentials(credentialsResponseDTO);
+
+        agentDTO.setBalance(agent.getBalance());
+        agentDTO.setWithdrawalAmount(agent.getWithdrawalAmount());
         return agentDTO;
     }
 
@@ -93,7 +98,10 @@ public class DtoServiceImp implements DtoService {
 
     @Override
     public Address convertDtoToAddress(AddressDTO addressDTO) {
-        Address address = new Address();
+
+        Long addressId=addressDTO.getAddressId();
+        if(addressId==null) addressId=0L;
+        Address address  = addressRepository.findById(addressId).orElse(new Address());
         address.setPincode(addressDTO.getPincode());
         address.setFirstStreet(addressDTO.getFirstStreet());
         address.setLastStreet(addressDTO.getLastStreet());
@@ -103,20 +111,31 @@ public class DtoServiceImp implements DtoService {
 
     @Override
     public void updateCityAndState(Address agentAddress, AddressDTO address) {
-        if (!agentAddress.getState().getStateName().equals(address.getState())) {
+
+        if(agentAddress.getState()==null){
+            State state=stateRepository.findByStateName(address.getState()).orElseThrow(()->new UserException("state not found"));
+            agentAddress.setState(state);
+        }
+        else if (!agentAddress.getState().getStateName().equals(address.getState())) {
             Optional<State> statecheck = stateRepository.findByStateName(address.getState());
             if (statecheck.isEmpty()) throw new UserException("state not found");
             State state = statecheck.get();
             agentAddress.setState(state);
         }
-        City cityInState = agentAddress.getState().getCities().stream()
-                .filter(city -> city.getCityName().equals(address.getCity()))
-                .findFirst()
-                .orElse(null);
-        if (cityInState == null) {
-            throw new UserException("city not found");
+
+        if(agentAddress.getCity()==null){
+            City city=cityRepository.findByCityName(address.getCity()).orElseThrow(()->new UserException("city not found"));
+            agentAddress.setCity(city);
+        }else{
+            City cityInState = agentAddress.getState().getCities().stream()
+                    .filter(city -> city.getCityName().equals(address.getCity()))
+                    .findFirst()
+                    .orElse(null);
+            if (cityInState == null) {
+                throw new UserException("city not found");
+            }
+            agentAddress.setCity(cityInState);
         }
-        agentAddress.setCity(cityInState);
     }
 
     @Override
@@ -174,16 +193,25 @@ public class DtoServiceImp implements DtoService {
         PolicyAccountDTO policyAccountDTO = new PolicyAccountDTO();
         policyAccountDTO.setPolicyAccountId(policyAccount.getPolicyAccountId());
         policyAccountDTO.setIsActive(policyAccount.getIsActive());
-        policyAccountDTO.setPolicyTerm(policyAccountDTO.getPolicyTerm());
+        policyAccountDTO.setPolicyTerm(policyAccount.getPolicyTerm());
         policyAccountDTO.setCreatedDate(policyAccount.getCreatedDate());
-        policyAccountDTO.setClaimAmount(policyAccountDTO.getClaimAmount());
-        policyAccountDTO.setCustomerId(policyAccountDTO.getCustomerId());
+        policyAccountDTO.setClaimAmount(policyAccount.getClaimAmount());
+        policyAccountDTO.setCustomerId(policyAccount.getCustomer().getCustomerId());
         policyAccountDTO.setMaturedDate(policyAccount.getMaturedDate());
-        policyAccountDTO.setAgentId(policyAccountDTO.getAgentId());
-        policyAccountDTO.setPaymentTimeInMonths(policyAccountDTO.getPaymentTimeInMonths());
+        if(policyAccount.getAgent()!=null){
+            policyAccountDTO.setAgentId(policyAccount.getAgent().getAgentId());
+            policyAccountDTO.setAgentName(policyAccount.getAgent().getFirstName()+" "+policyAccount.getAgent().getLastName());
+        }
+        if(policyAccount.getCustomer()!=null){
+            policyAccountDTO.setCustomerId(policyAccount.getCustomer().getCustomerId());
+            policyAccountDTO.setCustomerName(policyAccount.getCustomer().getFirstName()+" "+policyAccount.getCustomer().getLastName());
+        }
+        policyAccountDTO.setPaymentTimeInMonths(policyAccount.getPaymentTimeInMonths());
         policyAccountDTO.setTotalAmountPaid(policyAccount.getTotalAmountPaid());
-        policyAccountDTO.setPolicyId(policyAccountDTO.getPolicyId());
-        policyAccountDTO.setTimelyBalance(policyAccountDTO.getTimelyBalance());
+        policyAccountDTO.setPolicyId(policyAccount.getPolicy().getPolicyId());
+        policyAccountDTO.setTimelyBalance(policyAccount.getTimelyBalance());
+        policyAccountDTO.setNomineeName(policyAccount.getNomineeName());
+        policyAccountDTO.setNomineeRelation(policyAccount.getNomineeRelation());
         return policyAccountDTO;
 
     }
@@ -225,7 +253,37 @@ public class DtoServiceImp implements DtoService {
         for (WithdrawalRequests withdrawalRequest : withdrawalRequests) {
             withdrawalRequestsDTOS.add(convertWithdrawalToDto(withdrawalRequest));
         }
-        return null;
+        return withdrawalRequestsDTOS;
+    }
+    @Override
+    public PageResult convertTransactionsToPage(List<Transactions> customerList, int pageNo, String sort, String sortBy, String sortDirection, int size) {
+        Comparator<Transactions> comparator;
+
+        switch (sortBy.toLowerCase()) {
+            case "serialNo":
+                comparator = Comparator.comparing(Transactions::getSerialNo); // Assuming account number is a String
+                break;
+            case "amount":
+                comparator = Comparator.comparing(Transactions::getAmount); // Assuming balance is a BigDecimal
+                break;
+            case "transactionDate":
+                comparator = Comparator.comparing(Transactions::getTransactionDate); // Assuming created date is a LocalDateTime
+                break;
+            default:
+                comparator = Comparator.comparing(Transactions::getSerialNo); // Default sort by ID or any default field
+                break;
+        }
+
+        // If descending order is required, reverse the comparator
+        if (sortDirection.equalsIgnoreCase("desc")) {
+            comparator = comparator.reversed();
+        }
+
+        // Step 3: Implement pagination using subList method
+        int start = pageNo * size;
+        int end = Math.min((start + size), customerList.size());
+        List<Transactions> result = customerList.subList(start, end);
+        return new PageResult(result, end);
     }
 
     @Override
@@ -318,6 +376,16 @@ public class DtoServiceImp implements DtoService {
         withdrawalRequestsDTO.setRequestType(withdrawalRequest.getRequestType());
         withdrawalRequestsDTO.setIsApproved(withdrawalRequest.getIsApproved());
         withdrawalRequestsDTO.setWithdrawalRequestsId(withdrawalRequest.getWithdrawalRequestsId());
+
+        if(withdrawalRequest.getAgent()!=null){
+            withdrawalRequestsDTO.setAgentId(withdrawalRequest.getAgent().getAgentId());
+            withdrawalRequestsDTO.setAgentName(withdrawalRequest.getAgent().getFirstName()+" "+withdrawalRequest.getAgent().getLastName());
+        }
+        else{
+            withdrawalRequestsDTO.setCustomerId(withdrawalRequest.getCustomer().getCustomerId());
+            withdrawalRequestsDTO.setCustomerName(withdrawalRequest.getCustomer().getFirstName()+" "+withdrawalRequest.getCustomer().getLastName());
+        }
+
         return withdrawalRequestsDTO;
     }
 
@@ -620,6 +688,10 @@ public class DtoServiceImp implements DtoService {
         policyDTO.setProfitRatio(policy.getProfitRatio());
         policyDTO.setCreatedDate(policy.getCreatedDate());
 
+
+        byte [] imageData=storageService.downloadPolicyImage(policy.getPolicyId());
+        String base64Image = Base64.getEncoder().encodeToString(imageData);
+        policyDTO.setImageUrl(base64Image);
         if (policy.getDocumentsNeeded() != null) {
             policyDTO.setDocumentsNeeded(
                     policy.getDocumentsNeeded().stream()
@@ -634,7 +706,9 @@ public class DtoServiceImp implements DtoService {
         
         Image image = policy.getImage();
         if (image != null) {
-            byte[] imageData = storageService.downloadPolicyImage(policy.getPolicyId());
+
+            imageData  = storageService.downloadPolicyImage(policy.getPolicyId());
+
             
             String imageBase64 = Base64.getEncoder().encodeToString(imageData);
             policyDTO.setImageBase64(imageBase64);
@@ -688,7 +762,8 @@ public class DtoServiceImp implements DtoService {
         return documentUploaded;
     }
 
-    // Convert DocumentUploaded entity to DocumentUploadedDTO
+
+    @Override
     public DocumentUploadedDTO convertDocumentUploadedToDTO(DocumentUploaded documentUploaded) {
         DocumentUploadedDTO documentUploadedDTO = new DocumentUploadedDTO();
         documentUploadedDTO.setDocumentId(documentUploaded.getDocumentId());
@@ -793,7 +868,7 @@ public class DtoServiceImp implements DtoService {
                 .map(this::convertTransactionEntityToDTO)
                 .collect(Collectors.toList());
     }
-
+    @Override
     public TransactionsDTO convertTransactionEntityToDTO(Transactions transaction) {
         TransactionsDTO transactionsDTO = new TransactionsDTO();
         transactionsDTO.setTransactionId(transaction.getTransactionId());
@@ -921,7 +996,7 @@ public class DtoServiceImp implements DtoService {
         policyAccountDTO.setTotalAmountPaid(policyAccount.getTotalAmountPaid());
         policyAccountDTO.setClaimAmount(policyAccount.getClaimAmount());
         policyAccountDTO.setNomineeName(policyAccount.getNomineeName());
-        policyAccountDTO.setNomineeRelation(policyAccount.getNomineeRelation().toString());
+        policyAccountDTO.setNomineeRelation(policyAccount.getNomineeRelation());
 
         if (policyAccount.getPolicy() != null) {
             policyAccountDTO.setPolicyId(policyAccount.getPolicy().getPolicyId());
@@ -929,10 +1004,15 @@ public class DtoServiceImp implements DtoService {
 
         if (policyAccount.getCustomer() != null) {
             policyAccountDTO.setCustomerId(policyAccount.getCustomer().getCustomerId());
+
+            policyAccountDTO.setCustomerName(policyAccount.getCustomer().getFirstName()+" "+policyAccount.getCustomer().getLastName());
+
         }
 
         if (policyAccount.getAgent() != null) {
             policyAccountDTO.setAgentId(policyAccount.getAgent().getAgentId());
+
+            policyAccountDTO.setAgentName(policyAccount.getAgent().getFirstName()+" "+policyAccount.getAgent().getLastName());
         }
 
         return policyAccountDTO;
@@ -947,7 +1027,8 @@ public class DtoServiceImp implements DtoService {
         policyAccount.setPaymentTimeInMonths(policyAccountDTO.getPaymentTimeInMonths());
         policyAccount.setInvestmentAmount(policyAccountDTO.getInvestmentAmount());
         policyAccount.setNomineeName(policyAccountDTO.getNomineeName());
-        NomineeRelation relation = NomineeRelation.valueOf(policyAccountDTO.getNomineeRelation().toUpperCase());
+
+        NomineeRelation relation = (policyAccountDTO.getNomineeRelation());
         policyAccount.setNomineeRelation(relation);
 
         return policyAccount;
@@ -981,7 +1062,14 @@ public class DtoServiceImp implements DtoService {
                 .map(this::convertWithdrawalRequestToDTO)
                 .collect(Collectors.toList());
     }
-
+    @Override
+    public List<DocumentUploadedDTO> convertDocumentsToDTO(List<DocumentUploaded> allDocuments) {
+        List<DocumentUploadedDTO> documentUploadedDTOS=new ArrayList<>();
+        for(DocumentUploaded documentUploaded:allDocuments){
+            documentUploadedDTOS.add(convertDocumentUploadedToDTO(documentUploaded));
+        }
+        return documentUploadedDTOS;
+    }
 	@Override
 	public AdminCreationDTO converAdminToAdminCreationDTO(Admin updatedAdmin) {
 		AdminCreationDTO adminCreationDTO = new AdminCreationDTO();
@@ -1016,7 +1104,9 @@ public class DtoServiceImp implements DtoService {
 	@Override
 	public CustomerCreationDTO convertCustomerToCustomerCreationDTO(Customer customer) {
 		CustomerCreationDTO customerCreationDTO = new CustomerCreationDTO();
-		
+
+        customerCreationDTO.setCustomerId(customer.getCustomerId());
+
 		customerCreationDTO.setCustomerId(customer.getCustomerId());
 		customerCreationDTO.setFirstName(customer.getFirstName());
 		customerCreationDTO.setLastName(customer.getLastName());

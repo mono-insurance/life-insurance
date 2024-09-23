@@ -9,6 +9,10 @@ import java.util.NoSuchElementException;
 
 import com.monocept.app.dto.EmailDTO;
 import com.monocept.app.entity.Transactions;
+import com.monocept.app.dto.CustomUserDetails;
+import com.monocept.app.dto.EmailDTO;
+import com.monocept.app.entity.Transactions;
+import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.AgentRepository;
 import com.monocept.app.repository.TransactionsRepository;
 import com.monocept.app.utils.PaymentOrder;
@@ -29,24 +33,29 @@ public class PaymentService {
 
     @Autowired
     private APIContext apiContext;
-    private final String BASE_URL = "http://localhost:8080/";
-    private String CANCEL_URL = "status-failed";
-    private String SUCCESS_URL = "status-success";
+    private final String BASE_URL = "http://localhost:3000/";
     private final TransactionsRepository transactionsRepository;
     private final AgentRepository agentRepository;
     private final EmailService emailService;
+    private final AccessConService accessConService;
 
     public PaymentService(TransactionsRepository transactionsRepository, AgentRepository agentRepository,
-                          EmailService emailService) {
+                          EmailService emailService, AccessConService accessConService) {
         this.transactionsRepository = transactionsRepository;
         this.agentRepository = agentRepository;
         this.emailService = emailService;
+        this.accessConService = accessConService;
     }
 
     public Payment createPayment(Long transactionId, PaymentOrder order) throws PayPalRESTException {
         Amount amount = new Amount();
-        amount.setCurrency(order.getCurrency());
-        Double total = order.getPrice();
+
+        amount.setCurrency("USD");
+        Transactions transactions1=findTransaction(transactionId);
+        if(transactions1.getStatus().equals("Done")){
+            throw new UserException("your transaction is already completed");
+        }
+        Double total = transactions1.getAmount();
         total = new BigDecimal(total).setScale(2, RoundingMode.HALF_UP).doubleValue();
         amount.setTotal(String.format("%.2f", total));
 
@@ -58,17 +67,22 @@ public class PaymentService {
         transactions.add(transaction);
 
         Payer payer = new Payer();
-        payer.setPaymentMethod(order.getMethod().toString());
+
+        payer.setPaymentMethod("paypal");
 
         Payment payment = new Payment();
         payment.setIntent(order.getIntent().toString());
         payment.setPayer(payer);
         payment.setTransactions(transactions);
         RedirectUrls redirectUrls = new RedirectUrls();
-        CANCEL_URL += "?transaction=" + transactionId;
-        SUCCESS_URL += "?transaction=" + transactionId;
-        redirectUrls.setCancelUrl(BASE_URL + CANCEL_URL);
-        redirectUrls.setReturnUrl(BASE_URL + SUCCESS_URL);
+
+        CustomUserDetails customUserDetails=accessConService.checkUserAccess();
+        String cancel_url="customer/"+customUserDetails.getId()+"/perform-transaction/"+transactionId+"/failed";
+        Transactions mytransactions=transactionsRepository.findById(transactionId).
+                orElseThrow(()->new UserException("transaction not found"));
+        String success_url = "customer/policy-account/"+customUserDetails.getId()+"/view/"+mytransactions.getPolicyAccount().getPolicyAccountId();
+        redirectUrls.setCancelUrl(BASE_URL + cancel_url);
+        redirectUrls.setReturnUrl(BASE_URL + success_url);
         payment.setRedirectUrls(redirectUrls);
         return payment.create(apiContext);
     }

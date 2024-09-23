@@ -4,7 +4,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.monocept.app.dto.*;
 import com.monocept.app.utils.PagedResponse;
-import jakarta.validation.Valid;
+
 
 public interface AgentService {
     Long agentRegisterRequest(CredentialsDTO registrationDTO);
@@ -32,5 +32,27 @@ public interface AgentService {
 
 	Boolean approveAgent(Long agentId, Boolean isApproved);
 
+    DashBoardDTO agentDashboard();
+
+    Boolean inActivateAgent(Long agentId);
+
+    PagedResponse<AgentDTO> getAllActiveAgents(int pageNo, int size, String sort, String sortBy, String sortDirection);
+
+    PagedResponse<AgentDTO> getAllInActiveAgents(int pageNo, int size, String sort, String sortBy, String sortDirection);
+
+    PagedResponse<WithdrawalRequestsDTO> getAllApprovedCommissions(Long agentId,int pageNo, int size, String sort, String sortBy, String sortDirection);
+
+    PagedResponse<WithdrawalRequestsDTO> getAllNotApprovedCommissions(Long agentId, int pageNo, int size, String sort, String sortBy, String sortDirection);
+
+    BalanceDTO getAgentBalance();
+
+    PagedResponse<TransactionsDTO> getAllTransactions(int pageNo, int size, String sort, String sortBy, String sortDirection);
+
+    PagedResponse<AgentDTO> getAgentById(Long agentId);
+
+    PagedResponse<PolicyAccountDTO> getAllCustomerActiveAccounts(int page, int size, String sort, String sortBy, String sortDirection);
+
+    PagedResponse<PolicyAccountDTO> getAllCustomerInActiveAccounts(int page, int size, String sort, String sortBy, String sortDirection);
+//>>>>>>> target6/master
 	String agentRegistration(RegistrationDTO registrationDTO, MultipartFile file1, MultipartFile file2);
 }

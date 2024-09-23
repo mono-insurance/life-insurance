@@ -30,9 +30,11 @@ public class WithdrawalRequestsDTO {
     private Long agentId;
 
     private Long customerId;
-    
-    
+
     private Long transactionId;
+
+    private String agentName;
+    private String customerName;
     
     
     

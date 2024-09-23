@@ -59,20 +59,7 @@ public class StateController {
         return new ResponseEntity<>(state, HttpStatus.OK);
     }
     
-    
-    @Operation(summary = "By Admin and Employee: Get All States")
-    @GetMapping("")
-    public ResponseEntity<PagedResponse<StateDTO>> getAllStates(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sortBy", defaultValue = "stateId") String sortBy,
-            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
 
-        PagedResponse<StateDTO> states = stateService.getAllStates(page, size, sortBy, direction);
-
-        return new ResponseEntity<>(states, HttpStatus.OK);
-
-    }
     
     
     @Operation(summary = "By All: Get All Activated States")
@@ -99,7 +86,16 @@ public class StateController {
         return new ResponseEntity<>(states, HttpStatus.OK);
 
     }
-    
+
+    @Operation(summary = "By Admin and Employee: Get All Inactivated States")
+    @GetMapping("")
+    public ResponseEntity<PagedResponse<StateDTO>> getAllStates(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "sortBy", defaultValue = "stateId") String sortBy, @RequestParam(name = "direction", defaultValue = "asc") String direction) {
+
+        PagedResponse<StateDTO> states = stateService.getAllStates(page, size, sortBy, direction);
+
+        return new ResponseEntity<>(states, HttpStatus.OK);
+
+    }
     
     @Operation(summary = "By Admin and Employee: Get List of All Active states")
     @GetMapping("/all/active")

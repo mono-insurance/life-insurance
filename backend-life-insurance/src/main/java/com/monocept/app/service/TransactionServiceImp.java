@@ -84,6 +84,8 @@ public class TransactionServiceImp implements TransactionService {
         if (isApproved) {
             withdrawalRequestsRepository.reviewAgentCommission(withdrawalId);
 
+            Long agentId=withdrawalRequests.getAgent().getAgentId();
+            agentRepository.updateAgentCommission(agentId,withdrawalRequests.getAmount());
             emailDTO.setTitle("Withdrawal request accepted");
             emailDTO.setBody("Congrats!, your commission withdrawal request has been accepted.\n" +
                     " we have transferred requested money to your account\n");
@@ -109,7 +111,8 @@ public class TransactionServiceImp implements TransactionService {
                 Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Transactions> pages = transactionsRepository.findByPolicyAccount(policyAccount, pageable);
+
+        Page<Transactions> pages = transactionsRepository.findAllByPolicyAccount(policyAccount, pageable);
         List<Transactions> allTransactions = pages.getContent();
         List<TransactionsDTO> allTransactionsDTO = dtoService.convertTransactionListEntityToDTO(allTransactions);
 
@@ -226,8 +229,9 @@ public class TransactionServiceImp implements TransactionService {
 
         return new PagedResponse<TransactionsDTO>(allTransactionsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
 	}
-
-
-	
-	 
+    @Override
+    public TransactionsDTO getTransactionById(Long transactionId) {
+        Transactions transactions=transactionsRepository.findById(transactionId).orElseThrow(()->new UserException("transaction not found"));
+        return dtoService.convertTransactionEntityToDTO(transactions);
+    }
 }

@@ -49,6 +49,7 @@ public interface AdminService {
     SettingsDTO getSetting(String settingKey);
 
     PagedResponse<EmployeeDTO> getAllEmployees(int page, int size, String sortBy, String direction);
+    PagedResponse<AgentDTO> getAllRegisteredAgents(int page, int size, String sortBy, String direction);
 
     PagedResponse<EmployeeDTO> getAllActiveEmployees(int page, int size, String sortBy, String direction);
 

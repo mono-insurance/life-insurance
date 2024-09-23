@@ -2,6 +2,7 @@ package com.monocept.app.service;
 
 import com.monocept.app.dto.StripeChargeDTO;
 import com.monocept.app.dto.StripeTokenDTO;
+
 import com.monocept.app.entity.Settings;
 import com.monocept.app.entity.Transactions;
 import com.monocept.app.exception.UserException;
@@ -120,9 +121,7 @@ public class StripeServiceImp implements StripeService{
 		    String cancelUrl = requestData.get("failureUrl").toString();
 		    
 		    double totalAmountToPay = paymentToPay(LocalDate.now(), amount);
-		    
-		    System.out.println("yaha aaya ki nahi");
-		    
+
 	        String modifiedSuccessUrl = successUrl + "?session_id={CHECKOUT_SESSION_ID}";
 
 	        SessionCreateParams.Builder sessionBuilder = SessionCreateParams.builder()
@@ -152,7 +151,7 @@ public class StripeServiceImp implements StripeService{
 	        metadata.put("installmentAmount", requestData.get("amount").toString());
 	        metadata.put("paymentMade", String.valueOf(totalAmountToPay));
 	        if(requestData.containsKey("agentId")) metadata.put("agentId", requestData.get("agentId").toString());
-	        
+
 	        System.out.println("aur yaha aaya ki nahi");
 	        sessionBuilder.putAllMetadata(metadata);
 	        System.out.println("aur yaha aaya ki nahi");
@@ -160,9 +159,10 @@ public class StripeServiceImp implements StripeService{
 	        System.out.println("aur yaha aaya ki nahi");
 	        System.out.println(params);
 	        return Session.create(params);
-	        
+
 	    } catch (StripeException e) {
-	    	System.out.println("aur yaha aaya ki nahi");
+			System.out.println("aur yaha aaya ki nahi");
+
 	        throw new UserException("Stripe checkout session creation failed");
 	    }
 	}

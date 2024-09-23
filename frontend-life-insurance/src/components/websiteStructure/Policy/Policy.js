@@ -193,6 +193,13 @@ export const Policy = () => {
           data.maxInvestmentAmount
       );
 
+      if(Object.keys(validationErrors).length !== 0){          
+        Object.keys(validationErrors).forEach((key) => {
+        errorToast(validationErrors[key]);
+    });
+
+      }
+
       if(formValues.nomineeName === '' || formValues.nomineeRelation === ''){
         errorToast('Nominee Name and Nominee Relationship are required');
         return;
@@ -214,9 +221,7 @@ export const Policy = () => {
           setProfitAmount(0);
           setTotalMaturityAmount(0);
           setShowCalculations(false);
-          Object.keys(validationErrors).forEach((key) => {
-              errorToast(validationErrors[key]);
-          });
+
       }
   };
 

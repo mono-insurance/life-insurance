@@ -19,6 +19,7 @@ public class DocumentUploadedDTO {
     private String documentType;
 
     @NotNull(message = "Approved Status is mandatory")
+
     private Boolean isApproved;
 
     private Long customerId;
@@ -28,4 +29,7 @@ public class DocumentUploadedDTO {
     private Long policyId;
     
     private String imageBase64;
+
+    private String customerName;
+    private String agentName;
 }

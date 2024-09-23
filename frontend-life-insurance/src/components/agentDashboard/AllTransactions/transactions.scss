@@ -1,0 +1,226 @@
+.content-area-transactions {
+    & > section {
+      margin-bottom: 16px;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+.content-area-table-transactions {
+    background: var(--secondary-color);
+    border-radius: 5px;
+    box-shadow: var(--light-shadow1);
+    padding: 12px 16px;
+    margin-top: 50px;
+  
+    @media (max-width: 768px) {
+      padding: 12px;
+    }
+
+    .data-table-information{
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+    }
+  
+    .data-table-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--xl-text-color);
+      margin-bottom: 12px;
+    }
+  
+    .data-table-diagram {
+      border-radius: 6px;
+      border: 1px solid var(--tbl-border-color) !important;
+      overflow-x: scroll;
+  
+      &::-webkit-scrollbar {
+        height: 6px;
+        width: 6px;
+      }
+  
+      &::-webkit-scrollbar-track {
+        background-color: var(--scroll-track-bg-color);
+      }
+      &::-webkit-scrollbar-thumb {
+        border-radius: 100vh !important;
+        background-color: #e9e9e9;
+        outline: 1px solid rgba(0, 0, 0, 0.02);
+        outline-offset: -1px;
+      }
+  
+      
+    }
+}
+
+.form-input {
+    width: 100%; 
+    padding: 6px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  .filter-buttons {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+  }
+
+
+.form-submit-b {
+    padding: 6px 16px;
+    border-radius: 4px;
+    background: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    border: none;
+    background-color: var(--primary-color);
+    transition: var(--default-transition);
+  
+    &:hover {
+      background-color: var(--side-link-hover-color);
+      color: var(--side-text-color);
+    }
+  }
+
+  .filter {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+  
+    .date-range-wrapper {
+      display: inline-block;
+      box-shadow: var(--light-shadow1);
+  
+      .rdrDateDisplay {
+        margin: 0;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        border-radius: 5px;
+        overflow: hidden;
+      }
+  
+      .rdrDateRangeWrapper {
+        position: relative;
+      }
+  
+      .rdrMonthAndYearWrapper {
+        position: absolute;
+        top: 100%;
+        width: 100%;
+        background-color: var(--light-color);
+        padding-top: 0;
+        height: 40px;
+        z-index: 1;
+      }
+  
+      .rdrMonth {
+        padding: 0;
+        z-index: 1;
+      }
+  
+      .rdrWeekDays {
+        position: absolute;
+        top: calc(100% + 40px);
+        left: 0;
+        width: 100%;
+        background-color: var(--light-color);
+        height: 32px;
+        z-index: 1;
+      }
+  
+      .rdrDays {
+        position: absolute;
+        top: calc(100% + 40px + 32px);
+        left: 0;
+        width: 100%;
+        background-color: var(--light-color);
+        z-index: 1;
+      }
+  
+      &.hide-date-range {
+        .rdrMonthAndYearWrapper {
+          display: none;
+        }
+        .rdrMonth {
+          padding: 0;
+        }
+        .rdrWeekDays,
+        .rdrDays {
+          display: none;
+        }
+      }
+  
+      .rdrInRange {
+        background-color: var(--primary-color) !important; /* Background color for dates within the range */
+        color: #fff !important; /* Text color for dates within the range */
+      }
+      
+      /* Style specifically for the start date */
+      .rdrStartEdge {
+        background-color: var(--primary-color) !important; /* Background color for the start date */
+        color: #fff !important; /* Text color for the start date */
+        border-radius: 50% 0 0 50%; /* Round the left side for the start date */
+      }
+      
+      /* Style specifically for the end date */
+      .rdrEndEdge {
+        background-color: var(--primary-color) !important; /* Background color for the end date */
+        color: #fff !important; /* Text color for the end date */
+        border-radius: 0 50% 50% 0; /* Round the right side for the end date */
+      }
+  
+      .rdrDayHovered span,
+      .rdrDayNumber span {
+        border-color: var(--primary-color);
+      }
+  
+  
+      .rdrDateDisplayWrapper {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+        outline: var(--secondary-color);
+  
+        * {
+          background-color: var(--secondary-color);
+          border-color: var(--secondary-color);
+          outline: var(--secondary-color);
+          box-shadow: none;
+          color: var(--base-text-color);
+          font-size: 1.1rem;
+        }
+      }
+    }
+}
+
+.form-input {
+    width: 100%; 
+    padding: 6px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  .filter-buttons {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+  }
+  
+  .form-submit-b {
+    padding: 6px 16px;
+    border-radius: 4px;
+    background: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    border: none;
+    background-color: var(--primary-color);
+    transition: var(--default-transition);
+  
+    &:hover {
+      background-color: var(--side-link-hover-color);
+      color: var(--side-text-color);
+    }
+  }

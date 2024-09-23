@@ -3,6 +3,7 @@ package com.monocept.app.controller;
 import java.time.LocalDate;
 import java.util.Map;
 
+import com.monocept.app.utils.NomineeRelation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +43,7 @@ public class StripeContoller {
 	        return ResponseEntity.ok(session.getUrl());
 	    } catch (Exception e) {
 	    	System.out.println(requestData);
+
 	    	System.out.println("coming here?");
 	    	
 	        return ResponseEntity.badRequest().body("Failed to create checkout session: " + e.getMessage());
@@ -104,7 +106,9 @@ public class StripeContoller {
 					policyAccountDTO.setInvestmentAmount(Double.parseDouble(investmentAmount));
 					policyAccountDTO.setPolicyTerm(Integer.parseInt(policyTerm));
 					policyAccountDTO.setNomineeName(nomineeName);
-					policyAccountDTO.setNomineeRelation(nomineeRelation);
+
+					policyAccountDTO.setNomineeRelation(NomineeRelation.valueOf(nomineeRelation.toUpperCase()));
+
 					policyAccountDTO.setCustomerId(Long.parseLong(customerId));
 					policyAccountDTO.setPolicyId(Long.parseLong(policyId));
 					policyAccountDTO.setTimelyBalance(Double.parseDouble(installmentAmount));

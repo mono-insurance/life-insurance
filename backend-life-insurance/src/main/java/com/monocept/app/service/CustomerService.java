@@ -47,6 +47,11 @@ public interface CustomerService {
 
 	CustomerCreationDTO updateCustomer(CustomerCreationDTO customerDTO);
 
+	PagedResponse<CustomerDTO> getAllActiveCustomers(int pageNo, int size, String sort, String sortBy, String sortDirection);
+
+	PagedResponse<CustomerDTO> getAllCustomersStartswith(int page, int size, String sort, String sortBy, String direction);
+
+	CustomerCreationDTO getCustomerOnlyProfile();
 	List<DocumentUploadedDTO> getDocumentsOfCustomer(Long customerId);
 
 	String addOrUpdateDocumentsOfCustomer(Long customerId, String documentType, MultipartFile file);
@@ -55,6 +60,7 @@ public interface CustomerService {
 
 	void createInstallmentPayment(InstallmentDTO installmentDTO);
 
+    DocumentUploadedDTO getDocumentById(Long documentId);
 	PagedResponse<DocumentUploadedDTO> getAllDocuments(int page, int size, String sortBy, String direction);
 
 	PagedResponse<DocumentUploadedDTO> getAllDisapprovedDocuments(int page, int size, String sortBy, String direction);
@@ -64,5 +70,4 @@ public interface CustomerService {
 
 	PagedResponse<DocumentUploadedDTO> getAlDocumentsByCustomer(Long id, int page, int size, String sortBy,
 			String direction);
-
 }

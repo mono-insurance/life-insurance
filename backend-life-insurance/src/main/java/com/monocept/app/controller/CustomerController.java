@@ -64,6 +64,8 @@ public class CustomerController {
     }
 
 
+//<<<<<<< HEAD
+
     @PostMapping("/customer/registration")
     ResponseEntity<Long> customerRegistration(@RequestBody @Valid RegistrationDTO registrationDTO) {
 
@@ -73,11 +75,22 @@ public class CustomerController {
 
 
     @Operation(summary = "By Customer: Get the customer profile")
-    @GetMapping("/customer/{cid}")
+    @GetMapping("/{cid}")
     public ResponseEntity<CustomerDTO> getCustomerProfile(@PathVariable("cid") Long customerId) {
-
         CustomerDTO customer = customerService.getCustomerProfile(customerId);
         return new ResponseEntity<CustomerDTO>(customer, HttpStatus.OK);
+    }
+    @Operation(summary = "By Customer: Get the customer profile")
+    @GetMapping
+    public ResponseEntity<CustomerCreationDTO> getCustomerOnlyProfile() {
+        CustomerCreationDTO customer = customerService.getCustomerOnlyProfile();
+        return new ResponseEntity<CustomerCreationDTO>(customer, HttpStatus.OK);
+    }
+    @Operation(summary = "By Customer: Get the customer profile")
+    @GetMapping("/document/{did}")
+    public ResponseEntity<DocumentUploadedDTO> getDocumentById(@PathVariable("did")Long documentId) {
+        DocumentUploadedDTO documentUploadedDTO = customerService.getDocumentById(documentId);
+        return new ResponseEntity<>(documentUploadedDTO, HttpStatus.OK);
     }
 
 
@@ -130,16 +143,19 @@ public class CustomerController {
     }
 
 
+
+
     @Operation(summary = "By Admin,emp: Get All policyClaims by Customer")
     @GetMapping("/policy-claims-request/{cid}")
     ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllPolicyClaimsRequest(
-            @PathVariable("cid")Long customerId,
-            @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
+            @PathVariable("cid") Long customerId,
+            @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sort", defaultValue = "ASC") String sort,
             @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
-        PagedResponse<WithdrawalRequestsDTO> allPolicyClaims = customerService.getAllPolicyClaimsRequest(pageNo, size, sort, sortBy, sortDirection,customerId);
+
+        PagedResponse<WithdrawalRequestsDTO> allPolicyClaims = customerService.getAllPolicyClaimsRequest(page, size, sort, sortBy, sortDirection, customerId);
         return new ResponseEntity<>(allPolicyClaims, HttpStatus.OK);
     }
 
@@ -147,18 +163,22 @@ public class CustomerController {
     @Operation(summary = "By Admin,Emp: Get All PolicyClaims that are approved")
     @GetMapping("/policy-claims-approved")
     ResponseEntity<PagedResponse<WithdrawalRequestsDTO>> getAllPolicyClaimsApproved(
-            @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
+
+            @RequestParam(name = "page", defaultValue = "0") int page,
+
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sort", defaultValue = "ASC") String sort,
             @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
-        PagedResponse<WithdrawalRequestsDTO> allPolicyClaims = customerService.getAllPolicyClaimsApproved(pageNo, size, sort, sortBy, sortDirection);
+
+        PagedResponse<WithdrawalRequestsDTO> allPolicyClaims = customerService.getAllPolicyClaimsApproved(page, size, sort, sortBy, sortDirection);
         return new ResponseEntity<>(allPolicyClaims, HttpStatus.OK);
     }
     
     
     @Operation(summary = "By Customer: Get the customer profile")
     @GetMapping("/customer/profile/{cid}")
+
     public ResponseEntity<CustomerCreationDTO> getCustomerFullProfile(@PathVariable("cid") Long customerId) {
 
     	CustomerCreationDTO customer = customerService.getCustomerFullProfile(customerId);

@@ -80,6 +80,8 @@ public class PolicyDTO {
 
     @NotNull(message = "Insurance type ID is mandatory")
     private Long insuranceTypeId;
+
+    private String imageUrl;
     
     
     private String imageBase64;

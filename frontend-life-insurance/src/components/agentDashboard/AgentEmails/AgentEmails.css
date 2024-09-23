@@ -1,0 +1,5 @@
+/* Style for the dropdown option text */
+select option {
+    color: gray; /* Apply gray color to the option text */
+  }
+  

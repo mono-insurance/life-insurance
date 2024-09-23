@@ -30,4 +30,5 @@ public interface TransactionService {
 
 	PagedResponse<TransactionsDTO> getAllTransactions(int page, int size, String sortBy, String direction);
 
+    TransactionsDTO getTransactionById(Long transactionId);
 }

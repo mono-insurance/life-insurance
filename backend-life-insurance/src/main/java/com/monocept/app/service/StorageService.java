@@ -22,6 +22,7 @@ public interface StorageService {
 
 	byte[] updatePolicyImage(Long pid, MultipartFile file);
 
+    byte[] downloadImage(Long policyId);
 
 	void updateUserDocuments(Customer customer, DocumentUploaded documentUploaded, MultipartFile file);
 }

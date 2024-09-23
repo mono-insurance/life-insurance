@@ -20,4 +20,6 @@ public interface PolicyRepository extends JpaRepository<Policy,Long> {
 	List<Policy> findByIsActiveTrue();
 
 	List<Policy> findByIsActiveTrueAndInsuranceType(InsuranceType insuranceType);
+
+    Page<Policy> findAllByIsActiveTrue(Pageable pageable);
 }

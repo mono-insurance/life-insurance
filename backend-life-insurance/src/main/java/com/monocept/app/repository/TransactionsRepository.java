@@ -1,5 +1,6 @@
 package com.monocept.app.repository;
 
+
 import com.monocept.app.entity.PolicyAccount;
 import com.monocept.app.entity.Transactions;
 
@@ -33,4 +34,15 @@ public interface TransactionsRepository extends JpaRepository<Transactions,Long>
 	List<Transactions> findByStatusAndAgentNotNull(@Param("status")String status);
 
 	Page<Transactions> findByStatus(String status, Pageable pageable);
+
+
+	Page<Transactions> findAllByPolicyAccountIn(List<PolicyAccount> agentAccounts, Pageable pageable);
+
+	@Query("SELECT t from Transactions t where t.status = ?1")
+	Page<Transactions> findAllByStatus(Pageable pageable, String status);
+
+	Page<Transactions> findAllByPolicyAccountInAndStatus(List<PolicyAccount> agentAccounts, Pageable pageable, String done);
+
+	Page<Transactions> findAllByPolicyAccountAndStatus(PolicyAccount policyAccount, Pageable pageable, String done);
+
 }

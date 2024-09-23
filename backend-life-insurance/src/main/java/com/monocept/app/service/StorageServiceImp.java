@@ -14,7 +14,6 @@ import com.monocept.app.exception.RoleAccessException;
 import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.*;
 import com.monocept.app.utils.DocumentType;
-import com.monocept.app.utils.PagedResponse;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,16 +93,28 @@ public class StorageServiceImp implements StorageService {
 
     @Override
     public byte[] downloadPolicyImage(Long pid) {
-        Policy policy = policyRepository.findById(pid).orElseThrow(() -> new UserException("policy not found"));
+
+        Policy policy = findPolicyById(pid);
         Image image = policy.getImage();
         String cloudFileName = image.getCloudImageName();
         return downloadFromS3(cloudFileName);
     }
 
+    @Override
+    public byte[] downloadImage(Long policyId) {
+        Policy policy = findPolicyById(policyId);
+        String fileName = policy.getImage().getCloudImageName();
+        return downloadFromS3(fileName);
+    }
+
+    private Policy findPolicyById(Long policyId) {
+        return policyRepository.findById(policyId).orElseThrow(() -> new UserException("policy not found "));
+    }
+
     private byte[] downloadFromS3(String fileName) {
+        try{
         S3Object s3Object = s3Client.getObject(bucketName, fileName);
         S3ObjectInputStream inputStream = s3Object.getObjectContent();
-        try {
             byte[] content = IOUtils.toByteArray(inputStream);
             return content;
         } catch (IOException e) {
@@ -137,13 +148,15 @@ public class StorageServiceImp implements StorageService {
         deleteFromS3(fileName);
         documentUploaded.setIsApproved(false);
         documentUploadedRepository.save(documentUploaded);
-        EmailDTO emailDTO=new EmailDTO();
-        if(documentUploaded.getAgent()!=null)  emailDTO.setEmailId(documentUploaded.getAgent().getCredentials().getEmail());
-        else  if(documentUploaded.getCustomer()!=null)  emailDTO.setEmailId(documentUploaded.getCustomer().getCredentials().getEmail());
+
+        EmailDTO emailDTO = new EmailDTO();
+        if (documentUploaded.getAgent() != null)
+            emailDTO.setEmailId(documentUploaded.getAgent().getCredentials().getEmail());
+        else if (documentUploaded.getCustomer() != null)
+            emailDTO.setEmailId(documentUploaded.getCustomer().getCredentials().getEmail());
 
         emailDTO.setTitle("Document Deleted successfully");
-        emailDTO.setBody("Oops!! your document "+documentUploaded.getDocumentType()+" has been deleted, please upload it again.\n");
-
+        emailDTO.setBody("Oops!! your document " + documentUploaded.getDocumentType() + " has been deleted, please upload it again.\n");
         emailService.sendAccountCreationEmail(emailDTO);
         return true;
     }
@@ -236,6 +249,7 @@ public class StorageServiceImp implements StorageService {
             
             // Remove the existing image from the policy and repository
             policy.setImage(null);
+//            policyRepository.save(policy);
             imageRepository.delete(existingImage);
         }
 

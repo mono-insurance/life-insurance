@@ -60,6 +60,8 @@ public interface DtoService {
 
 	List<TransactionsDTO> convertTransactionListEntityToDTO(List<Transactions> allTransactions);
 
+	TransactionsDTO convertTransactionEntityToDTO(Transactions transaction);
+
 	CustomerDTO convertCustomerToCustomerResponseDTO(Customer customer);
 
 	Address convertAddressDTOToEntity(AddressDTO address);
@@ -127,7 +129,10 @@ public interface DtoService {
 	List<WithdrawalRequestsDTO> convertWithdrawalRequestsListEntityToDTO(
 			List<WithdrawalRequests> allWithdrawalRequests);
 
+
+    List<DocumentUploadedDTO> convertDocumentsToDTO(List<DocumentUploaded> allDocuments);
 	AdminCreationDTO converAdminToAdminCreationDTO(Admin updatedAdmin);
+
 
 	EmployeeCreationDTO convertEmployeeToEmployeeCreationDTO(Employee existingEmployee);
 
@@ -145,8 +150,11 @@ public interface DtoService {
 
 	CommissionDTO convertTransactionEntityToCommissionDTO(Transactions transactions);
 
-	List<DocumentUploadedDTO> convertDocumentUploadedListToDTO(List<DocumentUploaded> documents);
 
 	List<AgentDTO> convertAgentListEntityToDTO(List<Agent> agents);
 
+	PageResult convertTransactionsToPage(List<Transactions> transactions, int pageNo, String sort, String sortBy, String sortDirection, int size);
+
+	DocumentUploadedDTO convertDocumentUploadedToDTO(DocumentUploaded documentUploaded);
+	List<DocumentUploadedDTO> convertDocumentUploadedListToDTO(List<DocumentUploaded> documents);
 }

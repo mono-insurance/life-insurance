@@ -36,6 +36,8 @@ export const Login = () => {
             const token = response.headers['authorization'];
     
             localStorage.setItem("auth", token);
+            localStorage.setItem("role", response.data.role);
+            localStorage.setItem("id", response.data.id);
 
             resetSidebar();
             successToast("Login successful!");
@@ -47,6 +49,12 @@ export const Login = () => {
             if(response.data.role === "Customer"){
                 const redirectPath = location.state?.from || `/suraksha/home`;
                 navigate(redirectPath);
+            }
+            if(response.data.role === "Employee"){
+                navigate(`/employee/dashboard/${response.data.id}`)
+            }
+            if(response.data.role === "Agent"){
+                navigate(`/agent/dashboard/${response.data.id}`)
             }
         } 
         catch (error) {

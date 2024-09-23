@@ -33,10 +33,10 @@ public class AgentDTO {
     @NotNull(message = "Approved Status is mandatory")
     private Boolean isApproved;
 
+
     @NotNull(message = "balance is mandatory")
     private Double balance;
 
-    @NotNull(message = "balance is mandatory")
     private Double withdrawalAmount;
     
     @NotNull(message = "Credentials are mandatory")

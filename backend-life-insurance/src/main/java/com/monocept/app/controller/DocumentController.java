@@ -44,9 +44,21 @@ public class DocumentController {
                 .header("Content-disposition", "attachment; filename=\"" + "testfile" + "\"")
                 .body(resource);
     }
-    
-    
-    @GetMapping(value="/upload",consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @GetMapping("/policy-image/{pid}")
+    public ResponseEntity<ByteArrayResource> downloadImage(
+            @PathVariable("pid") Long policyId) {
+        byte[] data = storageService.downloadImage(policyId);
+        ByteArrayResource resource = new ByteArrayResource(data);
+        return ResponseEntity
+                .ok()
+                .contentLength(data.length)
+                .header("Content-type", "application/octet-stream")
+                .header("Content-disposition", "attachment; filename=\"" + "testfile" + "\"")
+                .body(resource);
+    }
+
+
+    @PostMapping(value = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     ResponseEntity<Boolean> addUserDocument(
             @ModelAttribute @Valid DocumentUploadedDTO documentUploadedDTO,
             @RequestParam("file") MultipartFile file) {
@@ -67,14 +79,12 @@ public class DocumentController {
         Boolean isDeleted = storageService.deletePolicyImage(imageId);
         return new ResponseEntity<>(isDeleted, HttpStatus.OK);
     }
-    
-    
     @GetMapping("/all")
     public List<String> getDocumentTypes() {
         return List.of(DocumentType.values())
-                   .stream()
-                   .map(DocumentType::name)
-                   .collect(Collectors.toList());
+                .stream()
+                .map(DocumentType::name)
+                .collect(Collectors.toList());
     }
     
     

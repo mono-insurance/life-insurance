@@ -31,11 +31,16 @@ public class EmailServiceImp implements EmailService{
                     = new MimeMessageHelper(mimeMessage, true);
             mimeMessageHelper.setFrom(sender);
             mimeMessageHelper.setTo(emailDTO.getEmailId());
-            String body= " Hi, i am agent from suraksha insurance !! \n Please use this link to create your policy in our company\n"+
-                    "http:localhost/demo-policy/${emailDto.getAgentId()}";
-            mimeMessageHelper.setText(body);
+
+            String body= emailDTO.getBody();
+            String link="http://localhost:3000/suraksha/scheme/"+emailDTO.getPolicyId()+"?agentId="+emailDTO.getAgentId();
+            String htmlContent = "<p>" + body + "</p>" +
+                    "<p>Click the link: <a href='" + link + "'>Referral Link</a></p>";
+
+
+            mimeMessageHelper.setText(htmlContent,true);
             mimeMessageHelper.setSubject(
-                    "Congrats! account has been activated");
+                    emailDTO.getTitle());
             javaMailSender.send(mimeMessage);
         }
         catch (MessagingException e) {

@@ -3,6 +3,14 @@ package com.monocept.app.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.monocept.app.dto.CustomUserDetails;
+import com.monocept.app.entity.*;
+import com.monocept.app.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -43,6 +51,8 @@ public class PolicyServiceImp implements PolicyService{
     private DocumentNeededRepository documentNeededRepository;
 	@Autowired
 	private AccessConService accessConService;
+	@Autowired
+	private CustomerRepository customerRepository;
 	
 	
 	@Override
@@ -181,7 +191,7 @@ public class PolicyServiceImp implements PolicyService{
 		
 		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
 		
-		Page<Policy> pages = policyRepository.findAll(pageable);
+		Page<Policy> pages = policyRepository.findAllByIsActiveTrue(pageable);
 		List<Policy> allPolicies = pages.getContent();
 		List<PolicyDTO> allPoliciesDTO = dtoService.convertPolicyListEntityToDTO(allPolicies);
 		
@@ -224,7 +234,51 @@ public class PolicyServiceImp implements PolicyService{
 		
 		return new PagedResponse<PolicyDTO>(allPoliciesDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
 	}
+	@Override
+	public Boolean isCustomerEligible(Long policyId) {
+		CustomUserDetails customUserDetails=accessConService.checkUserAccess();
+		Customer customer=findCustomerById(customUserDetails.getId());
+		Policy policy=findPolicyById(policyId);
 
+		return isEligible(customer,policy);
+	}
+
+	private Boolean isEligible(Customer customer, Policy policy) {
+
+		if (!policy.getIsActive()) {
+			throw new UserException("The policy is not active");
+		}
+		// Validate the customer's age
+		int age = LocalDate.now().getYear() - customer.getDateOfBirth().getYear();
+		if (age < policy.getMinAge() || age > policy.getMaxAge()) {
+			throw new UserException("Customer's age is not within the allowed range for this policy");
+		}
+
+		// Validate the customer's gender
+		if (!policy.getEligibleGender().equalsIgnoreCase("BOTH") &&
+				!policy.getEligibleGender().equalsIgnoreCase(customer.getGender().toString())) {
+			throw new UserException("Customer's gender is not eligible for this policy");
+		}
+		List<DocumentNeeded>policyDocumentsNeeded=policy.getDocumentsNeeded();
+		List<DocumentUploaded>documentUploadedList=customer.getDocuments();
+		Set<DocumentType> uploadedDocumentTypes = documentUploadedList.stream()
+				.filter(DocumentUploaded::getIsApproved)
+				.map(DocumentUploaded::getDocumentType) // Assuming DocumentUploaded has getDocumentType()
+				.collect(Collectors.toSet());
+
+		// Check if all needed documents are present in the uploaded documents
+		return policyDocumentsNeeded.stream()
+				.allMatch(neededDoc -> uploadedDocumentTypes.contains(neededDoc.getDocumentType())); // Assuming DocumentNeeded has getDocumentType()
+
+	}
+
+	private Policy findPolicyById(Long policyId) {
+		return policyRepository.findById(policyId).orElseThrow(()->new UserException("policy not found"));
+	}
+
+	private Customer findCustomerById(Long id) {
+		return customerRepository.findById(id).orElseThrow(()->new UserException("customer not found"));
+	}
 
 
 	@Override

@@ -83,8 +83,7 @@ const resetPagination = () => {
           }
           else if(filterTypeFromParams === 'id') {
             validateCustomerId(idFromParams);
-            const data = await getQueriesByCustomerId(idFromParams, currentPageFromParams, itemsPerPageFromParams);
-            response = covertIdDataIntoTable(data);
+            response = await getQueriesByCustomerId(idFromParams, currentPageFromParams, itemsPerPageFromParams);
           }
           else {
             response = await getAllQueries(currentPageFromParams, itemsPerPageFromParams);

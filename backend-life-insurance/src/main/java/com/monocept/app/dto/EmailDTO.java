@@ -18,10 +18,8 @@ public class EmailDTO {
     private String title;
     @NotBlank(message = "body could not be null")
     private String body;
-    @NotNull(message = "policyId could not be null")
+
+
     private Long policyId;
-    @NotBlank(message = "referralLink could not be null")
-    private String referralLink;
-    @NotNull(message = "agentId could not be null")
     private Long agentId;
 }

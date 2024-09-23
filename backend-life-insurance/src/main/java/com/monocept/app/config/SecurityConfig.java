@@ -109,7 +109,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.PUT, "/suraksha/city/**").
                                 hasAnyRole("EMPLOYEE","ADMIN")
                                 .requestMatchers(HttpMethod.PUT, "/suraksha/download/**").
-                                hasRole("ADMIN")
+                                hasAnyRole("ADMIN","CUSTOMER","AGENT","EMPLOYEE")
 
                                 .requestMatchers("/public/api/auth/**").permitAll()
                                 .requestMatchers("/swagger-ui/**","/v3/api-docs").permitAll()
@@ -118,7 +118,7 @@ public class SecurityConfig {
                                 
 
                                 .anyRequest().authenticated()
-//                                .anyRequest().permitAll()
+
 
                 ).exceptionHandling( exception -> exception
                         .authenticationEntryPoint(authenticationEntryPoint)
@@ -137,8 +137,8 @@ public class SecurityConfig {
         return (web) -> web.ignoring()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**");
     }
-    
-	@Bean
+
+    @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override

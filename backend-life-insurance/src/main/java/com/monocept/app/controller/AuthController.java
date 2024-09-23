@@ -6,7 +6,9 @@ import com.monocept.app.dto.LoginDTO;
 import com.monocept.app.service.AgentService;
 import com.monocept.app.service.AuthService;
 import com.monocept.app.service.CustomerService;
+import com.monocept.app.service.*;
 
+import com.monocept.app.utils.PagedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
@@ -23,30 +25,62 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+
+//}
+//        <<<<<<< HEAD
+//
+//@Autowired
+//private AuthService authService;
+//private final AgentService agentService;
+//
+//@Autowired
+//private CustomerService customerService;
+//
+//
+//public AuthController(AuthService authService, AgentService agentService) {
+//        this.authService = authService;
+//        this.agentService = agentService;
+//        }
+//
+//
+//@Operation(summary = "By Anyone: Login the user or admin if have registered and if active")
+//@PostMapping(value = {"/login"})
+//public ResponseEntity<JWTAuthResponse> login(@RequestBody LoginDTO loginDto){
+//        System.out.println(loginDto);
+//        JWTAuthResponse jwtAuthResponse = authService.login(loginDto);
+//        =======
 
 @RestController
 @RequestMapping("/public/api/auth")
 public class AuthController {
-	
+
+
     @Autowired
     private AuthService authService;
-    private final AgentService agentService;
-    
-    @Autowired
-    private CustomerService customerService;
-    
+    private  AgentService agentService;
+    private  CustomerService customerService;
+    private  StateService stateService;
+    private  EmailService emailService;
 
-    public AuthController(AuthService authService, AgentService agentService) {
+
+    public AuthController(AuthService authService, AgentService agentService, CustomerService customerService,
+                          StateService stateService, EmailService emailService) {
         this.authService = authService;
         this.agentService = agentService;
+        this.customerService = customerService;
+        this.stateService = stateService;
+        this.emailService = emailService;
     }
-    
-    
+
+
     @Operation(summary = "By Anyone: Login the user or admin if have registered and if active")
     @PostMapping(value = {"/login"})
-    public ResponseEntity<JWTAuthResponse> login(@RequestBody LoginDTO loginDto){
-    	System.out.println(loginDto);
-    	JWTAuthResponse jwtAuthResponse = authService.login(loginDto);
+    public ResponseEntity<JWTAuthResponse> login(@RequestBody LoginDTO loginDto) {
+        System.out.println(loginDto);
+        JWTAuthResponse jwtAuthResponse = authService.login(loginDto);
+//>>>>>>> target6/master
         System.out.println(loginDto);
 
         String token = jwtAuthResponse.getAccessToken();
@@ -58,6 +92,7 @@ public class AuthController {
         responseBody.setTokenType(jwtAuthResponse.getTokenType());
         responseBody.setRole(jwtAuthResponse.getRole());
         responseBody.setId(jwtAuthResponse.getId());
+//<<<<<<< HEAD
 
         return new ResponseEntity<>(responseBody, headers, HttpStatus.OK);
     }
@@ -71,68 +106,108 @@ public class AuthController {
         Long id = agentService.agentRegisterRequest(credentialsDTO);
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
-    
+
     @Operation(summary = "By Anyone: Verify Admin")
     @GetMapping(value = {"/verify/admin/{userId}"})
     public ResponseEntity<Boolean> isAdmin(@PathVariable(name = "userId")int userId, @RequestHeader("Authorization") String token){
-    	System.out.println("Received Token: " + token);
-    	
-    	if (token.startsWith("Bearer ")) {
+        System.out.println("Received Token: " + token);
+
+        if (token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
-    	
-    	boolean adminOrNot = authService.isAdmin(token , userId);
+
+        boolean adminOrNot = authService.isAdmin(token , userId);
         System.out.println(adminOrNot);
 
         return ResponseEntity.ok(adminOrNot);
     }
+
+    @PostMapping("/register-customer")
+    ResponseEntity<Long> customerRegistration(@RequestBody @Valid RegistrationDTO registrationDTO) {
+
+        Long id = customerService.customerRegistration(registrationDTO);
+        return new ResponseEntity<>(id, HttpStatus.OK);
+    }
+    @PostMapping("/contact-us")
+    ResponseEntity<HttpStatus> ContactUs(@RequestBody @Valid EmailDTO emailDTO) {
+
+        emailService.sendAccountCreationEmail(emailDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    @PostMapping("/change-password-request/{userId}")
+    ResponseEntity<HttpStatus> changePasswordRequest(@PathVariable("userId")String userId) {
+
+        authService.changePasswordRequest(userId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
     
-    
+    @PostMapping("/otp-confirmation/{userId}/{otp}")
+    ResponseEntity<Boolean> otpConfirmation(@PathVariable("userId")String userId,@PathVariable("otp")String otp) {
+
+        Boolean isTrue=authService.otpConfirmation(otp,userId);
+        return new ResponseEntity<>(isTrue,HttpStatus.OK);
+    }
+    @PostMapping("/password-reset")
+    ResponseEntity<Boolean> passwordReset(@RequestBody @Valid PasswordResetDTO passwordResetDTO) {
+
+        Boolean isSuccess=authService.passwordReset(passwordResetDTO);
+        return new ResponseEntity<>(isSuccess,HttpStatus.OK);
+    }
+    @Operation(summary = "By Admin and Employee: Get All States")
+    @GetMapping("/all-states")
+    public ResponseEntity<PagedResponse<StateDTO>> getAllStates(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size,
+            @RequestParam(name = "sortBy", defaultValue = "stateName") String sortBy,
+            @RequestParam(name = "direction", defaultValue = "asc") String direction) {
+
+        PagedResponse<StateDTO> states = stateService.getAllStates(page, size, sortBy, direction);
+
+        return new ResponseEntity<>(states, HttpStatus.OK);
+
+    }
+
+
+
+
+
+
     @Operation(summary = "By Anyone: Verify Employee")
     @GetMapping(value = {"/verify/employee/{userId}"})
-    public ResponseEntity<Boolean> isEmployee(@PathVariable(name = "userId")int userId, @RequestHeader("Authorization") String token){
-    	System.out.println("Received Token: " + token);
-    	
-    	if (token.startsWith("Bearer ")) {
+    public ResponseEntity<Boolean> isEmployee(@PathVariable(name = "userId") int userId, @RequestHeader("Authorization") String token) {
+        System.out.println("Received Token: " + token);
+
+        if (token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
-    	boolean employeeOrNot = authService.isEmployee(token, userId);
+        boolean employeeOrNot = authService.isEmployee(token, userId);
+//>>>>>>> target6/master
         System.out.println(employeeOrNot);
 
         return ResponseEntity.ok(employeeOrNot);
     }
-    
+//<<<<<<< HEAD
+
+
     @Operation(summary = "By Anyone: Verify Agent")
     @GetMapping(value = {"/verify/agent/{userId}"})
-    public ResponseEntity<Boolean> isAgent(@PathVariable(name = "userId")int userId, @RequestHeader("Authorization") String token){
-    	System.out.println("Received Token: " + token);
-    	
-    	if (token.startsWith("Bearer ")) {
+    public ResponseEntity<Boolean> isAgent(@PathVariable(name = "userId") int userId, @RequestHeader("Authorization") String token) {
+        System.out.println("Received Token: " + token);
+
+        if (token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
-    	
-    	boolean agentOrNot = authService.isAgent(token , userId);
+
+        boolean agentOrNot = authService.isAgent(token, userId);
+//>>>>>>> target6/master
         System.out.println(agentOrNot);
 
         return ResponseEntity.ok(agentOrNot);
     }
-    
-    
-    @Operation(summary = "By Anyone: Verify Customer")
-    @GetMapping(value = {"/verify/customer/{userId}"})
-    public ResponseEntity<Boolean> isCustomer(@PathVariable(name = "userId")int userId, @RequestHeader("Authorization") String token){
-    	System.out.println("Received Token: " + token);
-    	
-    	if (token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
-    	boolean customerOrNot = authService.isCustomer(token, userId);
-        System.out.println(customerOrNot);
+//<<<<<<< HEAD
 
-        return ResponseEntity.ok(customerOrNot);
-    }
-    
-    
+
+
     @Operation(summary = "By Anyone: Verify Customer")
     @GetMapping(value = {"/verify/customer"})
     public ResponseEntity<CustomerCreationDTO> isCustomerId(@RequestHeader("Authorization") String token){
@@ -150,7 +225,6 @@ public class AuthController {
         }
         return ResponseEntity.ok(null);
     }
-    
     
     @PostMapping("/update-password")
     ResponseEntity<String> updatePassword(@RequestBody Map<String, String> request) {

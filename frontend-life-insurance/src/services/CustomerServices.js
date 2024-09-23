@@ -241,7 +241,7 @@ export const getWithdrawalRequestsByPolicyAccountId = async (id, customerId) => 
 export const fetchingTransactionsByPolicyAccountId = async (id, currentPage, itemsPerPage) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get(`http://localhost:8080/suraksha/transaction/transactions/policy-account/${id}`, {
+        const response = await axios.get(`http://localhost:8080/suraksha/transaction/policy-account/${id}`, {
               headers: { 'Authorization': `Bearer ${token}` },
               params: { page: currentPage - 1, size: itemsPerPage }
           }).catch((error) => {throw new AxiosError(error.response.data.message)});

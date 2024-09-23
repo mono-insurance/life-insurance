@@ -39,7 +39,7 @@ export const getAllCustomers = async (currentPage, itemsPerPage) => {
 export const getAllActiveCustomers = async (currentPage, itemsPerPage) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get('http://localhost:8080/suraksha/employee/customers', {
+        const response = await axios.get('http://localhost:8080/suraksha/employee/active-customers', {
           params: { page: currentPage - 1, size: itemsPerPage },
           headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => {throw new AxiosError(error.response.data.message)});
@@ -73,7 +73,7 @@ export const getAllInactiveCustomers = async (currentPage, itemsPerPage) => {
 export const getCustomerById = async (id) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get(`http://localhost:8080/suraksha/customer/customer/${id}`, {
+        const response = await axios.get(`http://localhost:8080/suraksha/customer/${id}`, {
               headers: { 'Authorization': `Bearer ${token}` }
           }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
@@ -244,7 +244,7 @@ export const getAllInactiveEmployees = async (currentPage, itemsPerPage) => {
 export const getEmployeeById = async (id) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get(`http://localhost:8080/suraksha/employee/employee/profile/${id}`, {
+        const response = await axios.get(`http://localhost:8080/suraksha/employee/profile/${id}`, {
               headers: { 'Authorization': `Bearer ${token}` }
           }).catch((error) => {throw new AxiosError(error.response.data.message)});
 
@@ -397,7 +397,7 @@ export const getInsuranceCategoriesById = async (id) => {
 export const getAllPolicy = async (currentPage, itemsPerPage) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get('http://localhost:8080/suraksha/policy/policy', {
+        const response = await axios.get('http://localhost:8080/suraksha/policy', {
               params: { page: currentPage - 1, size: itemsPerPage },
               headers: { 'Authorization': `Bearer ${token}` }
           }).catch((error) => {throw new AxiosError(error.response.data.message)});
@@ -414,7 +414,7 @@ export const getAllPolicy = async (currentPage, itemsPerPage) => {
 export const getAllActivePolicy = async (currentPage, itemsPerPage) => {
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get('http://localhost:8080/suraksha/policy/policy/active', {
+        const response = await axios.get('http://localhost:8080/suraksha/policy/active', {
           params: { page: currentPage - 1, size: itemsPerPage },
           headers: { 'Authorization': `Bearer ${token}` }
         }).catch((error) => {throw new AxiosError(error.response.data.message)});
@@ -1431,7 +1431,7 @@ export const getAllTransactionsByDate = async (currentPage, itemsPerPage, startD
 export const downloadRequestsInCSV = async () => {  
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get(`http://localhost:8080/suraksha/download/withdrawal/download/csv`, {
+        const response = await axios.get(`http://localhost:8080/suraksha/download/admin/withdrawal/download/csv`, {
                 headers: { 
                     'Authorization': `Bearer ${token}`
                 },
@@ -1452,7 +1452,7 @@ export const downloadRequestsInCSV = async () => {
 export const downloadRequestsInPDF = async () => {  
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get(`http://localhost:8080/suraksha/download/withdrawal/download/pdf`, {
+        const response = await axios.get(`http://localhost:8080/suraksha/download/admin/withdrawal/download/pdf`, {
                 headers: { 
                     'Authorization': `Bearer ${token}`
                 },
@@ -1472,7 +1472,7 @@ export const downloadRequestsInPDF = async () => {
 export const downloadTransactionsInCSV = async () => {  
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get(`http://localhost:8080/suraksha/download/transaction/download/csv`, {
+        const response = await axios.get(`http://localhost:8080/suraksha/download/admin/transaction/download/csv`, {
                 headers: { 
                     'Authorization': `Bearer ${token}`
                 },
@@ -1493,7 +1493,7 @@ export const downloadTransactionsInCSV = async () => {
 export const downloadTransactionsByIdInPDF = async (id) => {  
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get(`http://localhost:8080/suraksha/download/transactions/policy-account/${id}/download/pdf`, {
+        const response = await axios.get(`http://localhost:8080/suraksha/download/admin/transactions/policy-account/${id}/download/pdf`, {
                 headers: { 
                     'Authorization': `Bearer ${token}`
                 },
@@ -1514,7 +1514,7 @@ export const downloadTransactionsByIdInPDF = async (id) => {
 export const downloadTransactionsInPDF = async () => {  
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get(`http://localhost:8080/suraksha/download/transaction/download/pdf`, {
+        const response = await axios.get(`http://localhost:8080/suraksha/download/admin/transaction/download/pdf`, {
                 headers: { 
                     'Authorization': `Bearer ${token}`
                 },
@@ -1534,7 +1534,7 @@ export const downloadTransactionsInPDF = async () => {
 export const downloadCustomersInCSV = async () => {  
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get(`http://localhost:8080/suraksha/download/customer/download/csv`, {
+        const response = await axios.get(`http://localhost:8080/suraksha/download/admin/customer/download/csv`, {
                 headers: { 
                     'Authorization': `Bearer ${token}`
                 },
@@ -1644,7 +1644,7 @@ export const approveDocument = async (id) => {
 export const downloadPolicyAccountInCSV = async () => {  
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get(`http://localhost:8080/suraksha/download/policy/accounts/download/csv`, {
+        const response = await axios.get(`http://localhost:8080/suraksha/download/admin/policy/accounts/download/csv`, {
                 headers: { 
                     'Authorization': `Bearer ${token}`
                 },
@@ -1721,7 +1721,7 @@ export const getAllPolicyAccount = async (currentPage, itemsPerPage) => {
 export const downloadAgentsInCSV = async () => {  
     const token = localStorage.getItem('auth');
     try {
-        const response = await axios.get(`http://localhost:8080/suraksha/download/customer/download/csv`, {
+        const response = await axios.get(`http://localhost:8080/suraksha/download/admin/agent/download/csv`, {
                 headers: { 
                     'Authorization': `Bearer ${token}`
                 },

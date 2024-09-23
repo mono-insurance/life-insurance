@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -24,6 +25,15 @@ public interface DocumentUploadedRepository extends JpaRepository<DocumentUpload
     @Modifying
     @Query("UPDATE DocumentUploaded d SET d.isApproved = true WHERE d.id = :documentId")
     int findByIdAndSetIsApprovedTrue(@Param("documentId") Long documentId);
+
+    Page<DocumentUploaded> findAllByIsApprovedFalse(Pageable pageable);
+
+    Page<DocumentUploaded> findAllByIsApprovedTrue(Pageable pageable);
+
+    DocumentUploaded findByCustomerAndDocumentType(Customer customer, DocumentType documentType);
+
+    DocumentUploaded findByAgentAndDocumentType(Agent agent, DocumentType documentType);
+
 
 	List<DocumentUploaded> findByCustomer(Customer customer);
 
